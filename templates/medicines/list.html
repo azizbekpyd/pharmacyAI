@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Medicines - Pharmacy Analytic AI{% endblock %}
+{% block page_title %}Medicines Management{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900">Medicines Management</h2>
+        <p class="text-sm text-gray-600 mt-1">Track catalog, pricing, stock levels, and expiry status</p>
+    </div>
+    <a href="{% url 'medicines-create' %}" class="inline-flex items-center bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm">
+        <i class="fas fa-plus mr-2"></i>Add Medicine
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <input type="text" id="search-input" placeholder="Search by name or SKU" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <select id="category-filter" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="">All Categories</option>
+        </select>
+        <select id="status-filter" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="">All Status</option>
+            <option value="expiring_soon">Expiring Soon</option>
+            <option value="expired">Expired</option>
+            <option value="low_stock">Low Stock</option>
+        </select>
+        <button onclick="loadMedicines()" class="inline-flex items-center justify-center bg-gray-900 text-white px-4 py-2.5 rounded-lg hover:bg-gray-800">
+            <i class="fas fa-filter mr-2"></i>Apply Filters
+        </button>
+    </div>
+</div>
+
+<!-- Medicines Table -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50/80">
+                <tr>
+                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Medicine</th>
+                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Category</th>
+                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
+                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
+                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Expiry</th>
+                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="medicines-table-body" class="bg-white divide-y divide-gray-200">
+                <tr>
+                    <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                        <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                        <p>Loading medicines...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="pagination" class="bg-gray-50 px-6 py-4 border-t border-gray-200"></div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPage = 1;
+let totalPages = 1;
+
+async function loadMedicines(page = 1) {
+    try {
+        const search = document.getElementById('search-input').value;
+        const category = document.getElementById('category-filter').value;
+        const status = document.getElementById('status-filter').value;
+        
+        let url = `/api/medicines/medicines/?page=${page}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (category) url += `&category=${category}`;
+        if (status) url += `&${status}=true`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        renderMedicines(data.results || []);
+        renderPagination(data);
+        
+        currentPage = page;
+        totalPages = Math.ceil((data.count || 0) / 20);
+    } catch (error) {
+        console.error('Error loading medicines:', error);
+    }
+}
+
+function renderMedicines(medicines) {
+    const tbody = document.getElementById('medicines-table-body');
+    
+    if (medicines.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">No medicines found</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = medicines.map(medicine => {
+        const expiryDate = medicine.expiry_date ? new Date(medicine.expiry_date).toLocaleDateString() : 'N/A';
+        const isExpiring = !!medicine.is_expiring_soon;
+        const isExpired = !!medicine.is_expired;
+        const isLowStock = !!medicine.is_low_stock;
+        const stock = medicine.current_stock || 0;
+        const stockBadge = isLowStock
+            ? '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">Low Stock</span>'
+            : '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">In Stock</span>';
+        const expiryClass = isExpired ? 'bg-red-100 text-red-700' : (isExpiring ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700');
+        const expiryLabel = isExpired ? 'Expired' : (isExpiring ? 'Expiring Soon' : 'Valid');
+        
+        return `
+            <tr class="hover:bg-gray-50/80 transition-colors">
+                <td class="px-6 py-4">
+                    <div class="text-sm font-semibold text-gray-900">${medicine.name}</div>
+                    <div class="text-xs text-gray-500 mt-1">SKU: ${medicine.sku}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-700">${medicine.category_name || 'Uncategorized'}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-semibold text-gray-900">${formatUZS(medicine.unit_price || 0)}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-gray-900">${stock}</span>
+                        ${stockBadge}
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-700">${expiryDate}</div>
+                    <span class="inline-flex mt-1 px-2.5 py-1 rounded-full text-xs font-medium ${expiryClass}">
+                        ${expiryLabel}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex items-center gap-3">
+                        <a href="/medicines/${medicine.id}/edit/" class="inline-flex items-center text-blue-600 hover:text-blue-800" title="Edit medicine">
+                            <i class="fas fa-pen"></i>
+                        </a>
+                        <form method="post" action="/medicines/${medicine.id}/delete/" class="inline" onsubmit="return confirm('Are you sure you want to delete this medicine?');">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            <button type="submit" class="inline-flex items-center text-red-600 hover:text-red-800" title="Delete medicine">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderPagination(data) {
+    const pagination = document.getElementById('pagination');
+    if (!data.next && !data.previous) {
+        pagination.innerHTML = '';
+        return;
+    }
+    
+    const current = currentPage;
+    const total = Math.ceil((data.count || 0) / 20);
+    
+    let html = '<div class="flex items-center justify-between">';
+    html += `<div class="text-sm text-gray-700">Showing ${((current - 1) * 20) + 1} to ${Math.min(current * 20, data.count)} of ${data.count} results</div>`;
+    html += '<div class="flex space-x-2">';
+    
+    if (data.previous) {
+        html += `<button onclick="loadMedicines(${current - 1})" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">Previous</button>`;
+    }
+    if (data.next) {
+        html += `<button onclick="loadMedicines(${current + 1})" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">Next</button>`;
+    }
+    
+    html += '</div></div>';
+    pagination.innerHTML = html;
+}
+
+function formatUZS(amount) {
+    return new Intl.NumberFormat('uz-UZ', {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(Number(amount || 0)) + ' UZS';
+}
+
+async function loadCategories() {
+    try {
+        const response = await fetch('/api/medicines/categories/');
+        const data = await response.json();
+        const select = document.getElementById('category-filter');
+        
+        data.results?.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading categories:', error);
+    }
+}
+
+// Event listeners
+document.getElementById('search-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') loadMedicines(1);
+});
+
+// Initialize
+loadCategories();
+loadMedicines(1);
+</script>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Reorder Recommendations - Pharmacy Analytic AI{% endblock %}
+{% block page_title %}Reorder Recommendations{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">Reorder Recommendations</h2>
+        <p class="text-gray-600 mt-1">Automatic reorder suggestions based on inventory levels</p>
+    </div>
+    <button onclick="generateRecommendations()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        <i class="fas fa-sync mr-2"></i>Generate Recommendations
+    </button>
+</div>
+
+<!-- Recommendations List -->
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Medicine</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Stock</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recommended Qty</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Priority</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="recommendations-table-body" class="bg-white divide-y divide-gray-200">
+                <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function loadRecommendations() {
+    try {
+        const response = await fetch('/api/inventory/reorder-recommendations/?status=PENDING');
+        const data = await response.json();
+        renderRecommendations(data.results || []);
+    } catch (error) {
+        console.error('Error loading recommendations:', error);
+    }
+}
+
+function renderRecommendations(recommendations) {
+    const tbody = document.getElementById('recommendations-table-body');
+    if (recommendations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No pending recommendations</td></tr>';
+        return;
+    }
+    
+    const priorityColors = {
+        'URGENT': 'bg-red-100 text-red-800',
+        'HIGH': 'bg-orange-100 text-orange-800',
+        'MEDIUM': 'bg-yellow-100 text-yellow-800',
+        'LOW': 'bg-blue-100 text-blue-800'
+    };
+    
+    tbody.innerHTML = recommendations.map(rec => `
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">${rec.medicine_name || 'N/A'}</div>
+                <div class="text-sm text-gray-500">${rec.medicine_sku || ''}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold">${rec.current_stock || 0}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">${rec.recommended_quantity || 0}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs rounded ${priorityColors[rec.priority] || 'bg-gray-100'}">${rec.priority_display || rec.priority}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">${rec.status_display || rec.status}</span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <button onclick="approveRecommendation(${rec.id})" class="text-green-600 hover:text-green-900 mr-3">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button onclick="rejectRecommendation(${rec.id})" class="text-red-600 hover:text-red-900">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+async function approveRecommendation(id) {
+    if (!confirm('Approve this reorder recommendation?')) return;
+    
+    try {
+        const response = await fetch(`/api/inventory/reorder-recommendations/${id}/approve/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        });
+        
+        if (response.ok) {
+            loadRecommendations();
+            alert('Recommendation approved and inventory updated!');
+        }
+    } catch (error) {
+        console.error('Error approving recommendation:', error);
+    }
+}
+
+async function rejectRecommendation(id) {
+    if (!confirm('Reject this reorder recommendation?')) return;
+    
+    try {
+        const response = await fetch(`/api/inventory/reorder-recommendations/${id}/reject/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        });
+        
+        if (response.ok) {
+            loadRecommendations();
+        }
+    } catch (error) {
+        console.error('Error rejecting recommendation:', error);
+    }
+}
+
+async function generateRecommendations() {
+    try {
+        const response = await fetch('/api/inventory/inventory/reorder_recommendations/');
+        const data = await response.json();
+        alert(`Generated ${data.count || 0} recommendations`);
+        loadRecommendations();
+    } catch (error) {
+        console.error('Error generating recommendations:', error);
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+loadRecommendations();
+</script>
+{% endblock %}

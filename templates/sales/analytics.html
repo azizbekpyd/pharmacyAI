@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Analytics - Pharmacy Analytic AI{% endblock %}
+{% block page_title %}Sales Analytics{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Sales Analytics</h2>
+    <p class="text-gray-600 mt-1">Comprehensive sales analysis and insights</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <p class="text-sm text-gray-600">Total Sales</p>
+        <p class="text-3xl font-bold text-gray-900 mt-2" id="total-sales">{{ total_sales|default:0 }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <p class="text-sm text-gray-600">Total Revenue</p>
+        <p class="text-3xl font-bold text-gray-900 mt-2" id="total-revenue">{{ total_revenue|floatformat:0|default:"0" }} UZS</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <p class="text-sm text-gray-600">Average Sale</p>
+        <p class="text-3xl font-bold text-gray-900 mt-2" id="avg-sale">{{ average_sale|floatformat:0|default:"0" }} UZS</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <p class="text-sm text-gray-600">Growth</p>
+        <p class="text-3xl font-bold mt-2 {% if growth_percentage >= 0 %}text-green-600{% else %}text-red-600{% endif %}" id="growth">
+            {% if growth_percentage != None %}{% if growth_percentage >= 0 %}+{% endif %}{{ growth_percentage|floatformat:1 }}%{% else %}N/A{% endif %}
+        </p>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold mb-4">Sales Trend</h3>
+        <canvas id="salesTrendChart" height="250"></canvas>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold mb-4">Category Distribution</h3>
+        <canvas id="categoryChart" height="250"></canvas>
+    </div>
+</div>
+
+<!-- Fast & Slow Moving -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold mb-4">Fast Moving Medicines</h3>
+        <div id="fast-moving-list">
+            {% if fast_moving_medicines %}
+                {% for item in fast_moving_medicines %}
+                <div class="flex justify-between p-3 mb-2 bg-orange-50 rounded">
+                    <div class="flex-1">
+                        <span class="font-medium">{{ item.medicine__name|default:"N/A" }}</span>
+                        <p class="text-sm text-gray-600">{{ item.total_quantity|default:0 }} units</p>
+                    </div>
+                    <span class="text-orange-600 font-semibold">{{ item.total_revenue|floatformat:0 }} UZS</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center text-gray-500 py-4">No fast moving medicines</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold mb-4">Slow Moving Medicines</h3>
+        <div id="slow-moving-list">
+            {% if slow_moving_medicines %}
+                {% for item in slow_moving_medicines %}
+                <div class="flex justify-between p-3 mb-2 bg-blue-50 rounded">
+                    <div class="flex-1">
+                        <span class="font-medium">{{ item.medicine_name|default:"N/A" }}</span>
+                        <p class="text-sm text-gray-600">{{ item.total_quantity|default:0 }} units</p>
+                    </div>
+                    <span class="text-blue-600">{{ item.total_revenue|floatformat:0 }} UZS</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center text-gray-500 py-4">No slow moving medicines</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Chart instances storage (to prevent multiple renders)
+let salesTrendChartInstance = null;
+let categoryChartInstance = null;
+
+// Use template data passed from backend (as separate labels and values arrays)
+const salesTrendLabels = {{ sales_trend_labels_json|safe }};
+const salesTrendSalesData = {{ sales_trend_sales_json|safe }};
+const salesTrendRevenueData = {{ sales_trend_revenue_json|safe }};
+
+const categoryLabels = {{ category_labels_json|safe }};
+const categoryRevenueData = {{ category_revenue_json|safe }};
+
+function loadAnalytics() {
+    // Render charts from template data (only once)
+    if (salesTrendLabels && salesTrendLabels.length > 0) {
+        renderSalesTrendChart(salesTrendLabels, salesTrendSalesData, salesTrendRevenueData);
+    }
+    
+    if (categoryLabels && categoryLabels.length > 0) {
+        renderCategoryChart(categoryLabels, categoryRevenueData);
+    }
+}
+
+function renderSalesTrendChart(labels, salesData, revenueData) {
+    // Destroy existing chart instance if it exists
+    if (salesTrendChartInstance) {
+        salesTrendChartInstance.destroy();
+        salesTrendChartInstance = null;
+    }
+    
+    const canvas = document.getElementById('salesTrendChart');
+    if (!canvas) {
+        console.error('Sales trend chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Parse JSON if strings
+    let parsedLabels = typeof labels === 'string' ? JSON.parse(labels) : labels;
+    let parsedSalesData = typeof salesData === 'string' ? JSON.parse(salesData) : salesData;
+    let parsedRevenueData = typeof revenueData === 'string' ? JSON.parse(revenueData) : revenueData;
+    
+    // Ensure all arrays have equal length
+    const minLength = Math.min(parsedLabels.length, parsedSalesData.length, parsedRevenueData.length);
+    parsedLabels = parsedLabels.slice(0, minLength);
+    parsedSalesData = parsedSalesData.slice(0, minLength);
+    parsedRevenueData = parsedRevenueData.slice(0, minLength);
+    
+    // Format dates for display
+    const formattedLabels = parsedLabels.map(label => {
+        try {
+            return new Date(label).toLocaleDateString();
+        } catch {
+            return label;
+        }
+    });
+    
+    // Create chart instance and store it
+    salesTrendChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: formattedLabels,
+            datasets: [{
+                label: 'Sales Count',
+                data: parsedSalesData,
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                yAxisID: 'y'
+            }, {
+                label: 'Revenue (UZS)',
+                data: parsedRevenueData,
+                borderColor: 'rgb(34, 197, 94)',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                tension: 0.4,
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    position: 'left'
+                },
+                y1: {
+                    beginAtZero: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderCategoryChart(labels, revenueData) {
+    // Destroy existing chart instance if it exists
+    if (categoryChartInstance) {
+        categoryChartInstance.destroy();
+        categoryChartInstance = null;
+    }
+    
+    const canvas = document.getElementById('categoryChart');
+    if (!canvas) {
+        console.error('Category chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Parse JSON if strings
+    let parsedLabels = typeof labels === 'string' ? JSON.parse(labels) : labels;
+    let parsedRevenueData = typeof revenueData === 'string' ? JSON.parse(revenueData) : revenueData;
+    
+    // Ensure arrays have equal length
+    const minLength = Math.min(parsedLabels.length, parsedRevenueData.length);
+    parsedLabels = parsedLabels.slice(0, minLength);
+    parsedRevenueData = parsedRevenueData.slice(0, minLength);
+    
+    // Create chart instance and store it
+    categoryChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: parsedLabels,
+            datasets: [{
+                data: parsedRevenueData,
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(34, 197, 94, 0.8)',
+                    'rgba(251, 146, 60, 0.8)',
+                    'rgba(168, 85, 247, 0.8)',
+                    'rgba(236, 72, 153, 0.8)',
+                    'rgba(20, 184, 166, 0.8)',
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed.toLocaleString('uz-UZ') + ' UZS';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function formatCurrency(amount) {
+    // Format as Uzbek Som (UZS) - no currency symbol, just number with spaces
+    return new Intl.NumberFormat('uz-UZ', { 
+        style: 'decimal',
+        maximumFractionDigits: 0
+    }).format(amount) + ' UZS';
+}
+
+// Initialize charts only once when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadAnalytics);
+} else {
+    loadAnalytics();
+}
+</script>
+{% endblock %}

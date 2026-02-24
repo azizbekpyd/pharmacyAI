@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Pharmacy Analytic AI{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Total Sales</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-sales">-</p>
+                <p class="text-sm text-green-600 mt-2" id="sales-growth">
+                    <i class="fas fa-arrow-up"></i> <span>-</span>%
+                </p>
+            </div>
+            <div class="bg-blue-100 rounded-full p-4">
+                <i class="fas fa-shopping-cart text-2xl text-blue-600"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-revenue">-</p>
+                <p class="text-sm text-green-600 mt-2" id="revenue-growth">
+                    <i class="fas fa-arrow-up"></i> <span>-</span>%
+                </p>
+            </div>
+            <div class="bg-green-100 rounded-full p-4">
+                <i class="fas fa-money-bill-wave text-2xl text-green-600"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Medicines</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-medicines">-</p>
+                <p class="text-sm text-orange-600 mt-2">
+                    <i class="fas fa-exclamation-triangle"></i> <span id="expiring-count">-</span> expiring soon
+                </p>
+            </div>
+            <div class="bg-purple-100 rounded-full p-4">
+                <i class="fas fa-pills text-2xl text-purple-600"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-600">Low Stock</p>
+                <p class="text-3xl font-bold text-gray-900 mt-2" id="low-stock-count">-</p>
+                <p class="text-sm text-red-600 mt-2">
+                    <i class="fas fa-boxes"></i> Needs reorder
+                </p>
+            </div>
+            <div class="bg-red-100 rounded-full p-4">
+                <i class="fas fa-exclamation-circle text-2xl text-red-600"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Sales Trend Chart -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            <i class="fas fa-chart-line text-blue-500 mr-2"></i>
+            Sales Trend (Last 7 Days)
+        </h3>
+        <canvas id="salesTrendChart" height="250"></canvas>
+    </div>
+    
+    <!-- Category Distribution -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            <i class="fas fa-chart-pie text-green-500 mr-2"></i>
+            Sales by Category
+        </h3>
+        <canvas id="categoryChart" height="250"></canvas>
+    </div>
+</div>
+
+<!-- Fast Moving & Slow Moving Medicines -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Fast Moving Medicines -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-fire text-orange-500 mr-2"></i>
+                Fast Moving Medicines
+            </h3>
+            <a href="{% url 'sales-analytics' %}" class="text-sm text-blue-600 hover:text-blue-800">
+                View All <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+        <div id="fast-moving-list" class="space-y-3">
+            <div class="text-center text-gray-500 py-8">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Slow Moving Medicines -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-snowflake text-blue-500 mr-2"></i>
+                Slow Moving Medicines
+            </h3>
+            <a href="{% url 'sales-analytics' %}" class="text-sm text-blue-600 hover:text-blue-800">
+                View All <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+        <div id="slow-moving-list" class="space-y-3">
+            <div class="text-center text-gray-500 py-8">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Sales & Alerts -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Recent Sales -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-clock text-indigo-500 mr-2"></i>
+                Recent Sales
+            </h3>
+            <a href="{% url 'sales-list' %}" class="text-sm text-blue-600 hover:text-blue-800">
+                View All <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+        <div id="recent-sales-list" class="space-y-3">
+            <div class="text-center text-gray-500 py-8">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alerts -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-bell text-yellow-500 mr-2"></i>
+                Alerts & Notifications
+            </h3>
+            <a href="{% url 'inventory-reorder-recommendations' %}" class="text-sm text-blue-600 hover:text-blue-800">
+                View All <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+        <div id="alerts-list" class="space-y-3">
+            <div class="text-center text-gray-500 py-8">
+                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Chart instances (render once)
+let salesTrendChartInstance = null;
+let categoryChartInstance = null;
+
+// Fallback for environments where Decimal might be referenced by libs/plugins
+const Decimal = Number;
+
+// Data from backend context (JSON-safe)
+const DASHBOARD = {
+  totalSales: {{ total_sales|default:0 }},
+  totalRevenueUZS: {{ total_revenue_uzs|default:0|floatformat:0 }},
+  salesGrowthPct: {{ sales_growth_pct|default:"null" }},
+  revenueGrowthPct: {{ revenue_growth_pct|default:"null" }},
+  medicinesCount: {{ medicines_count|default:0 }},
+  expiringSoonCount: {{ expiring_soon_count|default:0 }},
+  lowStockCount: {{ low_stock_count|default:0 }},
+  trendLabels: {{ trend_labels_json|safe }},
+  trendSales: {{ trend_sales_json|safe }},
+  trendRevenue: {{ trend_revenue_json|safe }},
+  categoryLabels: {{ category_labels_json|safe }},
+  categoryRevenue: {{ category_revenue_json|safe }},
+  fastMoving: {{ fast_moving_json|safe }},
+  slowMoving: {{ slow_moving_json|safe }},
+  recentSales: {{ recent_sales_json|safe }},
+  alerts: {{ alerts_json|safe }},
+};
+
+function loadDashboardData() {
+  // Stats
+  document.getElementById('total-sales').textContent = DASHBOARD.totalSales || 0;
+  document.getElementById('total-revenue').textContent = formatUZS(DASHBOARD.totalRevenueUZS || 0);
+  document.getElementById('total-medicines').textContent = DASHBOARD.medicinesCount || 0;
+  document.getElementById('expiring-count').textContent = DASHBOARD.expiringSoonCount || 0;
+  document.getElementById('low-stock-count').textContent = DASHBOARD.lowStockCount || 0;
+
+  // Growth labels
+  applyGrowth('sales-growth', DASHBOARD.salesGrowthPct);
+  applyGrowth('revenue-growth', DASHBOARD.revenueGrowthPct);
+
+  // Lists
+  renderFastMoving(DASHBOARD.fastMoving || []);
+  renderSlowMoving(DASHBOARD.slowMoving || []);
+  renderRecentSales(DASHBOARD.recentSales || []);
+  renderAlerts(DASHBOARD.alerts || []);
+
+  // Charts
+  renderSalesTrendChart(DASHBOARD.trendLabels || [], DASHBOARD.trendSales || [], DASHBOARD.trendRevenue || []);
+  renderCategoryChart(DASHBOARD.categoryLabels || [], DASHBOARD.categoryRevenue || []);
+}
+
+function applyGrowth(elementId, value) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  if (value === null || value === undefined) {
+    el.querySelector('span').textContent = '0.0';
+    return;
+  }
+  const num = Number(value);
+  el.querySelector('span').textContent = Math.abs(num).toFixed(1);
+  el.className = num >= 0 ? 'text-sm text-green-600 mt-2' : 'text-sm text-red-600 mt-2';
+  el.querySelector('i').className = num >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
+}
+
+// Render functions
+function renderFastMoving(data) {
+    const container = document.getElementById('fast-moving-list');
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-4">No fast moving medicines</p>';
+        return;
+    }
+    
+    container.innerHTML = data.map(item => `
+        <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+            <div class="flex-1">
+                <p class="font-medium text-gray-900">${item.medicine__name || 'N/A'}</p>
+                <p class="text-sm text-gray-600">${item.total_quantity || 0} units sold</p>
+            </div>
+            <div class="text-right">
+                <p class="font-semibold text-orange-600">${formatUZS(item.total_revenue_uzs || 0)}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderSlowMoving(data) {
+    const container = document.getElementById('slow-moving-list');
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-4">No slow moving medicines</p>';
+        return;
+    }
+    
+    container.innerHTML = data.map(item => `
+        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+            <div class="flex-1">
+                <p class="font-medium text-gray-900">${item.medicine_name || 'N/A'}</p>
+                <p class="text-sm text-gray-600">${item.total_quantity || 0} units sold</p>
+            </div>
+            <div class="text-right">
+                <span class="px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded">Low</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderRecentSales(sales) {
+    const container = document.getElementById('recent-sales-list');
+    if (!sales || sales.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-4">No recent sales</p>';
+        return;
+    }
+    
+    container.innerHTML = sales.map(sale => {
+        const date = new Date(sale.date);
+        return `
+            <div class="flex items-center justify-between p-3 border-b border-gray-100">
+                <div class="flex-1">
+                    <p class="font-medium text-gray-900">Sale #${sale.id}</p>
+                    <p class="text-sm text-gray-600">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-gray-900">${formatUZS(sale.total_amount_uzs || 0)}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderAlerts(recommendations) {
+    const container = document.getElementById('alerts-list');
+    if (!recommendations || recommendations.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-4">No alerts</p>';
+        return;
+    }
+    
+    container.innerHTML = recommendations.slice(0, 5).map(rec => {
+        const priorityColors = {
+            'URGENT': 'bg-red-100 text-red-800',
+            'HIGH': 'bg-orange-100 text-orange-800',
+            'MEDIUM': 'bg-yellow-100 text-yellow-800',
+            'LOW': 'bg-blue-100 text-blue-800'
+        };
+        return `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex-1">
+                    <p class="font-medium text-gray-900">${rec.medicine_name || 'N/A'}</p>
+                    <p class="text-sm text-gray-600">Reorder ${rec.recommended_quantity} units</p>
+                </div>
+                <span class="px-2 py-1 ${priorityColors[rec.priority] || 'bg-gray-100 text-gray-800'} text-xs rounded">
+                    ${rec.priority}
+                </span>
+            </div>
+        `;
+    }).join('');
+}
+
+// Chart rendering
+function renderSalesTrendChart(data) {
+    // Backwards compatible: accept either array-of-objects or arrays
+    let labels = [];
+    let salesData = [];
+    let revenueData = [];
+
+    if (Array.isArray(data) && data.length && typeof data[0] === 'object') {
+      labels = data.map(item => item.day);
+      salesData = data.map(item => Number(item.total_sales || 0));
+      revenueData = data.map(item => Number(item.total_amount || 0));
+    } else {
+      // new signature renderSalesTrendChart(labels, sales, revenue)
+      labels = (arguments[0] || []).map(x => x);
+      salesData = (arguments[1] || []).map(x => Number(x || 0));
+      revenueData = (arguments[2] || []).map(x => Number(x || 0));
+    }
+
+    // Destroy existing instance
+    if (salesTrendChartInstance) {
+      salesTrendChartInstance.destroy();
+      salesTrendChartInstance = null;
+    }
+
+    const canvas = document.getElementById('salesTrendChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const minLen = Math.min(labels.length, salesData.length, revenueData.length);
+    labels = labels.slice(0, minLen).map(d => {
+      try { return new Date(d).toLocaleDateString(); } catch { return d; }
+    });
+    salesData = salesData.slice(0, minLen).map(Number);
+    revenueData = revenueData.slice(0, minLen).map(Number);
+
+    salesTrendChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Sales Count',
+          data: salesData,
+          borderColor: 'rgb(59, 130, 246)',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          tension: 0.4,
+          yAxisID: 'y'
+        }, {
+          label: 'Revenue (UZS)',
+          data: revenueData,
+          borderColor: 'rgb(34, 197, 94)',
+          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+          tension: 0.4,
+          yAxisID: 'y1'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 2,
+        scales: {
+          y: { beginAtZero: true, position: 'left' },
+          y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } }
+        }
+      }
+    });
+}
+
+function renderCategoryChart(data) {
+    let labels = [];
+    let revenueData = [];
+    if (Array.isArray(data) && data.length && typeof data[0] === 'object') {
+      labels = data.map(item => item.medicine__category__name || 'Uncategorized');
+      revenueData = data.map(item => Number(item.total_revenue || 0));
+    } else {
+      labels = (arguments[0] || []).map(x => x);
+      revenueData = (arguments[1] || []).map(x => Number(x || 0));
+    }
+
+    if (categoryChartInstance) {
+      categoryChartInstance.destroy();
+      categoryChartInstance = null;
+    }
+
+    const canvas = document.getElementById('categoryChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const minLen = Math.min(labels.length, revenueData.length);
+    labels = labels.slice(0, minLen);
+    revenueData = revenueData.slice(0, minLen).map(Number);
+
+    categoryChartInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: revenueData,
+          backgroundColor: [
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(34, 197, 94, 0.8)',
+            'rgba(251, 146, 60, 0.8)',
+            'rgba(168, 85, 247, 0.8)',
+            'rgba(236, 72, 153, 0.8)',
+            'rgba(20, 184, 166, 0.8)',
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 2,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ' + Number(context.parsed).toLocaleString('uz-UZ') + ' UZS';
+              }
+            }
+          }
+        }
+      }
+    });
+}
+
+// Utility function
+function formatUZS(amount) {
+  return new Intl.NumberFormat('uz-UZ', { style: 'decimal', maximumFractionDigits: 0 }).format(amount) + ' UZS';
+}
+
+// Initialize dashboard once
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadDashboardData);
+} else {
+  loadDashboardData();
+}
+</script>
+{% endblock %}

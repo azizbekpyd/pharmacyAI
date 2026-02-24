@@ -1,0 +1,4 @@
+from .compat import patch_django42_basecontext_copy_for_py314
+
+
+patch_django42_basecontext_copy_for_py314()
