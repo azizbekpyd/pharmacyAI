@@ -4,18 +4,22 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from apps.inventory.models import Inventory
+from apps.tenants.services import SubscriptionService
 
 from .models import Medicine
 
 
 class MedicineService:
     @staticmethod
-    def create_medicine_with_inventory(*, pharmacy, medicine_data, initial_stock=0):
+    def create_medicine_with_inventory(*, pharmacy, medicine_data, initial_stock=0, enforce_limits=True):
         """
         Create medicine and one-to-one inventory atomically for a tenant.
         """
         if pharmacy is None:
             raise ValidationError({"pharmacy": "Pharmacy is required."})
+
+        if enforce_limits:
+            SubscriptionService.enforce_limits(pharmacy, SubscriptionService.RESOURCE_MEDICINES)
 
         try:
             initial_stock = int(initial_stock or 0)
@@ -41,17 +45,12 @@ class MedicineService:
                 pharmacy=pharmacy,
                 **medicine_data,
             )
-            inventory, created = Inventory.objects.get_or_create(
+            Inventory.objects.update_or_create(
                 medicine=medicine,
                 defaults={
                     "pharmacy": pharmacy,
                     "current_stock": initial_stock,
                 },
             )
-            if not created:
-                inventory.pharmacy = pharmacy
-                inventory.current_stock = initial_stock
-                inventory.save(update_fields=["pharmacy", "current_stock", "updated_at"])
 
         return medicine
-

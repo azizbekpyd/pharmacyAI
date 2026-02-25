@@ -7,9 +7,9 @@ from datetime import datetime
 
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.accounts.permissions import SaleRolePermission
 from apps.tenants.mixins import TenantScopedQuerysetMixin
 from apps.tenants.models import Pharmacy
 from apps.tenants.utils import require_user_pharmacy
@@ -20,7 +20,7 @@ from .services import DemandForecastingService, SalesAnalyticsService
 
 class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     queryset = Sale.objects.select_related("user", "pharmacy").prefetch_related("items__medicine").all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [SaleRolePermission]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["notes", "user__username"]
     ordering_fields = ["date", "total_amount", "created_at"]
@@ -32,6 +32,12 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
         if self.action == "list":
             return SaleListSerializer
         return SaleSerializer
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        if response.status_code == status.HTTP_201_CREATED and isinstance(response.data, dict):
+            response.data["message"] = "Sale created successfully"
+        return response
 
     def _resolve_action_pharmacy(self):
         user = self.request.user
@@ -186,4 +192,3 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
         days = int(request.query_params.get("days", 90))
         slow_moving = SalesAnalyticsService.get_slow_moving_medicines(days=days, pharmacy=pharmacy)
         return Response(slow_moving, status=status.HTTP_200_OK)
-

@@ -79,6 +79,8 @@ class MedicineSerializer(serializers.ModelSerializer):
         Create medicine and initialize inventory atomically.
         """
         initial_stock = validated_data.pop("initial_stock", 0)
+        request = self.context.get("request")
+        skip_limits = bool(request and request.user and request.user.is_authenticated and request.user.is_superuser)
         pharmacy = validated_data.pop("pharmacy", None)
         if pharmacy is None:
             pharmacy_id = validated_data.pop("pharmacy_id", None)
@@ -91,6 +93,7 @@ class MedicineSerializer(serializers.ModelSerializer):
                 pharmacy=pharmacy,
                 medicine_data=validated_data,
                 initial_stock=initial_stock,
+                enforce_limits=not skip_limits,
             )
         except DjangoValidationError as exc:
             if hasattr(exc, "message_dict"):

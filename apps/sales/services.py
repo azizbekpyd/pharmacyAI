@@ -6,8 +6,9 @@ from datetime import timedelta
 from django.db.models import Avg, Count, Max, Min, Q, Sum
 from django.utils import timezone
 
-from .models import Sale, SaleItem
+from apps.inventory.services import InventoryOptimizationService
 from apps.medicines.models import Medicine
+from .models import Sale, SaleItem
 
 
 class SalesAnalyticsService:
@@ -69,6 +70,11 @@ class SalesAnalyticsService:
             previous_end=previous_period_end,
             pharmacy=pharmacy,
         )
+        forecast_accuracy = SalesAnalyticsService.get_forecast_accuracy_comparison(
+            pharmacy=pharmacy,
+            days=30,
+            limit=10,
+        )
 
         return {
             "period": {
@@ -91,6 +97,7 @@ class SalesAnalyticsService:
             "category_analytics": category_analytics,
             "peak_hours": peak_hours,
             "growth_metrics": growth_metrics,
+            "forecast_accuracy": forecast_accuracy,
         }
 
     @staticmethod
@@ -308,183 +315,177 @@ class SalesAnalyticsService:
             },
         }
 
-
-class DemandForecastingService:
     @staticmethod
-    def get_forecast(days=30, medicine_id=None, method="sma", pharmacy=None):
-        if medicine_id:
-            medicines = SalesAnalyticsService._scope_medicines(pharmacy).filter(id=medicine_id)
-        else:
-            medicines = SalesAnalyticsService._scope_medicines(pharmacy)
+    def get_forecast_accuracy_comparison(pharmacy=None, days=30, limit=10, alpha=0.3):
+        """
+        Compare forecast models (moving average vs exponential smoothing) for top medicines.
+        """
+        start_date = timezone.now() - timedelta(days=days)
+        medicine_ids = list(
+            SalesAnalyticsService._scope_sale_items(pharmacy)
+            .filter(sale__date__gte=start_date)
+            .values("medicine_id")
+            .annotate(total_qty=Sum("quantity"))
+            .order_by("-total_qty")
+            .values_list("medicine_id", flat=True)[:limit]
+        )
+        if not medicine_ids:
+            medicine_ids = list(
+                SalesAnalyticsService._scope_medicines(pharmacy).order_by("name").values_list("id", flat=True)[:limit]
+            )
 
-        forecasts = []
+        medicines = SalesAnalyticsService._scope_medicines(pharmacy).filter(id__in=medicine_ids)
+        results = []
         for medicine in medicines:
-            if method == "sma":
-                forecast_data = DemandForecastingService._simple_moving_average(medicine, days, pharmacy=pharmacy)
-            elif method == "exponential":
-                forecast_data = DemandForecastingService._exponential_smoothing(medicine, days, pharmacy=pharmacy)
-            elif method == "trend":
-                forecast_data = DemandForecastingService._trend_analysis(medicine, days, pharmacy=pharmacy)
-            elif method == "weighted":
-                forecast_data = DemandForecastingService._weighted_moving_average(medicine, days, pharmacy=pharmacy)
-            else:
-                forecast_data = DemandForecastingService._simple_moving_average(medicine, days, pharmacy=pharmacy)
-
-            forecasts.append(
+            comparison = InventoryOptimizationService.compare_forecasts(
+                medicine=medicine,
+                pharmacy=medicine.pharmacy if pharmacy is None else pharmacy,
+                forecast_days=days,
+                alpha=alpha,
+            )
+            selected = comparison["selected_forecast"]
+            results.append(
                 {
                     "medicine_id": medicine.id,
                     "medicine_name": medicine.name,
                     "medicine_sku": medicine.sku,
-                    "method": method,
-                    **forecast_data,
+                    "selected_method": comparison["selected_method"],
+                    "mape": selected["accuracy"].get("mape"),
+                    "mae": selected["accuracy"].get("mae"),
+                    "rmse": selected["accuracy"].get("rmse"),
+                    "forecasted_daily_demand": selected.get("forecasted_daily_demand"),
+                    "forecasted_quantity": selected.get("forecasted_quantity"),
                 }
             )
 
-        return {"forecast_period_days": days, "method": method, "forecasts": forecasts}
+        avg_mape_values = [row["mape"] for row in results if row["mape"] is not None]
+        avg_mape = (sum(avg_mape_values) / len(avg_mape_values)) if avg_mape_values else None
+        return {"count": len(results), "average_mape": avg_mape, "results": results}
+
+
+class DemandForecastingService:
+    """
+    Forecasting facade backed by InventoryOptimizationService.
+    """
+
+    METHOD_ALIASES = {
+        "sma": "moving_average",
+        "moving_average": "moving_average",
+        "weighted": "moving_average",
+        "trend": "moving_average",
+        "exponential": "exponential_smoothing",
+        "exponential_smoothing": "exponential_smoothing",
+    }
 
     @staticmethod
-    def _simple_moving_average(medicine, forecast_days, pharmacy=None):
-        lookback_days = 60
-        start_date = timezone.now() - timedelta(days=lookback_days)
-        sale_items = SalesAnalyticsService._scope_sale_items(pharmacy).filter(medicine=medicine, sale__date__gte=start_date)
-        total_quantity = sale_items.aggregate(Sum("quantity"))["quantity__sum"] or 0
-        avg_daily_sales = total_quantity / lookback_days if lookback_days > 0 else 0
-        forecasted_quantity = avg_daily_sales * forecast_days
+    def _normalize_method(method):
+        return DemandForecastingService.METHOD_ALIASES.get((method or "").lower(), "moving_average")
+
+    @staticmethod
+    def _format_result(medicine, method, result):
+        historical = result.get("historical", {})
         return {
+            "medicine_id": medicine.id,
+            "medicine_name": medicine.name,
+            "medicine_sku": medicine.sku,
+            "method": method,
             "historical_data": {
-                "lookback_days": lookback_days,
-                "total_quantity_sold": total_quantity,
-                "average_daily_sales": round(avg_daily_sales, 2),
+                "lookback_days": len(historical.get("series", [])),
+                "average_daily_sales": round(float(result.get("daily_average_demand") or 0.0), 4),
+                "moving_average_7_day": round(float(result.get("moving_average_7_day") or 0.0), 4)
+                if method == "moving_average"
+                else None,
+                "moving_average_30_day": round(float(result.get("moving_average_30_day") or 0.0), 4)
+                if method == "moving_average"
+                else None,
+                "smoothing_factor": result.get("alpha") if method == "exponential_smoothing" else None,
             },
-            "forecast": {"forecast_days": forecast_days, "forecasted_quantity": round(forecasted_quantity, 2)},
+            "forecast": {
+                "forecast_days": result.get("forecast_horizon_days"),
+                "forecasted_daily_demand": round(float(result.get("forecasted_daily_demand") or 0.0), 4),
+                "forecasted_quantity": round(float(result.get("forecasted_quantity") or 0.0), 4),
+            },
+            "accuracy": {
+                "mape": result.get("accuracy", {}).get("mape"),
+                "mae": result.get("accuracy", {}).get("mae"),
+                "rmse": result.get("accuracy", {}).get("rmse"),
+            },
         }
 
     @staticmethod
-    def _exponential_smoothing(medicine, forecast_days, alpha=0.3, pharmacy=None):
-        lookback_days = 60
-        start_date = timezone.now() - timedelta(days=lookback_days)
-        daily_sales = (
-            SalesAnalyticsService._scope_sale_items(pharmacy)
-            .filter(medicine=medicine, sale__date__gte=start_date)
-            .extra(select={"day": "date(sale__date)"})
-            .values("day")
-            .annotate(daily_quantity=Sum("quantity"))
-            .order_by("day")
+    def get_forecast(days=30, medicine_id=None, method="sma", pharmacy=None, alpha=0.3):
+        normalized = DemandForecastingService._normalize_method(method)
+        medicines = (
+            SalesAnalyticsService._scope_medicines(pharmacy).filter(id=medicine_id)
+            if medicine_id
+            else SalesAnalyticsService._scope_medicines(pharmacy)
         )
-        if not daily_sales:
-            return DemandForecastingService._simple_moving_average(medicine, forecast_days, pharmacy=pharmacy)
 
-        daily_quantities = [item["daily_quantity"] for item in daily_sales]
-        smoothed = [daily_quantities[0]]
-        for i in range(1, len(daily_quantities)):
-            smoothed_value = alpha * daily_quantities[i] + (1 - alpha) * smoothed[i - 1]
-            smoothed.append(smoothed_value)
+        forecasts = []
+        forecasts_by_medicine = {}
+        for medicine in medicines:
+            scoped_pharmacy = medicine.pharmacy if pharmacy is None else pharmacy
+            if normalized == "exponential_smoothing":
+                raw = InventoryOptimizationService.exponential_smoothing(
+                    medicine=medicine,
+                    pharmacy=scoped_pharmacy,
+                    forecast_days=days,
+                    alpha=alpha,
+                )
+            else:
+                raw = InventoryOptimizationService.moving_average_forecast(
+                    medicine=medicine,
+                    pharmacy=scoped_pharmacy,
+                    forecast_days=days,
+                )
 
-        avg_daily_sales = smoothed[-1] if smoothed else 0
-        forecasted_quantity = avg_daily_sales * forecast_days
-        total_quantity = sum(daily_quantities)
+            formatted = DemandForecastingService._format_result(
+                medicine=medicine,
+                method=normalized,
+                result=raw,
+            )
+            forecasts.append(formatted)
+            forecasts_by_medicine[str(medicine.id)] = formatted
+
         return {
-            "historical_data": {
-                "lookback_days": lookback_days,
-                "total_quantity_sold": total_quantity,
-                "average_daily_sales": round(avg_daily_sales, 2),
-                "smoothing_factor": alpha,
-            },
-            "forecast": {"forecast_days": forecast_days, "forecasted_quantity": round(forecasted_quantity, 2)},
+            "forecast_period_days": days,
+            "method": normalized,
+            "forecasts": forecasts,
+            "forecasts_by_medicine": forecasts_by_medicine,
         }
 
     @staticmethod
-    def _trend_analysis(medicine, forecast_days, pharmacy=None):
-        lookback_days = 60
-        start_date = timezone.now() - timedelta(days=lookback_days)
-        weekly_sales = (
-            SalesAnalyticsService._scope_sale_items(pharmacy)
-            .filter(medicine=medicine, sale__date__gte=start_date)
-            .extra(select={"week": "strftime('%%Y-%%W', sale__date)"})
-            .values("week")
-            .annotate(weekly_quantity=Sum("quantity"))
-            .order_by("week")
-        )
-        if len(weekly_sales) < 2:
-            return DemandForecastingService._simple_moving_average(medicine, forecast_days, pharmacy=pharmacy)
-
-        weeks = list(range(len(weekly_sales)))
-        quantities = [item["weekly_quantity"] for item in weekly_sales]
-        n = len(weeks)
-        sum_x = sum(weeks)
-        sum_y = sum(quantities)
-        sum_xy = sum(x * y for x, y in zip(weeks, quantities))
-        sum_x2 = sum(x * x for x in weeks)
-        denominator = n * sum_x2 - sum_x * sum_x
-        slope = (n * sum_xy - sum_x * sum_y) / denominator if denominator != 0 else 0
-        intercept = (sum_y - slope * sum_x) / n if n > 0 else 0
-
-        future_weeks = forecast_days / 7
-        forecasted_quantity = max(0, intercept + slope * (len(weeks) + future_weeks))
-        total_quantity = sum(quantities)
-        avg_weekly_sales = total_quantity / len(weekly_sales) if len(weekly_sales) > 0 else 0
-        avg_daily_sales = avg_weekly_sales / 7
-
-        return {
-            "historical_data": {
-                "lookback_days": lookback_days,
-                "total_quantity_sold": total_quantity,
-                "average_daily_sales": round(avg_daily_sales, 2),
-                "trend_slope": round(slope, 2),
-            },
-            "forecast": {"forecast_days": forecast_days, "forecasted_quantity": round(forecasted_quantity, 2)},
-        }
-
-    @staticmethod
-    def _weighted_moving_average(medicine, forecast_days, pharmacy=None):
-        lookback_days = 60
-        start_date = timezone.now() - timedelta(days=lookback_days)
-        weekly_sales = (
-            SalesAnalyticsService._scope_sale_items(pharmacy)
-            .filter(medicine=medicine, sale__date__gte=start_date)
-            .extra(select={"week": "strftime('%%Y-%%W', sale__date)"})
-            .values("week")
-            .annotate(weekly_quantity=Sum("quantity"))
-            .order_by("week")
-        )
-        if not weekly_sales:
-            return DemandForecastingService._simple_moving_average(medicine, forecast_days, pharmacy=pharmacy)
-
-        quantities = [item["weekly_quantity"] for item in weekly_sales]
-        n = len(quantities)
-        weights = list(range(1, n + 1))
-        total_weight = sum(weights)
-        weighted_avg = sum(q * w for q, w in zip(quantities, weights)) / total_weight if total_weight > 0 else 0
-        avg_daily_sales = weighted_avg / 7
-        forecasted_quantity = avg_daily_sales * forecast_days
-        total_quantity = sum(quantities)
-
-        return {
-            "historical_data": {
-                "lookback_days": lookback_days,
-                "total_quantity_sold": total_quantity,
-                "average_daily_sales": round(avg_daily_sales, 2),
-                "weeks_analyzed": n,
-            },
-            "forecast": {"forecast_days": forecast_days, "forecasted_quantity": round(forecasted_quantity, 2)},
-        }
-
-    @staticmethod
-    def get_forecast_comparison(medicine_id, days=30, pharmacy=None):
-        methods = ["sma", "exponential", "trend", "weighted"]
-        comparison = {"medicine_id": medicine_id, "forecast_days": days, "methods": {}}
+    def get_forecast_comparison(medicine_id, days=30, pharmacy=None, alpha=0.3):
         try:
-            SalesAnalyticsService._scope_medicines(pharmacy).get(id=medicine_id)
+            medicine = SalesAnalyticsService._scope_medicines(pharmacy).get(id=medicine_id)
         except Medicine.DoesNotExist:
             return None
 
-        for method in methods:
-            forecast_data = DemandForecastingService.get_forecast(
-                days=days,
-                medicine_id=medicine_id,
-                method=method,
-                pharmacy=pharmacy,
-            )
-            if forecast_data["forecasts"]:
-                comparison["methods"][method] = forecast_data["forecasts"][0]
-        return comparison
+        scoped_pharmacy = medicine.pharmacy if pharmacy is None else pharmacy
+        comparison = InventoryOptimizationService.compare_forecasts(
+            medicine=medicine,
+            pharmacy=scoped_pharmacy,
+            forecast_days=days,
+            alpha=alpha,
+        )
+
+        moving = DemandForecastingService._format_result(
+            medicine=medicine,
+            method="moving_average",
+            result=comparison["methods"]["moving_average"],
+        )
+        exponential = DemandForecastingService._format_result(
+            medicine=medicine,
+            method="exponential_smoothing",
+            result=comparison["methods"]["exponential_smoothing"],
+        )
+
+        return {
+            "medicine_id": medicine.id,
+            "forecast_days": days,
+            "selected_method": comparison["selected_method"],
+            "methods": {
+                "moving_average": moving,
+                "exponential_smoothing": exponential,
+            },
+        }

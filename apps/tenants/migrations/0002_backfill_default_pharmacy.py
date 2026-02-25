@@ -17,14 +17,12 @@ def backfill_default_pharmacy(apps, schema_editor):
     if owner is None:
         owner = User.objects.order_by("id").first()
     if owner is None:
-        owner = User.objects.create_user(
+        owner = User.objects.create(
             username="system_owner",
             email="system-owner@example.com",
-            password=None,
+            password="!",
             is_active=True,
         )
-        owner.set_unusable_password()
-        owner.save(update_fields=["password"])
 
     default_pharmacy, _ = Pharmacy.objects.get_or_create(
         name="Default Pharmacy",
@@ -74,4 +72,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(backfill_default_pharmacy, reverse_code=noop_reverse),
     ]
-

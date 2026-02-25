@@ -4,9 +4,11 @@ Serializers for POS integration app.
 Handles serialization of POS data for ingestion.
 """
 from rest_framework import serializers
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 from apps.sales.models import Sale, SaleItem
 from apps.medicines.models import Medicine
+from apps.tenants.services import SubscriptionService
 from apps.tenants.utils import require_user_pharmacy
 
 
@@ -74,6 +76,14 @@ class POSSaleSerializer(serializers.Serializer):
                 pharmacy = require_user_pharmacy(user)
             elif user and user.is_authenticated and user.is_superuser:
                 raise serializers.ValidationError({"pharmacy": "Superuser must provide pharmacy context."})
+
+        if not (user and user.is_authenticated and user.is_superuser):
+            try:
+                SubscriptionService.enforce_limits(pharmacy, SubscriptionService.RESOURCE_MONTHLY_SALES)
+            except DjangoValidationError as exc:
+                if hasattr(exc, "message_dict"):
+                    raise serializers.ValidationError(exc.message_dict)
+                raise serializers.ValidationError({"subscription": exc.messages})
 
         # Create sale
         sale = Sale.objects.create(

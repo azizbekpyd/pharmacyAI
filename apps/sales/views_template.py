@@ -5,6 +5,7 @@ import json
 from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.db.models import Count, Q, Sum
 from django.shortcuts import render
 from django.utils import timezone
@@ -22,6 +23,8 @@ def _scope_queryset(queryset, pharmacy):
 @login_required
 def sales_list_view(request):
     """Render sales list page."""
+    if request.GET.get("created") == "1":
+        messages.success(request, "Sale created successfully")
     return render(request, "sales/list.html")
 
 
@@ -65,10 +68,12 @@ def sales_analytics_view(request):
     total_revenue = float(revenue_result["total"] or 0)
     average_sale = total_revenue / total_sales if total_sales > 0 else 0.0
 
-    trend_start_date = timezone.now() - timedelta(days=7)
+    trend_start_date = start_date if start_date else timezone.now() - timedelta(days=30)
+    trend_end_date = end_date if end_date else timezone.now()
+    trend_filter = Q(date__gte=trend_start_date, date__lte=trend_end_date)
     daily_trends = (
         _scope_queryset(Sale.objects, pharmacy)
-        .filter(date__gte=trend_start_date)
+        .filter(trend_filter)
         .extra(select={"day": "date(date)"})
         .values("day")
         .annotate(total_sales=Count("id"), total_amount=Sum("total_amount"))
@@ -205,4 +210,3 @@ def sales_analytics_view(request):
 def sales_forecast_view(request):
     """Render demand forecasting page."""
     return render(request, "sales/forecast.html")
-

@@ -7,7 +7,7 @@ from decimal import Decimal, InvalidOperation
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import ProtectedError
@@ -17,6 +17,7 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST, require_http_methods
 
 from apps.inventory.models import Inventory
+from apps.accounts.permissions import can_delete_medicines, can_manage_medicines
 from apps.tenants.models import Pharmacy
 from apps.tenants.utils import require_user_pharmacy
 from .models import Category, Medicine
@@ -59,6 +60,7 @@ class MedicineUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         pharmacy = kwargs.pop("pharmacy", None)
         super().__init__(*args, **kwargs)
+        self.fields["category"].required = False
         if pharmacy is not None:
             self.fields["category"].queryset = self.fields["category"].queryset.filter(pharmacy=pharmacy)
         if self.instance and self.instance.pk:
@@ -87,7 +89,11 @@ def _tenant_medicine_queryset(request):
 @login_required
 def medicine_list_view(request: HttpRequest) -> HttpResponse:
     """Render medicines list page."""
-    return render(request, "medicines/list.html")
+    context = {
+        "can_manage_medicines": can_manage_medicines(request.user),
+        "can_delete_medicines": can_delete_medicines(request.user),
+    }
+    return render(request, "medicines/list.html", context)
 
 
 @login_required
@@ -99,9 +105,15 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
     For JSON POST (template fetch), returns JSON response.
     """
     if request.method == "GET":
+        if not can_manage_medicines(request.user):
+            raise PermissionDenied("You do not have permission to create medicines.")
         return render(request, "medicines/create.html")
 
-    is_json = request.content_type.startswith("application/json")
+    if not can_manage_medicines(request.user):
+        raise PermissionDenied("You do not have permission to create medicines.")
+
+    content_type = request.content_type or ""
+    is_json = content_type.startswith("application/json")
     if is_json:
         try:
             payload = json.loads(request.body.decode("utf-8") or "{}")
@@ -186,11 +198,13 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
     }
 
     try:
-        medicine = MedicineService.create_medicine_with_inventory(
-            pharmacy=pharmacy,
-            medicine_data=medicine_data,
-            initial_stock=initial_stock,
-        )
+        with transaction.atomic():
+            medicine = MedicineService.create_medicine_with_inventory(
+                pharmacy=pharmacy,
+                medicine_data=medicine_data,
+                initial_stock=initial_stock,
+                enforce_limits=not request.user.is_superuser,
+            )
     except ValidationError as exc:
         detail = exc.message_dict if hasattr(exc, "message_dict") else {"detail": exc.messages}
         if is_json:
@@ -221,7 +235,7 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
             status=201,
         )
 
-    messages.success(request, "Medicine created successfully.")
+    messages.success(request, "Medicine created successfully")
     return redirect("medicines-list")
 
 
@@ -236,6 +250,9 @@ def medicine_detail_view(request: HttpRequest, pk: int) -> HttpResponse:
 @require_http_methods(["GET", "POST"])
 def medicine_update_view(request: HttpRequest, pk: int) -> HttpResponse:
     """Render and process medicine update form."""
+    if not can_manage_medicines(request.user):
+        raise PermissionDenied("You do not have permission to update medicines.")
+
     medicine = get_object_or_404(_tenant_medicine_queryset(request), pk=pk)
     pharmacy = medicine.pharmacy
 
@@ -244,7 +261,7 @@ def medicine_update_view(request: HttpRequest, pk: int) -> HttpResponse:
         if form.is_valid():
             with transaction.atomic():
                 form.save()
-            messages.success(request, "Medicine updated successfully.")
+            messages.success(request, "Medicine updated successfully")
             return redirect("medicines-list")
     else:
         form = MedicineUpdateForm(instance=medicine, pharmacy=pharmacy)
@@ -263,11 +280,10 @@ def medicine_update_view(request: HttpRequest, pk: int) -> HttpResponse:
 @require_POST
 def medicine_delete_view(request: HttpRequest, pk: int) -> HttpResponse:
     """Delete a medicine by POST request only."""
-    try:
-        medicine = _tenant_medicine_queryset(request).get(pk=pk)
-    except Medicine.DoesNotExist:
-        messages.error(request, "Medicine not found.")
-        return redirect("medicines-list")
+    if not can_delete_medicines(request.user):
+        raise PermissionDenied("You do not have permission to delete medicines.")
+
+    medicine = get_object_or_404(_tenant_medicine_queryset(request), pk=pk)
 
     try:
         medicine.delete()

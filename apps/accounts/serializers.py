@@ -5,8 +5,10 @@ Handles serialization/deserialization of User model and authentication data.
 """
 from rest_framework import serializers
 from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError as DjangoValidationError
 from .models import User
 from apps.tenants.models import Pharmacy
+from apps.tenants.services import SubscriptionService
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -69,6 +71,15 @@ class UserCreateSerializer(serializers.ModelSerializer):
             validated_data["pharmacy"] = getattr(request.user, "pharmacy", None)
         elif "pharmacy" not in validated_data and request and request.user and request.user.is_authenticated:
             validated_data["pharmacy"] = getattr(request.user, "pharmacy", None)
+
+        pharmacy = validated_data.get("pharmacy")
+        if pharmacy is not None and not (request and request.user and request.user.is_authenticated and request.user.is_superuser):
+            try:
+                SubscriptionService.enforce_limits(pharmacy, SubscriptionService.RESOURCE_USERS)
+            except DjangoValidationError as exc:
+                if hasattr(exc, "message_dict"):
+                    raise serializers.ValidationError(exc.message_dict)
+                raise serializers.ValidationError({"subscription": exc.messages})
 
         user = User.objects.create_user(password=password, **validated_data)
         return user

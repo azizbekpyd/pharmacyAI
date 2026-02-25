@@ -160,6 +160,18 @@
         
         <!-- Page Content -->
         <main class="p-6">
+            {% if request.demo_mode %}
+            <div class="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                Demo mode is active. All write operations are disabled.
+            </div>
+            {% endif %}
+
+            {% if request.subscription_expired %}
+            <div class="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+                Subscription expired. Your workspace is currently in read-only mode.
+            </div>
+            {% endif %}
+
             {% if messages %}
             <div class="mb-6 space-y-2">
                 {% for message in messages %}

@@ -75,7 +75,12 @@
             <i class="fas fa-chart-line text-blue-500 mr-2"></i>
             Sales Trend (Last 7 Days)
         </h3>
-        <canvas id="salesTrendChart" height="250"></canvas>
+        <p id="dashboard-sales-trend-empty" class="hidden text-sm text-gray-500 text-center py-6">
+            No sales trend data available.
+        </p>
+        <div id="dashboard-sales-trend-wrap" class="relative h-80">
+            <canvas id="salesTrendChart"></canvas>
+        </div>
     </div>
     
     <!-- Category Distribution -->
@@ -84,7 +89,12 @@
             <i class="fas fa-chart-pie text-green-500 mr-2"></i>
             Sales by Category
         </h3>
-        <canvas id="categoryChart" height="250"></canvas>
+        <p id="dashboard-category-empty" class="hidden text-sm text-gray-500 text-center py-6">
+            No category data available.
+        </p>
+        <div id="dashboard-category-wrap" class="relative h-80">
+            <canvas id="categoryChart"></canvas>
+        </div>
     </div>
 </div>
 
@@ -126,6 +136,39 @@
                 <p>Loading...</p>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Inventory Optimization -->
+<div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">
+            <i class="fas fa-calculator text-indigo-500 mr-2"></i>
+            Inventory Optimization Forecast
+        </h3>
+        <div class="text-sm text-gray-600">
+            Service Level Target:
+            <span class="font-semibold" id="service-level-target">95%</span>
+            (Z=<span id="service-level-z">1.65</span>)
+        </div>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Medicine</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Forecast (30d)</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Reorder Qty</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Model</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">MAPE</th>
+                </tr>
+            </thead>
+            <tbody id="optimization-list" class="bg-white divide-y divide-gray-200">
+                <tr>
+                    <td colspan="5" class="px-4 py-3 text-sm text-gray-500">Loading optimization data...</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -177,6 +220,7 @@
 // Chart instances (render once)
 let salesTrendChartInstance = null;
 let categoryChartInstance = null;
+const UZS_NUMBER = new Intl.NumberFormat('uz-UZ', { maximumFractionDigits: 0 });
 
 // Fallback for environments where Decimal might be referenced by libs/plugins
 const Decimal = Number;
@@ -199,6 +243,9 @@ const DASHBOARD = {
   slowMoving: {{ slow_moving_json|safe }},
   recentSales: {{ recent_sales_json|safe }},
   alerts: {{ alerts_json|safe }},
+  forecastReorder: {{ forecast_reorder_json|safe }},
+  forecastChart: {{ forecast_chart_json|safe }},
+  serviceLevel: {{ service_level_json|safe }},
 };
 
 function loadDashboardData() {
@@ -218,6 +265,7 @@ function loadDashboardData() {
   renderSlowMoving(DASHBOARD.slowMoving || []);
   renderRecentSales(DASHBOARD.recentSales || []);
   renderAlerts(DASHBOARD.alerts || []);
+  renderOptimization(DASHBOARD.forecastReorder || [], DASHBOARD.serviceLevel || {});
 
   // Charts
   renderSalesTrendChart(DASHBOARD.trendLabels || [], DASHBOARD.trendSales || [], DASHBOARD.trendRevenue || []);
@@ -354,6 +402,8 @@ function renderSalesTrendChart(data) {
     }
 
     const canvas = document.getElementById('salesTrendChart');
+    const chartWrap = document.getElementById('dashboard-sales-trend-wrap');
+    const emptyState = document.getElementById('dashboard-sales-trend-empty');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
@@ -363,6 +413,15 @@ function renderSalesTrendChart(data) {
     });
     salesData = salesData.slice(0, minLen).map(Number);
     revenueData = revenueData.slice(0, minLen).map(Number);
+
+    if (minLen === 0) {
+      if (chartWrap) chartWrap.classList.add('hidden');
+      if (emptyState) emptyState.classList.remove('hidden');
+      return;
+    }
+
+    if (chartWrap) chartWrap.classList.remove('hidden');
+    if (emptyState) emptyState.classList.add('hidden');
 
     salesTrendChartInstance = new Chart(ctx, {
       type: 'line',
@@ -386,14 +445,97 @@ function renderSalesTrendChart(data) {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
-        aspectRatio: 2,
+        maintainAspectRatio: false,
+        resizeDelay: 150,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        layout: {
+          padding: {
+            top: 8,
+            right: 8,
+            bottom: 4,
+            left: 4
+          }
+        },
         scales: {
-          y: { beginAtZero: true, position: 'left' },
-          y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } }
+          y: {
+            beginAtZero: true,
+            position: 'left',
+            grace: '10%',
+            ticks: { precision: 0 },
+            title: {
+              display: true,
+              text: 'Sales Count'
+            }
+          },
+          y1: {
+            beginAtZero: true,
+            position: 'right',
+            grace: '10%',
+            ticks: {
+              callback: (value) => formatUZS(value)
+            },
+            title: {
+              display: true,
+              text: 'Revenue (UZS)'
+            },
+            grid: { drawOnChartArea: false }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              boxWidth: 10
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.dataset.label || '';
+                if (context.dataset.yAxisID === 'y1') {
+                  return `${label}: ${formatUZS(context.parsed.y)}`;
+                }
+                return `${label}: ${context.parsed.y}`;
+              }
+            }
+          }
         }
       }
     });
+}
+
+function renderOptimization(items, serviceLevel) {
+    const tbody = document.getElementById('optimization-list');
+    if (!tbody) return;
+
+    const targetEl = document.getElementById('service-level-target');
+    const zEl = document.getElementById('service-level-z');
+    if (targetEl) targetEl.textContent = `${serviceLevel.target_percent || 95}%`;
+    if (zEl) zEl.textContent = `${serviceLevel.z_value ?? 1.65}`;
+
+    if (!items || !items.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-3 text-sm text-gray-500">No optimization data available.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = items.map((item) => {
+        const model = (item.selected_method || '').replaceAll('_', ' ');
+        const mape = item.mape === null || item.mape === undefined ? 'N/A' : `${Number(item.mape).toFixed(2)}%`;
+        return `
+            <tr>
+                <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.medicine_name || 'N/A'}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${Number(item.forecasted_demand_30_days || 0).toFixed(2)}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${item.recommended_reorder_quantity || 0}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${model || 'N/A'}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${mape}</td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function renderCategoryChart(data) {
@@ -413,12 +555,23 @@ function renderCategoryChart(data) {
     }
 
     const canvas = document.getElementById('categoryChart');
+    const categoryWrap = document.getElementById('dashboard-category-wrap');
+    const categoryEmpty = document.getElementById('dashboard-category-empty');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     const minLen = Math.min(labels.length, revenueData.length);
     labels = labels.slice(0, minLen);
     revenueData = revenueData.slice(0, minLen).map(Number);
+
+    if (minLen === 0) {
+      if (categoryWrap) categoryWrap.classList.add('hidden');
+      if (categoryEmpty) categoryEmpty.classList.remove('hidden');
+      return;
+    }
+
+    if (categoryWrap) categoryWrap.classList.remove('hidden');
+    if (categoryEmpty) categoryEmpty.classList.add('hidden');
 
     categoryChartInstance = new Chart(ctx, {
       type: 'doughnut',
@@ -438,14 +591,23 @@ function renderCategoryChart(data) {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
-        aspectRatio: 2,
+        maintainAspectRatio: false,
+        resizeDelay: 150,
         plugins: {
-          legend: { position: 'bottom' },
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              boxWidth: 10
+            }
+          },
           tooltip: {
             callbacks: {
               label: function(context) {
-                return context.label + ': ' + Number(context.parsed).toLocaleString('uz-UZ') + ' UZS';
+                const total = context.dataset.data.reduce((sum, item) => sum + Number(item || 0), 0);
+                const value = Number(context.parsed || 0);
+                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+                return `${context.label}: ${formatUZS(value)} (${percentage}%)`;
               }
             }
           }
@@ -456,7 +618,7 @@ function renderCategoryChart(data) {
 
 // Utility function
 function formatUZS(amount) {
-  return new Intl.NumberFormat('uz-UZ', { style: 'decimal', maximumFractionDigits: 0 }).format(amount) + ' UZS';
+  return `${UZS_NUMBER.format(Number(amount || 0))} UZS`;
 }
 
 // Initialize dashboard once

@@ -7,9 +7,9 @@ from django.db.models import F
 from django.utils import timezone
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.accounts.permissions import InventoryRolePermission, ReorderRecommendationRolePermission
 from apps.tenants.mixins import TenantScopedQuerysetMixin
 from apps.tenants.models import Pharmacy
 from apps.tenants.utils import require_user_pharmacy
@@ -25,7 +25,7 @@ from .services import InventoryService
 
 class InventoryViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     queryset = Inventory.objects.select_related("medicine", "pharmacy").all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [InventoryRolePermission]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["medicine__name", "medicine__sku"]
     ordering_fields = ["current_stock", "medicine__name", "created_at"]
@@ -104,7 +104,7 @@ class InventoryViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
 class ReorderRecommendationViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     queryset = ReorderRecommendation.objects.select_related("medicine", "approved_by", "pharmacy").all()
     serializer_class = ReorderRecommendationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [ReorderRecommendationRolePermission]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["medicine__name", "medicine__sku", "reason"]
     ordering_fields = ["priority", "status", "created_at"]
@@ -163,4 +163,3 @@ class ReorderRecommendationViewSet(TenantScopedQuerysetMixin, viewsets.ModelView
         recommendation.save()
         serializer = self.get_serializer(recommendation)
         return Response(serializer.data, status=status.HTTP_200_OK)
-

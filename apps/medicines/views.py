@@ -9,9 +9,9 @@ from django.db.models import F
 from django.utils import timezone
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.accounts.permissions import CategoryRolePermission, MedicineRolePermission
 from apps.tenants.mixins import TenantScopedQuerysetMixin
 from .models import Category, Medicine
 from .serializers import CategorySerializer, MedicineListSerializer, MedicineSerializer
@@ -26,7 +26,7 @@ class CategoryViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
 
     queryset = Category.objects.select_related("pharmacy").all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [CategoryRolePermission]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["name", "description"]
     ordering_fields = ["name", "created_at"]
@@ -44,7 +44,7 @@ class MedicineViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     """
 
     queryset = Medicine.objects.select_related("category", "pharmacy").all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [MedicineRolePermission]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["name", "sku", "description"]
     ordering_fields = ["name", "unit_price", "expiry_date", "created_at"]
@@ -104,4 +104,3 @@ class MedicineViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
         medicines = self.get_queryset().filter(expiry_date__lt=timezone.now().date()).order_by("expiry_date")
         serializer = self.get_serializer(medicines, many=True)
         return Response({"count": medicines.count(), "medicines": serializer.data})
-

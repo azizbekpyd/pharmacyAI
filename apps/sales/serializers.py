@@ -3,11 +3,15 @@ Serializers for sales app.
 
 Handles serialization/deserialization of Sale and SaleItem models.
 """
+from decimal import Decimal
+
 from rest_framework import serializers
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from .models import Sale, SaleItem
 from apps.medicines.models import Medicine
 from apps.inventory.models import Inventory
+from apps.tenants.services import SubscriptionService
 from apps.tenants.utils import require_user_pharmacy
 
 
@@ -29,7 +33,7 @@ class SaleItemSerializer(serializers.ModelSerializer):
             'id', 'medicine', 'medicine_id', 'medicine_name', 'medicine_sku',
             'quantity', 'unit_price', 'subtotal', 'created_at'
         ]
-        read_only_fields = ['id', 'subtotal', 'created_at']
+        read_only_fields = ['id', 'medicine', 'subtotal', 'created_at']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -121,10 +125,24 @@ class SaleCreateSerializer(serializers.ModelSerializer):
             if "user" not in validated_data:
                 validated_data["user"] = user
 
-        with transaction.atomic():
-            sale = Sale.objects.create(**validated_data)
+        if not (request and request.user.is_authenticated and request.user.is_superuser):
+            try:
+                SubscriptionService.enforce_limits(pharmacy, SubscriptionService.RESOURCE_MONTHLY_SALES)
+            except DjangoValidationError as exc:
+                if hasattr(exc, "message_dict"):
+                    raise serializers.ValidationError(exc.message_dict)
+                raise serializers.ValidationError({"subscription": exc.messages})
 
-            total_amount = 0
+        initial_total = Decimal("0.00")
+        for item_data in items_data:
+            initial_total += item_data["quantity"] * item_data["unit_price"]
+        if initial_total <= 0:
+            raise serializers.ValidationError({"items": "At least one valid sale item is required."})
+
+        with transaction.atomic():
+            sale = Sale.objects.create(total_amount=initial_total, **validated_data)
+
+            total_amount = Decimal("0.00")
             for item_data in items_data:
                 item_data["pharmacy"] = sale.pharmacy
                 if item_data["medicine"].pharmacy_id != sale.pharmacy_id:

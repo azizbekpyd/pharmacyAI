@@ -7,7 +7,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from django.shortcuts import redirect
-from apps.accounts.views import logout_view
+from apps.accounts.views import logout_view, start_trial_view
+from pharmacy_ai.views import landing_entry_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -16,7 +17,8 @@ urlpatterns = [
     path('accounts/login/', lambda request: redirect('/login/', permanent=False)),
     
     # Frontend routes (template views)
-    path('', include('apps.dashboard.urls')),
+    path('', landing_entry_view, name='landing'),
+    path('start-trial/', start_trial_view, name='start-trial'),
     path('login/', include('apps.accounts.urls')),  # Frontend login page
     path('logout/', logout_view, name='logout'),  # Frontend logout
     path('dashboard/', include('apps.dashboard.urls')),
@@ -35,4 +37,3 @@ urlpatterns = [
 # Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

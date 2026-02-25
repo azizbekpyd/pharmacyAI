@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
 import csv
 import io
@@ -14,6 +15,7 @@ from .serializers import POSSaleSerializer, POSBulkSaleSerializer
 from apps.sales.models import Sale, SaleItem
 from apps.medicines.models import Medicine
 from apps.tenants.models import Pharmacy
+from apps.tenants.services import SubscriptionService
 from apps.tenants.utils import require_user_pharmacy
 
 
@@ -120,6 +122,13 @@ def import_csv_sales(request):
     
     Note: Each row creates a separate sale with one item.
     """
+    pharmacy = _resolve_request_pharmacy(request)
+    if request.user.is_superuser and pharmacy is None:
+        return Response(
+            {'error': 'pharmacy or pharmacy_id is required for superuser requests'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     if 'file' not in request.FILES:
         return Response(
             {'error': 'CSV file is required'},
@@ -172,6 +181,17 @@ def import_csv_sales(request):
             notes = row.get('notes', '')
             
             # Create sale
+            if not request.user.is_superuser:
+                try:
+                    SubscriptionService.enforce_limits(pharmacy, SubscriptionService.RESOURCE_MONTHLY_SALES)
+                except DjangoValidationError as exc:
+                    if hasattr(exc, "message_dict"):
+                        limit_message = str(exc.message_dict)
+                    else:
+                        limit_message = ", ".join(exc.messages)
+                    errors.append(f'Row {row_num}: {limit_message}')
+                    continue
+
             sale = Sale.objects.create(
                 date=sale_date,
                 user=request.user,
@@ -218,9 +238,3 @@ def import_csv_sales(request):
         'errors': errors,
         'sales': created_sales
     }, status=status.HTTP_201_CREATED if created_sales else status.HTTP_400_BAD_REQUEST)
-    pharmacy = _resolve_request_pharmacy(request)
-    if request.user.is_superuser and pharmacy is None:
-        return Response(
-            {'error': 'pharmacy or pharmacy_id is required for superuser requests'},
-            status=status.HTTP_400_BAD_REQUEST
-        )

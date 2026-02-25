@@ -81,6 +81,10 @@
             </div>
 
             <div id="form-message" class="hidden rounded-lg px-4 py-3 text-sm"></div>
+            <div id="form-errors" class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <p class="font-semibold mb-2">Please fix the following:</p>
+                <ul id="form-errors-list" class="list-disc pl-5 space-y-1"></ul>
+            </div>
 
             <div class="flex items-center justify-end gap-3 pt-2">
                 <a href="{% url 'medicines-list' %}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Cancel</a>
@@ -130,6 +134,36 @@ function setMessage(text, type) {
     box.classList.remove('hidden');
 }
 
+function clearErrors() {
+    const errorsBox = document.getElementById('form-errors');
+    const list = document.getElementById('form-errors-list');
+    list.innerHTML = '';
+    errorsBox.classList.add('hidden');
+}
+
+function renderFieldErrors(errorPayload) {
+    clearErrors();
+    const errorsBox = document.getElementById('form-errors');
+    const list = document.getElementById('form-errors-list');
+    const entries = Object.entries(errorPayload || {});
+    if (!entries.length) {
+        return false;
+    }
+
+    entries.forEach(([field, value]) => {
+        const messages = Array.isArray(value) ? value : [value];
+        messages.forEach((message) => {
+            const li = document.createElement('li');
+            const prefix = field === 'detail' ? '' : `${field}: `;
+            li.textContent = `${prefix}${message}`;
+            list.appendChild(li);
+        });
+    });
+
+    errorsBox.classList.remove('hidden');
+    return true;
+}
+
 async function loadCategories() {
     try {
         const response = await fetch('/api/medicines/categories/');
@@ -152,6 +186,7 @@ document.getElementById('unit_price').addEventListener('input', function() {
 
 document.getElementById('medicine-create-form').addEventListener('submit', async function(e) {
     e.preventDefault();
+    clearErrors();
     const form = e.target;
     const stockRaw = form.stock.value;
     const stockValue = stockRaw === '' ? 0 : Number(stockRaw);
@@ -188,16 +223,18 @@ document.getElementById('medicine-create-form').addEventListener('submit', async
         const responseData = await response.json();
 
         if (response.ok) {
-            setMessage('Medicine created successfully.', 'success');
+            setMessage('Medicine created successfully', 'success');
             setTimeout(() => {
                 window.location.href = "{% url 'medicines-list' %}";
             }, 700);
             return;
         }
 
-        const firstError = Object.values(responseData)[0];
-        const errorMessage = Array.isArray(firstError) ? firstError[0] : 'Failed to create medicine.';
-        setMessage(errorMessage, 'error');
+        if (!renderFieldErrors(responseData)) {
+            setMessage('Failed to create medicine.', 'error');
+        } else {
+            setMessage('Please review the form errors.', 'error');
+        }
     } catch (error) {
         setMessage('Network error while creating medicine.', 'error');
     }

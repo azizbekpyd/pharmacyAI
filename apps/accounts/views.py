@@ -10,8 +10,13 @@ from rest_framework.views import APIView
 from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.db import transaction
+from django.utils import timezone
+from datetime import timedelta
 from .models import User
 from .serializers import UserSerializer, UserCreateSerializer, LoginSerializer
+from apps.tenants.models import Pharmacy
+from apps.tenants.services import SubscriptionService
 from apps.tenants.utils import require_user_pharmacy
 
 
@@ -140,6 +145,80 @@ def logout_view(request):
     messages.success(request, 'You have been logged out successfully.')
     from django.urls import reverse
     return redirect(reverse('login'))
+
+
+def start_trial_view(request):
+    """
+    Public onboarding flow:
+    - create pharmacy
+    - create admin user
+    - apply BASIC plan defaults
+    - trial period 14 days
+    """
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
+    context = {}
+    if request.method == "POST":
+        pharmacy_name = (request.POST.get("pharmacy_name") or "").strip()
+        username = (request.POST.get("username") or "").strip()
+        email = (request.POST.get("email") or "").strip()
+        password = request.POST.get("password") or ""
+        password_confirm = request.POST.get("password_confirm") or ""
+
+        errors = {}
+        if not pharmacy_name:
+            errors["pharmacy_name"] = "Pharmacy name is required."
+        if not username:
+            errors["username"] = "Username is required."
+        if not email:
+            errors["email"] = "Email is required."
+        if not password:
+            errors["password"] = "Password is required."
+        if password and len(password) < 8:
+            errors["password"] = "Password must be at least 8 characters."
+        if password != password_confirm:
+            errors["password_confirm"] = "Passwords do not match."
+        if username and User.objects.filter(username=username).exists():
+            errors["username"] = "Username already exists."
+        if email and User.objects.filter(email=email).exists():
+            errors["email"] = "Email already exists."
+
+        if errors:
+            context["errors"] = errors
+            context["form"] = {
+                "pharmacy_name": pharmacy_name,
+                "username": username,
+                "email": email,
+            }
+            return render(request, "accounts/start_trial.html", context, status=400)
+
+        with transaction.atomic():
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                role=User.ROLE_ADMIN,
+                is_staff=True,
+            )
+            trial_start = timezone.now()
+            pharmacy = Pharmacy.objects.create(
+                name=pharmacy_name,
+                owner=user,
+                plan_type=Pharmacy.PlanType.BASIC,
+                subscription_start=trial_start,
+                subscription_end=trial_start + timedelta(days=14),
+                is_active=True,
+            )
+            SubscriptionService.apply_plan_defaults(pharmacy, plan_type=Pharmacy.PlanType.BASIC)
+            user.pharmacy = pharmacy
+            user.save(update_fields=["pharmacy"])
+
+        login(request, user)
+        messages.success(request, "Trial started successfully. Welcome to PharmacyAI.")
+        return redirect("dashboard")
+
+    return render(request, "accounts/start_trial.html", context)
 
 
 @api_view(['GET'])

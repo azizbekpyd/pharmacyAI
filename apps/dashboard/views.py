@@ -11,6 +11,7 @@ import json
 from apps.sales.models import Sale, SaleItem
 from apps.medicines.models import Medicine
 from apps.inventory.models import Inventory, ReorderRecommendation
+from apps.inventory.services import InventoryOptimizationService
 
 
 def _scope_queryset(queryset, pharmacy):
@@ -149,6 +150,12 @@ def dashboard_view(request):
     ).count()
     low_stock_count = _scope_queryset(Inventory.objects, pharmacy).filter(current_stock__lt=F('min_stock_level')).count()
 
+    optimization_payload = (
+        InventoryOptimizationService.build_dashboard_forecast_data(pharmacy=pharmacy, limit=10)
+        if pharmacy is not None
+        else {"items": [], "chart": {"labels": [], "forecasted_demand": [], "recommended_reorder_quantity": [], "mape": []}, "service_level": {"target_percent": 95, "z_value": 1.65, "estimated_fill_rate_percent": None}}
+    )
+
     # Recent sales (last 5)
     recent_sales = []
     recent_sales_qs = _scope_queryset(Sale.objects, pharmacy).order_by('-date')[:5]
@@ -191,10 +198,15 @@ def dashboard_view(request):
         'slow_moving_json': json.dumps(slow_moving),
         'recent_sales_json': json.dumps(recent_sales),
         'alerts_json': json.dumps(alerts),
+        'forecast_reorder_json': json.dumps(optimization_payload.get('items', [])),
+        'forecast_chart_json': json.dumps(optimization_payload.get('chart', {})),
+        'service_level_json': json.dumps(optimization_payload.get('service_level', {})),
 
         # Lists
         'fast_moving_medicines': fast_moving,
         'slow_moving_medicines': slow_moving,
+        'forecast_reorder_items': optimization_payload.get('items', []),
+        'service_level_indicator': optimization_payload.get('service_level', {}),
 
         # Counts
         'medicines_count': medicines_count,
