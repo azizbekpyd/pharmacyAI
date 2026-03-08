@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.db.models import Count, Q, Sum
 from django.shortcuts import render
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from apps.tenants.utils import require_user_pharmacy
 from .models import Sale, SaleItem
@@ -24,7 +25,7 @@ def _scope_queryset(queryset, pharmacy):
 def sales_list_view(request):
     """Render sales list page."""
     if request.GET.get("created") == "1":
-        messages.success(request, "Sale created successfully")
+        messages.success(request, _("Sale created successfully"))
     return render(request, "sales/list.html")
 
 
@@ -106,7 +107,7 @@ def sales_analytics_view(request):
     category_labels = []
     category_revenue_data = []
     for item in category_dist:
-        cat_name = item.get("medicine__category__name") or "Uncategorized"
+        cat_name = item.get("medicine__category__name") or str(_("Uncategorized"))
         cat_revenue = float(item.get("total_revenue", 0))
         cat_quantity = item.get("total_quantity", 0)
         category_list.append(

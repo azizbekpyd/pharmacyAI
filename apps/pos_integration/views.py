@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 import csv
 import io
 from .serializers import POSSaleSerializer, POSBulkSaleSerializer
@@ -52,7 +53,7 @@ def receive_sale(request):
     pharmacy = _resolve_request_pharmacy(request)
     if request.user.is_superuser and pharmacy is None:
         return Response(
-            {'error': 'pharmacy or pharmacy_id is required for superuser requests'},
+            {'error': _('pharmacy or pharmacy_id is required for superuser requests')},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -61,7 +62,7 @@ def receive_sale(request):
     if serializer.is_valid():
         sale = serializer.save()
         return Response({
-            'message': 'Sale received successfully',
+            'message': _('Sale received successfully'),
             'sale_id': sale.id,
             'total_amount': float(sale.total_amount)
         }, status=status.HTTP_201_CREATED)
@@ -90,7 +91,7 @@ def receive_bulk_sales(request):
     pharmacy = _resolve_request_pharmacy(request)
     if request.user.is_superuser and pharmacy is None:
         return Response(
-            {'error': 'pharmacy or pharmacy_id is required for superuser requests'},
+            {'error': _('pharmacy or pharmacy_id is required for superuser requests')},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -99,7 +100,7 @@ def receive_bulk_sales(request):
     if serializer.is_valid():
         sales = serializer.save()
         return Response({
-            'message': f'{len(sales)} sales received successfully',
+            'message': _('%(count)s sales received successfully') % {'count': len(sales)},
             'count': len(sales),
             'sales': [{'id': sale.id, 'total_amount': float(sale.total_amount)} for sale in sales]
         }, status=status.HTTP_201_CREATED)
@@ -125,13 +126,13 @@ def import_csv_sales(request):
     pharmacy = _resolve_request_pharmacy(request)
     if request.user.is_superuser and pharmacy is None:
         return Response(
-            {'error': 'pharmacy or pharmacy_id is required for superuser requests'},
+            {'error': _('pharmacy or pharmacy_id is required for superuser requests')},
             status=status.HTTP_400_BAD_REQUEST
         )
 
     if 'file' not in request.FILES:
         return Response(
-            {'error': 'CSV file is required'},
+            {'error': _('CSV file is required')},
             status=status.HTTP_400_BAD_REQUEST
         )
     
@@ -144,7 +145,7 @@ def import_csv_sales(request):
         reader = csv.DictReader(io_string)
     except Exception as e:
         return Response(
-            {'error': f'Error reading CSV file: {str(e)}'},
+            {'error': _('Error reading CSV file: %(error)s') % {'error': str(e)}},
             status=status.HTTP_400_BAD_REQUEST
         )
     
@@ -166,13 +167,18 @@ def import_csv_sales(request):
             # Get medicine
             medicine_sku = row.get('medicine_sku', '').strip()
             if not medicine_sku:
-                errors.append(f'Row {row_num}: medicine_sku is required')
+                errors.append(
+                    _('Row %(row)s: medicine_sku is required') % {'row': row_num}
+                )
                 continue
             
             try:
                 medicine = Medicine.objects.get(sku=medicine_sku, pharmacy=pharmacy)
             except Medicine.DoesNotExist:
-                errors.append(f'Row {row_num}: Medicine with SKU "{medicine_sku}" not found')
+                errors.append(
+                    _('Row %(row)s: Medicine with SKU "%(sku)s" not found')
+                    % {'row': row_num, 'sku': medicine_sku}
+                )
                 continue
             
             # Get quantity and price
@@ -189,7 +195,9 @@ def import_csv_sales(request):
                         limit_message = str(exc.message_dict)
                     else:
                         limit_message = ", ".join(exc.messages)
-                    errors.append(f'Row {row_num}: {limit_message}')
+                    errors.append(
+                        _('Row %(row)s: %(message)s') % {'row': row_num, 'message': limit_message}
+                    )
                     continue
 
             sale = Sale.objects.create(
@@ -230,10 +238,12 @@ def import_csv_sales(request):
             })
             
         except Exception as e:
-            errors.append(f'Row {row_num}: {str(e)}')
-    
+            errors.append(
+                _('Row %(row)s: %(error)s') % {'row': row_num, 'error': str(e)}
+            )
+
     return Response({
-        'message': f'Imported {len(created_sales)} sales',
+        'message': _('Imported %(count)s sales') % {'count': len(created_sales)},
         'created': len(created_sales),
         'errors': errors,
         'sales': created_sales

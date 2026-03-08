@@ -1,19 +1,20 @@
+﻿{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.LANGUAGE_CODE|default:'uz' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Pharmacy Analytic AI{% endblock %}</title>
-    
+    <title>{% block title %}{% trans "Pharmacy Analytic AI" %}{% endblock %}</title>
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
+
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Custom CSS -->
     <style>
         /* Custom scrollbar */
@@ -31,23 +32,23 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
-        
+
         /* Sidebar animation */
         .sidebar-transition {
             transition: transform 0.3s ease-in-out;
         }
-        
+
         /* Card hover effect */
         .card-hover:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
+
         .card-hover {
             transition: all 0.3s ease;
         }
     </style>
-    
+
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-50">
@@ -65,57 +66,57 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <!-- Navigation -->
             <nav class="flex-1 overflow-y-auto px-4 py-6">
                 <ul class="space-y-2">
                     <li>
                         <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 rounded-lg px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white {% if request.resolver_match.url_name == 'dashboard' or request.path == '/' or request.path == '/dashboard/' %}bg-gray-800 text-white{% endif %}">
                             <i class="fas fa-chart-line w-5"></i>
-                            <span>Dashboard</span>
+                            <span>{% trans "Dashboard" %}</span>
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'medicines-list' %}" class="flex items-center space-x-3 rounded-lg px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white {% if 'medicines' in request.resolver_match.url_name %}bg-gray-800 text-white{% endif %}">
                             <i class="fas fa-pills w-5"></i>
-                            <span>Medicines</span>
+                            <span>{% trans "Medicines" %}</span>
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'sales-list' %}" class="flex items-center space-x-3 rounded-lg px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white {% if 'sales' in request.resolver_match.url_name %}bg-gray-800 text-white{% endif %}">
                             <i class="fas fa-shopping-cart w-5"></i>
-                            <span>Sales</span>
+                            <span>{% trans "Sales" %}</span>
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'sales-analytics' %}" class="flex items-center space-x-3 rounded-lg px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white {% if request.resolver_match.url_name == 'sales-analytics' %}bg-gray-800 text-white{% endif %}">
                             <i class="fas fa-chart-bar w-5"></i>
-                            <span>Analytics</span>
+                            <span>{% trans "Analytics" %}</span>
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'inventory-list' %}" class="flex items-center space-x-3 rounded-lg px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white {% if 'inventory' in request.resolver_match.url_name %}bg-gray-800 text-white{% endif %}">
                             <i class="fas fa-boxes w-5"></i>
-                            <span>Inventory</span>
+                            <span>{% trans "Inventory" %}</span>
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'inventory-reorder-recommendations' %}" class="flex items-center space-x-3 rounded-lg px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white {% if request.resolver_match.url_name == 'inventory-reorder-recommendations' %}bg-gray-800 text-white{% endif %}">
                             <i class="fas fa-exclamation-triangle w-5"></i>
-                            <span>Reorder Alerts</span>
+                            <span>{% trans "Reorder Alerts" %}</span>
                         </a>
                     </li>
                     {% if user.is_admin %}
                     <li>
                         <a href="/admin/" class="flex items-center space-x-3 rounded-lg px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
                             <i class="fas fa-cog w-5"></i>
-                            <span>Admin Panel</span>
+                            <span>{% trans "Admin Panel" %}</span>
                         </a>
                     </li>
                     {% endif %}
                 </ul>
             </nav>
-            
+
             <!-- User Info -->
             <div class="border-t border-gray-700 px-4 py-4">
                 <div class="flex items-center space-x-3">
@@ -129,15 +130,15 @@
                 </div>
                 <a href="{% url 'logout' %}" class="mt-3 flex w-full items-center justify-center space-x-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium hover:bg-red-700">
                     <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
+                    <span>{% trans "Logout" %}</span>
                 </a>
             </div>
         </div>
     </aside>
-    
+
     <!-- Mobile sidebar overlay -->
     <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black bg-opacity-50 lg:hidden hidden"></div>
-    
+
     <!-- Main Content -->
     <div class="lg:ml-64">
         <!-- Top Bar -->
@@ -147,9 +148,23 @@
                     <button id="mobile-sidebar-toggle" class="lg:hidden text-gray-600 hover:text-gray-900">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
-                    <h1 class="text-2xl font-semibold text-gray-800">{% block page_title %}Dashboard{% endblock %}</h1>
+                    <h1 class="text-2xl font-semibold text-gray-800">{% block page_title %}{% trans "Dashboard" %}{% endblock %}</h1>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <form action="{% url 'set_language' %}" method="post" class="flex items-center">
+                        {% csrf_token %}
+                        {% if request.path|slice:":4" == "/uz/" or request.path|slice:":4" == "/ru/" or request.path|slice:":4" == "/en/" %}
+                        <input name="next" type="hidden" value="{{ request.path|slice:'3:' }}">
+                        {% else %}
+                        <input name="next" type="hidden" value="{{ request.path }}">
+                        {% endif %}
+                        <label for="language-switcher" class="sr-only">{% trans "Language" %}</label>
+                        <select id="language-switcher" name="language" onchange="this.form.submit()" class="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700">
+                            <option value="uz" {% if request.LANGUAGE_CODE == 'uz' %}selected{% endif %}>Oʻzbekcha</option>
+                            <option value="ru" {% if request.LANGUAGE_CODE == 'ru' %}selected{% endif %}>Русский</option>
+                            <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
+                        </select>
+                    </form>
                     <div class="text-sm text-gray-600">
                         <i class="far fa-clock mr-2"></i>
                         <span id="current-time"></span>
@@ -157,18 +172,18 @@
                 </div>
             </div>
         </header>
-        
+
         <!-- Page Content -->
         <main class="p-6">
             {% if request.demo_mode %}
             <div class="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                Demo mode is active. All write operations are disabled.
+                {% trans "Demo mode is active. All write operations are disabled." %}
             </div>
             {% endif %}
 
             {% if request.subscription_expired %}
             <div class="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
-                Subscription expired. Your workspace is currently in read-only mode.
+                {% trans "Subscription expired. Your workspace is currently in read-only mode." %}
             </div>
             {% endif %}
 
@@ -181,7 +196,7 @@
                 {% endfor %}
             </div>
             {% endif %}
-            
+
             {% block content %}{% endblock %}
         </main>
     </div>
@@ -189,7 +204,7 @@
     <!-- Not authenticated - show login or redirect -->
     {% block auth_content %}{% endblock %}
     {% endif %}
-    
+
     <!-- JavaScript -->
     <script>
         // Sidebar toggle for mobile
@@ -197,33 +212,34 @@
         const sidebarOverlay = document.getElementById('sidebar-overlay');
         const mobileToggle = document.getElementById('mobile-sidebar-toggle');
         const sidebarToggle = document.getElementById('sidebar-toggle');
-        
+        const APP_LOCALE = "{{ request.LANGUAGE_CODE|default:'uz'|escapejs }}".replace('_', '-');
+
         if (mobileToggle) {
             mobileToggle.addEventListener('click', () => {
                 sidebar.classList.remove('-translate-x-full');
                 sidebarOverlay.classList.remove('hidden');
             });
         }
-        
+
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', () => {
                 sidebar.classList.add('-translate-x-full');
                 sidebarOverlay.classList.add('hidden');
             });
         }
-        
+
         if (sidebarOverlay) {
             sidebarOverlay.addEventListener('click', () => {
                 sidebar.classList.add('-translate-x-full');
                 sidebarOverlay.classList.add('hidden');
             });
         }
-        
+
         // Update current time
         function updateTime() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
+            const timeString = now.toLocaleTimeString(APP_LOCALE, {
+                hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit'
             });
@@ -234,13 +250,14 @@
         }
         updateTime();
         setInterval(updateTime, 1000);
-        
+
         // Initialize mobile sidebar as hidden
-        if (window.innerWidth < 1024) {
+        if (sidebar && window.innerWidth < 1024) {
             sidebar.classList.add('-translate-x-full');
         }
     </script>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>
+

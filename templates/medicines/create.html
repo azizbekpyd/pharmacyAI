@@ -1,17 +1,18 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Add Medicine - Pharmacy Analytic AI{% endblock %}
-{% block page_title %}Add Medicine{% endblock %}
+{% block title %}{% trans "Add Medicine - Pharmacy Analytic AI" %}{% endblock %}
+{% block page_title %}{% trans "Add Medicine" %}{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
     <div class="mb-6 flex items-start justify-between">
         <div>
-            <h2 class="text-2xl font-bold text-gray-900">Create New Medicine</h2>
-            <p class="mt-1 text-sm text-gray-600">Enter medicine details for your pharmacy catalog.</p>
+            <h2 class="text-2xl font-bold text-gray-900">{% trans "Create New Medicine" %}</h2>
+            <p class="mt-1 text-sm text-gray-600">{% trans "Enter medicine details for your pharmacy catalog." %}</p>
         </div>
         <a href="{% url 'medicines-list' %}" class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-            <i class="fas fa-arrow-left mr-2"></i>Back to List
+            <i class="fas fa-arrow-left mr-2"></i>{% trans "Back to List" %}
         </a>
     </div>
 
@@ -19,29 +20,29 @@
         <form id="medicine-create-form" class="p-6 space-y-5">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Medicine Name</label>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Medicine Name" %}</label>
                     <input id="name" name="name" type="text" required
                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                           placeholder="e.g. Paracetamol 500mg">
+                           placeholder="{% trans 'e.g. Paracetamol 500mg' %}">
                 </div>
                 <div>
                     <label for="sku" class="block text-sm font-medium text-gray-700 mb-1">SKU</label>
                     <input id="sku" name="sku" type="text" required
                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                           placeholder="e.g. MED011">
+                           placeholder="{% trans 'e.g. MED011' %}">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <label for="category" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Category" %}</label>
                     <select id="category" name="category"
                             class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
-                        <option value="">Uncategorized</option>
+                        <option value="">{% trans "Uncategorized" %}</option>
                     </select>
                 </div>
                 <div>
-                    <label for="expiry_date" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                    <label for="expiry_date" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Expiry Date" %}</label>
                     <input id="expiry_date" name="expiry_date" type="date"
                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
                 </div>
@@ -49,47 +50,47 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label for="unit_price" class="block text-sm font-medium text-gray-700 mb-1">Unit Price (UZS)</label>
+                    <label for="unit_price" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Unit Price (UZS)" %}</label>
                     <input id="unit_price" name="unit_price" type="number" min="0.01" step="0.01" required
                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                           placeholder="e.g. 25000">
-                    <p class="mt-1 text-xs text-gray-500">Enter numeric value only; displayed as UZS in the UI.</p>
+                           placeholder="{% trans 'e.g. 25000' %}">
+                    <p class="mt-1 text-xs text-gray-500">{% trans "Enter numeric value only; displayed as UZS in the UI." %}</p>
                 </div>
                 <div>
-                    <label for="stock" class="block text-sm font-medium text-gray-700 mb-1">Initial Stock</label>
+                    <label for="stock" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Initial Stock" %}</label>
                     <input id="stock" name="stock" type="number" min="0" step="1" value="0"
                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                           placeholder="e.g. 100">
-                    <p class="mt-1 text-xs text-gray-500">Current quantity available in inventory.</p>
+                           placeholder="{% trans 'e.g. 100' %}">
+                    <p class="mt-1 text-xs text-gray-500">{% trans "Current quantity available in inventory." %}</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="flex items-end">
                     <div class="w-full rounded-lg bg-gray-50 border border-gray-200 px-3 py-2.5">
-                        <p class="text-xs text-gray-500">Preview</p>
+                        <p class="text-xs text-gray-500">{% trans "Preview" %}</p>
                         <p id="price-preview" class="text-sm font-semibold text-gray-900">0.00 UZS</p>
                     </div>
                 </div>
             </div>
 
             <div>
-                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Description" %}</label>
                 <textarea id="description" name="description" rows="4"
                           class="w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                          placeholder="Optional notes about this medicine"></textarea>
+                          placeholder="{% trans 'Optional notes about this medicine' %}"></textarea>
             </div>
 
             <div id="form-message" class="hidden rounded-lg px-4 py-3 text-sm"></div>
             <div id="form-errors" class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                <p class="font-semibold mb-2">Please fix the following:</p>
+                <p class="font-semibold mb-2">{% trans "Please fix the following:" %}</p>
                 <ul id="form-errors-list" class="list-disc pl-5 space-y-1"></ul>
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-2">
-                <a href="{% url 'medicines-list' %}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Cancel</a>
+                <a href="{% url 'medicines-list' %}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{% trans "Cancel" %}</a>
                 <button type="submit" class="inline-flex items-center rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700">
-                    <i class="fas fa-save mr-2"></i>Create Medicine
+                    <i class="fas fa-save mr-2"></i>{% trans "Create Medicine" %}
                 </button>
             </div>
         </form>
@@ -99,6 +100,16 @@
 
 {% block extra_js %}
 <script>
+const APP_LOCALE = "{{ LANGUAGE_CODE|default:'uz'|escapejs }}".replace('_', '-');
+const I18N = {
+    couldNotLoadCategories: "{% trans 'Could not load categories.' %}",
+    stockMustBeNonNegativeInteger: "{% trans 'Stock must be a non-negative integer.' %}",
+    medicineCreated: "{% trans 'Medicine created successfully' %}",
+    failedCreateMedicine: "{% trans 'Failed to create medicine.' %}",
+    reviewFormErrors: "{% trans 'Please review the form errors.' %}",
+    networkCreateError: "{% trans 'Network error while creating medicine.' %}",
+};
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -115,7 +126,7 @@ function getCookie(name) {
 }
 
 function formatUZS(amount) {
-    return new Intl.NumberFormat('uz-UZ', {
+    return new Intl.NumberFormat(APP_LOCALE, {
         style: 'decimal',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -176,7 +187,7 @@ async function loadCategories() {
             select.appendChild(option);
         });
     } catch (error) {
-        setMessage('Could not load categories.', 'error');
+        setMessage(I18N.couldNotLoadCategories, 'error');
     }
 }
 
@@ -192,7 +203,7 @@ document.getElementById('medicine-create-form').addEventListener('submit', async
     const stockValue = stockRaw === '' ? 0 : Number(stockRaw);
 
     if (!Number.isInteger(stockValue) || stockValue < 0) {
-        setMessage('Stock must be a non-negative integer.', 'error');
+        setMessage(I18N.stockMustBeNonNegativeInteger, 'error');
         return;
     }
 
@@ -223,7 +234,7 @@ document.getElementById('medicine-create-form').addEventListener('submit', async
         const responseData = await response.json();
 
         if (response.ok) {
-            setMessage('Medicine created successfully', 'success');
+            setMessage(I18N.medicineCreated, 'success');
             setTimeout(() => {
                 window.location.href = "{% url 'medicines-list' %}";
             }, 700);
@@ -231,15 +242,16 @@ document.getElementById('medicine-create-form').addEventListener('submit', async
         }
 
         if (!renderFieldErrors(responseData)) {
-            setMessage('Failed to create medicine.', 'error');
+            setMessage(I18N.failedCreateMedicine, 'error');
         } else {
-            setMessage('Please review the form errors.', 'error');
+            setMessage(I18N.reviewFormErrors, 'error');
         }
     } catch (error) {
-        setMessage('Network error while creating medicine.', 'error');
+        setMessage(I18N.networkCreateError, 'error');
     }
 });
 
 loadCategories();
 </script>
 {% endblock %}
+

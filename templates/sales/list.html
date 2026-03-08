@@ -1,49 +1,48 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Sales - Pharmacy Analytic AI{% endblock %}
-{% block page_title %}Sales Records{% endblock %}
+{% block title %}{% trans "Sales - Pharmacy Analytic AI" %}{% endblock %}
+{% block page_title %}{% trans "Sales Records" %}{% endblock %}
 
 {% block content %}
 <div class="mb-6 flex items-center justify-between">
     <div>
-        <h2 class="text-2xl font-bold text-gray-800">Sales Records</h2>
-        <p class="text-gray-600 mt-1">View and manage sales transactions</p>
+        <h2 class="text-2xl font-bold text-gray-800">{% trans "Sales Records" %}</h2>
+        <p class="text-gray-600 mt-1">{% trans "View and manage sales transactions" %}</p>
     </div>
     <a href="{% url 'sales-analytics' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-        <i class="fas fa-chart-bar mr-2"></i>View Analytics
+        <i class="fas fa-chart-bar mr-2"></i>{% trans "View Analytics" %}
     </a>
 </div>
 
-<!-- Filters -->
 <div class="bg-white rounded-lg shadow-md p-4 mb-6">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <input type="date" id="start-date" class="px-4 py-2 border border-gray-300 rounded-lg">
         <input type="date" id="end-date" class="px-4 py-2 border border-gray-300 rounded-lg">
         <button onclick="loadSales()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            <i class="fas fa-filter mr-2"></i>Filter
+            <i class="fas fa-filter mr-2"></i>{% trans "Filter" %}
         </button>
         <button onclick="resetFilters()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
-            <i class="fas fa-redo mr-2"></i>Reset
+            <i class="fas fa-redo mr-2"></i>{% trans "Reset" %}
         </button>
     </div>
 </div>
 
-<!-- Sales Table -->
 <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sale ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Amount</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Sale ID" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Date" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "User" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Items" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Total Amount" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Actions" %}</th>
                 </tr>
             </thead>
             <tbody id="sales-table-body" class="bg-white divide-y divide-gray-200">
-                <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin"></i> {% trans "Loading..." %}</td></tr>
             </tbody>
         </table>
     </div>
@@ -55,19 +54,28 @@
 {% block extra_js %}
 <script>
 let currentPage = 1;
+const APP_LOCALE = "{{ LANGUAGE_CODE|default:'uz'|escapejs }}".replace('_', '-');
+const I18N = {
+    noSales: "{% trans 'No sales found' %}",
+    na: "{% trans 'N/A' %}",
+    items: "{% trans 'items' %}",
+    page: "{% trans 'Page' %}",
+    previous: "{% trans 'Previous' %}",
+    next: "{% trans 'Next' %}",
+};
 
 async function loadSales(page = 1) {
     try {
         let url = `/api/sales/sales/?page=${page}&ordering=-date`;
         const startDate = document.getElementById('start-date').value;
         const endDate = document.getElementById('end-date').value;
-        
+
         if (startDate) url += `&start_date=${startDate}`;
         if (endDate) url += `&end_date=${endDate}`;
-        
+
         const response = await fetch(url);
         const data = await response.json();
-        
+
         renderSales(data.results || []);
         renderPagination(data);
         currentPage = page;
@@ -79,18 +87,18 @@ async function loadSales(page = 1) {
 function renderSales(sales) {
     const tbody = document.getElementById('sales-table-body');
     if (sales.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No sales found</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">${I18N.noSales}</td></tr>`;
         return;
     }
-    
+
     tbody.innerHTML = sales.map(sale => {
         const date = new Date(sale.date);
         return `
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">#${sale.id}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${date.toLocaleString()}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.user_name || 'N/A'}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.items_count || 0} items</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${date.toLocaleString(APP_LOCALE)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.user_name || I18N.na}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.items_count || 0} ${I18N.items}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">${formatUZS(sale.total_amount || 0)}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                     <a href="/api/sales/sales/${sale.id}/" class="text-blue-600 hover:text-blue-900">
@@ -108,12 +116,12 @@ function renderPagination(data) {
         pagination.innerHTML = '';
         return;
     }
-    
+
     let html = '<div class="flex items-center justify-between">';
-    html += `<div class="text-sm text-gray-700">Page ${currentPage}</div>`;
+    html += `<div class="text-sm text-gray-700">${I18N.page} ${currentPage}</div>`;
     html += '<div class="flex space-x-2">';
-    if (data.previous) html += `<button onclick="loadSales(${currentPage - 1})" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Previous</button>`;
-    if (data.next) html += `<button onclick="loadSales(${currentPage + 1})" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Next</button>`;
+    if (data.previous) html += `<button onclick="loadSales(${currentPage - 1})" class="px-4 py-2 border rounded-lg hover:bg-gray-100">${I18N.previous}</button>`;
+    if (data.next) html += `<button onclick="loadSales(${currentPage + 1})" class="px-4 py-2 border rounded-lg hover:bg-gray-100">${I18N.next}</button>`;
     html += '</div></div>';
     pagination.innerHTML = html;
 }
@@ -125,7 +133,7 @@ function resetFilters() {
 }
 
 function formatUZS(amount) {
-    return new Intl.NumberFormat('uz-UZ', {
+    return new Intl.NumberFormat(APP_LOCALE, {
         style: 'decimal',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -135,3 +143,4 @@ function formatUZS(amount) {
 loadSales(1);
 </script>
 {% endblock %}
+

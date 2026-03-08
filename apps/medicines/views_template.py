@@ -14,6 +14,7 @@ from django.db.models import ProtectedError
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST, require_http_methods
 
 from apps.inventory.models import Inventory
@@ -31,7 +32,7 @@ class MedicineUpdateForm(forms.ModelForm):
         min_value=0,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
-        help_text="Current stock quantity",
+        help_text=_("Current stock quantity"),
     )
 
     class Meta:
@@ -106,11 +107,11 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
     """
     if request.method == "GET":
         if not can_manage_medicines(request.user):
-            raise PermissionDenied("You do not have permission to create medicines.")
+            raise PermissionDenied(_("You do not have permission to create medicines."))
         return render(request, "medicines/create.html")
 
     if not can_manage_medicines(request.user):
-        raise PermissionDenied("You do not have permission to create medicines.")
+        raise PermissionDenied(_("You do not have permission to create medicines."))
 
     content_type = request.content_type or ""
     is_json = content_type.startswith("application/json")
@@ -118,7 +119,7 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
         try:
             payload = json.loads(request.body.decode("utf-8") or "{}")
         except (TypeError, ValueError):
-            return JsonResponse({"detail": "Invalid JSON payload."}, status=400)
+            return JsonResponse({"detail": _("Invalid JSON payload.")}, status=400)
     else:
         payload = request.POST
 
@@ -131,7 +132,7 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
         pharmacy = require_user_pharmacy(request.user)
 
     if pharmacy is None:
-        error = {"pharmacy": "Pharmacy is required for medicine creation."}
+        error = {"pharmacy": _("Pharmacy is required for medicine creation.")}
         if is_json:
             return JsonResponse(error, status=400)
         messages.error(request, error["pharmacy"])
@@ -147,38 +148,38 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
 
     errors = {}
     if not name:
-        errors["name"] = "Medicine name is required."
+        errors["name"] = _("Medicine name is required.")
     if not sku:
-        errors["sku"] = "SKU is required."
+        errors["sku"] = _("SKU is required.")
     if unit_price_raw in (None, ""):
-        errors["unit_price"] = "Unit price is required."
+        errors["unit_price"] = _("Unit price is required.")
 
     category = None
     if category_id:
         category = Category.objects.filter(id=category_id, pharmacy=pharmacy).first()
         if category is None:
-            errors["category"] = "Selected category is invalid for this pharmacy."
+            errors["category"] = _("Selected category is invalid for this pharmacy.")
 
     try:
         initial_stock = int(initial_stock_raw or 0)
         if initial_stock < 0:
-            errors["initial_stock"] = "Initial stock must be non-negative."
+            errors["initial_stock"] = _("Initial stock must be non-negative.")
     except (TypeError, ValueError):
-        errors["initial_stock"] = "Initial stock must be an integer."
+        errors["initial_stock"] = _("Initial stock must be an integer.")
         initial_stock = 0
 
     try:
         unit_price = Decimal(str(unit_price_raw)) if unit_price_raw not in (None, "") else None
         if unit_price is not None and unit_price <= 0:
-            errors["unit_price"] = "Unit price must be greater than 0."
+            errors["unit_price"] = _("Unit price must be greater than 0.")
     except (InvalidOperation, TypeError, ValueError):
-        errors["unit_price"] = "Unit price is invalid."
+        errors["unit_price"] = _("Unit price is invalid.")
         unit_price = None
 
     if expiry_date is not None:
         parsed_expiry = parse_date(str(expiry_date))
         if parsed_expiry is None:
-            errors["expiry_date"] = "Expiry date is invalid."
+            errors["expiry_date"] = _("Expiry date is invalid.")
         expiry_date = parsed_expiry
 
     if errors:
@@ -217,7 +218,7 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
                 messages.error(request, str(value))
         return render(request, "medicines/create.html", status=400)
     except IntegrityError:
-        error = {"sku": "A medicine with this SKU already exists in this pharmacy."}
+        error = {"sku": _("A medicine with this SKU already exists in this pharmacy.")}
         if is_json:
             return JsonResponse(error, status=400)
         messages.error(request, error["sku"])
@@ -235,7 +236,7 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
             status=201,
         )
 
-    messages.success(request, "Medicine created successfully")
+    messages.success(request, _("Medicine created successfully"))
     return redirect("medicines-list")
 
 
@@ -251,7 +252,7 @@ def medicine_detail_view(request: HttpRequest, pk: int) -> HttpResponse:
 def medicine_update_view(request: HttpRequest, pk: int) -> HttpResponse:
     """Render and process medicine update form."""
     if not can_manage_medicines(request.user):
-        raise PermissionDenied("You do not have permission to update medicines.")
+        raise PermissionDenied(_("You do not have permission to update medicines."))
 
     medicine = get_object_or_404(_tenant_medicine_queryset(request), pk=pk)
     pharmacy = medicine.pharmacy
@@ -261,7 +262,7 @@ def medicine_update_view(request: HttpRequest, pk: int) -> HttpResponse:
         if form.is_valid():
             with transaction.atomic():
                 form.save()
-            messages.success(request, "Medicine updated successfully")
+            messages.success(request, _("Medicine updated successfully"))
             return redirect("medicines-list")
     else:
         form = MedicineUpdateForm(instance=medicine, pharmacy=pharmacy)
@@ -281,17 +282,17 @@ def medicine_update_view(request: HttpRequest, pk: int) -> HttpResponse:
 def medicine_delete_view(request: HttpRequest, pk: int) -> HttpResponse:
     """Delete a medicine by POST request only."""
     if not can_delete_medicines(request.user):
-        raise PermissionDenied("You do not have permission to delete medicines.")
+        raise PermissionDenied(_("You do not have permission to delete medicines."))
 
     medicine = get_object_or_404(_tenant_medicine_queryset(request), pk=pk)
 
     try:
         medicine.delete()
-        messages.success(request, "Medicine deleted successfully.")
+        messages.success(request, _("Medicine deleted successfully."))
     except ProtectedError:
         messages.error(
             request,
-            "This medicine cannot be deleted because it is used in existing sales records.",
+            _("This medicine cannot be deleted because it is used in existing sales records."),
         )
 
     return redirect("medicines-list")

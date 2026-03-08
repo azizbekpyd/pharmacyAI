@@ -1,35 +1,35 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Inventory - Pharmacy Analytic AI{% endblock %}
-{% block page_title %}Inventory Management{% endblock %}
+{% block title %}{% trans "Inventory - Pharmacy Analytic AI" %}{% endblock %}
+{% block page_title %}{% trans "Inventory Management" %}{% endblock %}
 
 {% block content %}
 <div class="mb-6 flex items-center justify-between">
     <div>
-        <h2 class="text-2xl font-bold text-gray-800">Inventory</h2>
-        <p class="text-gray-600 mt-1">Monitor stock levels and manage inventory</p>
+        <h2 class="text-2xl font-bold text-gray-800">{% trans "Inventory" %}</h2>
+        <p class="text-gray-600 mt-1">{% trans "Monitor stock levels and manage inventory" %}</p>
     </div>
     <a href="{% url 'inventory-reorder-recommendations' %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
-        <i class="fas fa-exclamation-triangle mr-2"></i>Reorder Alerts
+        <i class="fas fa-exclamation-triangle mr-2"></i>{% trans "Reorder Alerts" %}
     </a>
 </div>
 
-<!-- Inventory Table -->
 <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Medicine</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Stock</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Min Level</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Max Level</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Medicine" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Current Stock" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Min Level" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Max Level" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Status" %}</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Actions" %}</th>
                 </tr>
             </thead>
             <tbody id="inventory-table-body" class="bg-white divide-y divide-gray-200">
-                <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin"></i> {% trans "Loading..." %}</td></tr>
             </tbody>
         </table>
     </div>
@@ -39,6 +39,15 @@
 
 {% block extra_js %}
 <script>
+const I18N = {
+    noInventory: "{% trans 'No inventory records' %}",
+    lowStock: "{% trans 'Low Stock' %}",
+    medium: "{% trans 'Medium' %}",
+    good: "{% trans 'Good' %}",
+    na: "{% trans 'N/A' %}",
+    enterQuantity: "{% trans 'Enter new stock quantity:' %}",
+};
+
 async function loadInventory() {
     try {
         const response = await fetch('/api/inventory/inventory/');
@@ -52,20 +61,20 @@ async function loadInventory() {
 function renderInventory(inventory) {
     const tbody = document.getElementById('inventory-table-body');
     if (inventory.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No inventory records</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">${I18N.noInventory}</td></tr>`;
         return;
     }
-    
+
     tbody.innerHTML = inventory.map(item => {
         const needsReorder = item.needs_reorder;
         const stockPercent = item.stock_percentage || 0;
         const statusClass = needsReorder ? 'bg-red-100 text-red-800' : stockPercent < 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800';
-        const statusText = needsReorder ? 'Low Stock' : stockPercent < 50 ? 'Medium' : 'Good';
-        
+        const statusText = needsReorder ? I18N.lowStock : stockPercent < 50 ? I18N.medium : I18N.good;
+
         return `
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">${item.medicine_name || 'N/A'}</div>
+                    <div class="text-sm font-medium text-gray-900">${item.medicine_name || I18N.na}</div>
                     <div class="text-sm text-gray-500">${item.medicine_sku || ''}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm ${needsReorder ? 'text-red-600 font-semibold' : 'text-gray-900'}">
@@ -87,9 +96,9 @@ function renderInventory(inventory) {
 }
 
 function updateStock(id) {
-    const quantity = prompt('Enter new stock quantity:');
+    const quantity = prompt(I18N.enterQuantity);
     if (!quantity || isNaN(quantity)) return;
-    
+
     fetch(`/api/inventory/inventory/${id}/update_stock/`, {
         method: 'POST',
         headers: {
@@ -120,3 +129,4 @@ function getCookie(name) {
 loadInventory();
 </script>
 {% endblock %}
+

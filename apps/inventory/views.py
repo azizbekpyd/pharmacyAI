@@ -5,6 +5,7 @@ Handles CRUD operations for inventory and reorder recommendations.
 """
 from django.db.models import F
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -56,12 +57,12 @@ class InventoryViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
         operation = request.data.get("operation", "set")
 
         if quantity is None:
-            return Response({"error": "Quantity is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": _("Quantity is required")}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             quantity = int(quantity)
         except (TypeError, ValueError):
-            return Response({"error": "Quantity must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": _("Quantity must be an integer")}, status=status.HTTP_400_BAD_REQUEST)
 
         if operation == "set":
             inventory.current_stock = quantity
@@ -71,7 +72,7 @@ class InventoryViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
             inventory.current_stock = max(0, inventory.current_stock - quantity)
         else:
             return Response(
-                {"error": 'Invalid operation. Use "set", "add", or "subtract"'},
+                {"error": _('Invalid operation. Use "set", "add", or "subtract"')},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -87,12 +88,12 @@ class InventoryViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
             pharmacy_id = request.query_params.get("pharmacy_id")
             if not pharmacy_id:
                 return Response(
-                    {"error": "pharmacy_id is required for superuser"},
+                    {"error": _("pharmacy_id is required for superuser")},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             pharmacy = Pharmacy.objects.filter(id=pharmacy_id).first()
             if pharmacy is None:
-                return Response({"error": "Pharmacy not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": _("Pharmacy not found")}, status=status.HTTP_404_NOT_FOUND)
         else:
             pharmacy = require_user_pharmacy(request.user)
 
@@ -132,7 +133,7 @@ class ReorderRecommendationViewSet(TenantScopedQuerysetMixin, viewsets.ModelView
     def approve(self, request, pk=None):
         recommendation = self.get_object()
         if recommendation.status != "PENDING":
-            return Response({"error": "Only pending recommendations can be approved"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": _("Only pending recommendations can be approved")}, status=status.HTTP_400_BAD_REQUEST)
 
         recommendation.status = "APPROVED"
         recommendation.approved_by = request.user
@@ -157,7 +158,7 @@ class ReorderRecommendationViewSet(TenantScopedQuerysetMixin, viewsets.ModelView
     def reject(self, request, pk=None):
         recommendation = self.get_object()
         if recommendation.status != "PENDING":
-            return Response({"error": "Only pending recommendations can be rejected"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": _("Only pending recommendations can be rejected")}, status=status.HTTP_400_BAD_REQUEST)
 
         recommendation.status = "REJECTED"
         recommendation.save()

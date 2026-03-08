@@ -1,7 +1,8 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Medicine Details - Pharmacy Analytic AI{% endblock %}
-{% block page_title %}Medicine Details{% endblock %}
+{% block title %}{% trans "Medicine Details - Pharmacy Analytic AI" %}{% endblock %}
+{% block page_title %}{% trans "Medicine Details" %}{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto space-y-6">
@@ -11,33 +12,52 @@
             <p class="mt-1 text-sm text-gray-600">SKU: {{ medicine.sku }}</p>
         </div>
         <a href="{% url 'medicines-list' %}" class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-            <i class="fas fa-arrow-left mr-2"></i>Back to List
+            <i class="fas fa-arrow-left mr-2"></i>{% trans "Back to List" %}
         </a>
     </div>
 
     <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
         <div class="grid grid-cols-1 gap-5 p-6 md:grid-cols-2">
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Category</p>
-                <p class="mt-1 text-sm text-gray-900">{{ medicine.category.name|default:"Uncategorized" }}</p>
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">{% trans "Category" %}</p>
+                <p class="mt-1 text-sm text-gray-900">
+                    {% if medicine.category %}
+                        {{ medicine.category.name }}
+                    {% else %}
+                        {% trans "Uncategorized" %}
+                    {% endif %}
+                </p>
             </div>
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Unit Price</p>
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">{% trans "Unit Price" %}</p>
                 <p class="mt-1 text-sm text-gray-900">{{ medicine.unit_price }} UZS</p>
             </div>
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Expiry Date</p>
-                <p class="mt-1 text-sm text-gray-900">{{ medicine.expiry_date|date:"Y-m-d"|default:"Not set" }}</p>
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">{% trans "Expiry Date" %}</p>
+                <p class="mt-1 text-sm text-gray-900">
+                    {% if medicine.expiry_date %}
+                        {{ medicine.expiry_date|date:"SHORT_DATE_FORMAT" }}
+                    {% else %}
+                        {% trans "Not set" %}
+                    {% endif %}
+                </p>
             </div>
             <div>
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Created</p>
-                <p class="mt-1 text-sm text-gray-900">{{ medicine.created_at|date:"Y-m-d H:i" }}</p>
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">{% trans "Created" %}</p>
+                <p class="mt-1 text-sm text-gray-900">{{ medicine.created_at|date:"SHORT_DATETIME_FORMAT" }}</p>
             </div>
             <div class="md:col-span-2">
-                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Description</p>
-                <p class="mt-1 text-sm leading-6 text-gray-900">{{ medicine.description|default:"No description provided." }}</p>
+                <p class="text-xs font-medium uppercase tracking-wide text-gray-500">{% trans "Description" %}</p>
+                <p class="mt-1 text-sm leading-6 text-gray-900">
+                    {% if medicine.description %}
+                        {{ medicine.description }}
+                    {% else %}
+                        {% trans "No description provided." %}
+                    {% endif %}
+                </p>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
+

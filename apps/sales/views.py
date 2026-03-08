@@ -8,6 +8,7 @@ from datetime import datetime
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.utils.translation import gettext_lazy as _
 
 from apps.accounts.permissions import SaleRolePermission
 from apps.tenants.mixins import TenantScopedQuerysetMixin
@@ -36,7 +37,7 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         if response.status_code == status.HTTP_201_CREATED and isinstance(response.data, dict):
-            response.data["message"] = "Sale created successfully"
+            response.data["message"] = _("Sale created successfully")
         return response
 
     def _resolve_action_pharmacy(self):
@@ -68,7 +69,7 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     def analytics(self, request):
         pharmacy = self._resolve_action_pharmacy()
         if request.user.is_superuser and request.query_params.get("pharmacy_id") and pharmacy is None:
-            return Response({"error": "Pharmacy not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Pharmacy not found")}, status=status.HTTP_404_NOT_FOUND)
 
         start_date = request.query_params.get("start_date")
         end_date = request.query_params.get("end_date")
@@ -79,7 +80,7 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     def forecast(self, request):
         pharmacy = self._resolve_action_pharmacy()
         if request.user.is_superuser and request.query_params.get("pharmacy_id") and pharmacy is None:
-            return Response({"error": "Pharmacy not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Pharmacy not found")}, status=status.HTTP_404_NOT_FOUND)
 
         days = int(request.query_params.get("days", 30))
         medicine_id = request.query_params.get("medicine_id")
@@ -96,12 +97,12 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     def forecast_comparison(self, request):
         pharmacy = self._resolve_action_pharmacy()
         if request.user.is_superuser and request.query_params.get("pharmacy_id") and pharmacy is None:
-            return Response({"error": "Pharmacy not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Pharmacy not found")}, status=status.HTTP_404_NOT_FOUND)
 
         medicine_id = request.query_params.get("medicine_id")
         days = int(request.query_params.get("days", 30))
         if not medicine_id:
-            return Response({"error": "medicine_id parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": _("medicine_id parameter is required")}, status=status.HTTP_400_BAD_REQUEST)
 
         comparison = DemandForecastingService.get_forecast_comparison(
             medicine_id=medicine_id,
@@ -109,14 +110,14 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
             pharmacy=pharmacy,
         )
         if comparison is None:
-            return Response({"error": "Medicine not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Medicine not found")}, status=status.HTTP_404_NOT_FOUND)
         return Response(comparison, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"])
     def category_analytics(self, request):
         pharmacy = self._resolve_action_pharmacy()
         if request.user.is_superuser and request.query_params.get("pharmacy_id") and pharmacy is None:
-            return Response({"error": "Pharmacy not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Pharmacy not found")}, status=status.HTTP_404_NOT_FOUND)
 
         start_date = request.query_params.get("start_date")
         end_date = request.query_params.get("end_date")
@@ -136,7 +137,7 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     def monthly_trends(self, request):
         pharmacy = self._resolve_action_pharmacy()
         if request.user.is_superuser and request.query_params.get("pharmacy_id") and pharmacy is None:
-            return Response({"error": "Pharmacy not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Pharmacy not found")}, status=status.HTTP_404_NOT_FOUND)
 
         start_date = request.query_params.get("start_date")
         end_date = request.query_params.get("end_date")
@@ -156,12 +157,12 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     def medicine_performance(self, request):
         pharmacy = self._resolve_action_pharmacy()
         if request.user.is_superuser and request.query_params.get("pharmacy_id") and pharmacy is None:
-            return Response({"error": "Pharmacy not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Pharmacy not found")}, status=status.HTTP_404_NOT_FOUND)
 
         medicine_id = request.query_params.get("medicine_id")
         days = int(request.query_params.get("days", 30))
         if not medicine_id:
-            return Response({"error": "medicine_id parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": _("medicine_id parameter is required")}, status=status.HTTP_400_BAD_REQUEST)
 
         performance = SalesAnalyticsService.get_medicine_performance(
             medicine_id=medicine_id,
@@ -169,14 +170,14 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
             pharmacy=pharmacy,
         )
         if performance is None:
-            return Response({"error": "Medicine not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Medicine not found")}, status=status.HTTP_404_NOT_FOUND)
         return Response(performance, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"])
     def fast_moving(self, request):
         pharmacy = self._resolve_action_pharmacy()
         if request.user.is_superuser and request.query_params.get("pharmacy_id") and pharmacy is None:
-            return Response({"error": "Pharmacy not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Pharmacy not found")}, status=status.HTTP_404_NOT_FOUND)
 
         days = int(request.query_params.get("days", 30))
         limit = int(request.query_params.get("limit", 10))
@@ -187,7 +188,7 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
     def slow_moving(self, request):
         pharmacy = self._resolve_action_pharmacy()
         if request.user.is_superuser and request.query_params.get("pharmacy_id") and pharmacy is None:
-            return Response({"error": "Pharmacy not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Pharmacy not found")}, status=status.HTTP_404_NOT_FOUND)
 
         days = int(request.query_params.get("days", 90))
         slow_moving = SalesAnalyticsService.get_slow_moving_medicines(days=days, pharmacy=pharmacy)

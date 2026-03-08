@@ -6,6 +6,7 @@ Handles serialization/deserialization of User model and authentication data.
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.utils.translation import gettext_lazy as _
 from .models import User
 from apps.tenants.models import Pharmacy
 from apps.tenants.services import SubscriptionService
@@ -57,7 +58,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         """Validate that passwords match."""
         if attrs['password'] != attrs['password_confirm']:
             raise serializers.ValidationError({
-                'password': 'Passwords do not match.'
+                'password': _('Passwords do not match.')
             })
         return attrs
     
@@ -112,18 +113,18 @@ class LoginSerializer(serializers.Serializer):
             
             if not user:
                 raise serializers.ValidationError(
-                    'Invalid username/email or password.'
+                    _('Invalid username/email or password.')
                 )
             
             if not user.is_active:
                 raise serializers.ValidationError(
-                    'User account is disabled.'
+                    _('User account is disabled.')
                 )
             
             attrs['user'] = user
         else:
             raise serializers.ValidationError(
-                'Must include "username" and "password".'
+                _('Must include "username" and "password".')
             )
         
         return attrs

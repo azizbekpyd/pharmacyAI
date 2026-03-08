@@ -6,6 +6,7 @@ This module defines models for inventory tracking and reorder recommendations.
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.utils.translation import gettext_lazy as _
 from apps.medicines.models import Medicine
 
 
@@ -64,7 +65,7 @@ class Inventory(models.Model):
     def clean(self):
         super().clean()
         if self.medicine_id and self.pharmacy_id and self.medicine.pharmacy_id != self.pharmacy_id:
-            raise ValidationError({"medicine": "Medicine must belong to the same pharmacy."})
+            raise ValidationError({"medicine": _("Medicine must belong to the same pharmacy.")})
     
     def needs_reorder(self):
         """
@@ -177,4 +178,4 @@ class ReorderRecommendation(models.Model):
     def clean(self):
         super().clean()
         if self.medicine_id and self.pharmacy_id and self.medicine.pharmacy_id != self.pharmacy_id:
-            raise ValidationError({"medicine": "Medicine must belong to the same pharmacy."})
+            raise ValidationError({"medicine": _("Medicine must belong to the same pharmacy.")})

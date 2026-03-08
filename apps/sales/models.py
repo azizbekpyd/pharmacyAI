@@ -8,6 +8,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.utils.translation import gettext_lazy as _
 from apps.accounts.models import User
 from apps.medicines.models import Medicine
 
@@ -128,9 +129,9 @@ class SaleItem(models.Model):
     def clean(self):
         super().clean()
         if self.sale_id and self.pharmacy_id and self.sale.pharmacy_id != self.pharmacy_id:
-            raise ValidationError({"sale": "Sale must belong to the same pharmacy."})
+            raise ValidationError({"sale": _("Sale must belong to the same pharmacy.")})
         if self.medicine_id and self.pharmacy_id and self.medicine.pharmacy_id != self.pharmacy_id:
-            raise ValidationError({"medicine": "Medicine must belong to the same pharmacy."})
+            raise ValidationError({"medicine": _("Medicine must belong to the same pharmacy.")})
     
     def save(self, *args, **kwargs):
         """Override save to automatically calculate subtotal."""

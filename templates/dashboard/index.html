@@ -1,7 +1,8 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Dashboard - Pharmacy Analytic AI{% endblock %}
-{% block page_title %}Dashboard Overview{% endblock %}
+{% block title %}{% trans "Dashboard - Pharmacy Analytic AI" %}{% endblock %}
+{% block page_title %}{% trans "Dashboard Overview" %}{% endblock %}
 
 {% block content %}
 <!-- Stats Cards -->
@@ -9,7 +10,7 @@
     <div class="bg-white rounded-lg shadow-md p-6 card-hover">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-gray-600">Total Sales</p>
+                <p class="text-sm font-medium text-gray-600">{% trans "Total Sales" %}</p>
                 <p class="text-3xl font-bold text-gray-900 mt-2" id="total-sales">-</p>
                 <p class="text-sm text-green-600 mt-2" id="sales-growth">
                     <i class="fas fa-arrow-up"></i> <span>-</span>%
@@ -20,11 +21,11 @@
             </div>
         </div>
     </div>
-    
+
     <div class="bg-white rounded-lg shadow-md p-6 card-hover">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                <p class="text-sm font-medium text-gray-600">{% trans "Total Revenue" %}</p>
                 <p class="text-3xl font-bold text-gray-900 mt-2" id="total-revenue">-</p>
                 <p class="text-sm text-green-600 mt-2" id="revenue-growth">
                     <i class="fas fa-arrow-up"></i> <span>-</span>%
@@ -35,14 +36,14 @@
             </div>
         </div>
     </div>
-    
+
     <div class="bg-white rounded-lg shadow-md p-6 card-hover">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-gray-600">Medicines</p>
+                <p class="text-sm font-medium text-gray-600">{% trans "Medicines" %}</p>
                 <p class="text-3xl font-bold text-gray-900 mt-2" id="total-medicines">-</p>
                 <p class="text-sm text-orange-600 mt-2">
-                    <i class="fas fa-exclamation-triangle"></i> <span id="expiring-count">-</span> expiring soon
+                    <i class="fas fa-exclamation-triangle"></i> <span id="expiring-count">-</span> {% trans "expiring soon" %}
                 </p>
             </div>
             <div class="bg-purple-100 rounded-full p-4">
@@ -50,14 +51,14 @@
             </div>
         </div>
     </div>
-    
+
     <div class="bg-white rounded-lg shadow-md p-6 card-hover">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-gray-600">Low Stock</p>
+                <p class="text-sm font-medium text-gray-600">{% trans "Low Stock" %}</p>
                 <p class="text-3xl font-bold text-gray-900 mt-2" id="low-stock-count">-</p>
                 <p class="text-sm text-red-600 mt-2">
-                    <i class="fas fa-boxes"></i> Needs reorder
+                    <i class="fas fa-boxes"></i> {% trans "Needs reorder" %}
                 </p>
             </div>
             <div class="bg-red-100 rounded-full p-4">
@@ -73,24 +74,24 @@
     <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">
             <i class="fas fa-chart-line text-blue-500 mr-2"></i>
-            Sales Trend (Last 7 Days)
+            {% trans "Sales Trend (Last 7 Days)" %}
         </h3>
         <p id="dashboard-sales-trend-empty" class="hidden text-sm text-gray-500 text-center py-6">
-            No sales trend data available.
+            {% trans "No sales trend data available." %}
         </p>
         <div id="dashboard-sales-trend-wrap" class="relative h-80">
             <canvas id="salesTrendChart"></canvas>
         </div>
     </div>
-    
+
     <!-- Category Distribution -->
     <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">
             <i class="fas fa-chart-pie text-green-500 mr-2"></i>
-            Sales by Category
+            {% trans "Sales by Category" %}
         </h3>
         <p id="dashboard-category-empty" class="hidden text-sm text-gray-500 text-center py-6">
-            No category data available.
+            {% trans "No category data available." %}
         </p>
         <div id="dashboard-category-wrap" class="relative h-80">
             <canvas id="categoryChart"></canvas>
@@ -105,35 +106,35 @@
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-800">
                 <i class="fas fa-fire text-orange-500 mr-2"></i>
-                Fast Moving Medicines
+                {% trans "Fast Moving Medicines" %}
             </h3>
             <a href="{% url 'sales-analytics' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                View All <i class="fas fa-arrow-right ml-1"></i>
+                {% trans "View All" %} <i class="fas fa-arrow-right ml-1"></i>
             </a>
         </div>
         <div id="fast-moving-list" class="space-y-3">
             <div class="text-center text-gray-500 py-8">
                 <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>Loading...</p>
+                <p>{% trans "Loading..." %}</p>
             </div>
         </div>
     </div>
-    
+
     <!-- Slow Moving Medicines -->
     <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-800">
                 <i class="fas fa-snowflake text-blue-500 mr-2"></i>
-                Slow Moving Medicines
+                {% trans "Slow Moving Medicines" %}
             </h3>
             <a href="{% url 'sales-analytics' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                View All <i class="fas fa-arrow-right ml-1"></i>
+                {% trans "View All" %} <i class="fas fa-arrow-right ml-1"></i>
             </a>
         </div>
         <div id="slow-moving-list" class="space-y-3">
             <div class="text-center text-gray-500 py-8">
                 <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>Loading...</p>
+                <p>{% trans "Loading..." %}</p>
             </div>
         </div>
     </div>
@@ -144,10 +145,10 @@
     <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-semibold text-gray-800">
             <i class="fas fa-calculator text-indigo-500 mr-2"></i>
-            Inventory Optimization Forecast
+            {% trans "Inventory Optimization Forecast" %}
         </h3>
         <div class="text-sm text-gray-600">
-            Service Level Target:
+            {% trans "Service Level Target:" %}
             <span class="font-semibold" id="service-level-target">95%</span>
             (Z=<span id="service-level-z">1.65</span>)
         </div>
@@ -156,16 +157,16 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Medicine</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Forecast (30d)</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Reorder Qty</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Model</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Medicine" %}</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Forecast (30d)" %}</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Reorder Qty" %}</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Model" %}</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">MAPE</th>
                 </tr>
             </thead>
             <tbody id="optimization-list" class="bg-white divide-y divide-gray-200">
                 <tr>
-                    <td colspan="5" class="px-4 py-3 text-sm text-gray-500">Loading optimization data...</td>
+                    <td colspan="5" class="px-4 py-3 text-sm text-gray-500">{% trans "Loading optimization data..." %}</td>
                 </tr>
             </tbody>
         </table>
@@ -179,35 +180,35 @@
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-800">
                 <i class="fas fa-clock text-indigo-500 mr-2"></i>
-                Recent Sales
+                {% trans "Recent Sales" %}
             </h3>
             <a href="{% url 'sales-list' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                View All <i class="fas fa-arrow-right ml-1"></i>
+                {% trans "View All" %} <i class="fas fa-arrow-right ml-1"></i>
             </a>
         </div>
         <div id="recent-sales-list" class="space-y-3">
             <div class="text-center text-gray-500 py-8">
                 <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>Loading...</p>
+                <p>{% trans "Loading..." %}</p>
             </div>
         </div>
     </div>
-    
+
     <!-- Alerts -->
     <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-800">
                 <i class="fas fa-bell text-yellow-500 mr-2"></i>
-                Alerts & Notifications
+                {% trans "Alerts & Notifications" %}
             </h3>
             <a href="{% url 'inventory-reorder-recommendations' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                View All <i class="fas fa-arrow-right ml-1"></i>
+                {% trans "View All" %} <i class="fas fa-arrow-right ml-1"></i>
             </a>
         </div>
         <div id="alerts-list" class="space-y-3">
             <div class="text-center text-gray-500 py-8">
                 <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>Loading...</p>
+                <p>{% trans "Loading..." %}</p>
             </div>
         </div>
     </div>
@@ -220,7 +221,24 @@
 // Chart instances (render once)
 let salesTrendChartInstance = null;
 let categoryChartInstance = null;
-const UZS_NUMBER = new Intl.NumberFormat('uz-UZ', { maximumFractionDigits: 0 });
+const APP_LOCALE = "{{ LANGUAGE_CODE|default:'uz'|escapejs }}".replace('_', '-');
+const UZS_NUMBER = new Intl.NumberFormat(APP_LOCALE, { maximumFractionDigits: 0 });
+
+const I18N = {
+  noFastMoving: "{% trans 'No fast moving medicines' %}",
+  noSlowMoving: "{% trans 'No slow moving medicines' %}",
+  noRecentSales: "{% trans 'No recent sales' %}",
+  noAlerts: "{% trans 'No alerts' %}",
+  reorder: "{% trans 'Reorder' %}",
+  units: "{% trans 'units' %}",
+  unitsSold: "{% trans 'units sold' %}",
+  low: "{% trans 'Low' %}",
+  sale: "{% trans 'Sale' %}",
+  notAvailable: "{% trans 'N/A' %}",
+  noOptimizationData: "{% trans 'No optimization data available.' %}",
+  salesCount: "{% trans 'Sales Count' %}",
+  revenueUZS: "{% trans 'Revenue (UZS)' %}",
+};
 
 // Fallback for environments where Decimal might be referenced by libs/plugins
 const Decimal = Number;
@@ -249,25 +267,21 @@ const DASHBOARD = {
 };
 
 function loadDashboardData() {
-  // Stats
   document.getElementById('total-sales').textContent = DASHBOARD.totalSales || 0;
   document.getElementById('total-revenue').textContent = formatUZS(DASHBOARD.totalRevenueUZS || 0);
   document.getElementById('total-medicines').textContent = DASHBOARD.medicinesCount || 0;
   document.getElementById('expiring-count').textContent = DASHBOARD.expiringSoonCount || 0;
   document.getElementById('low-stock-count').textContent = DASHBOARD.lowStockCount || 0;
 
-  // Growth labels
   applyGrowth('sales-growth', DASHBOARD.salesGrowthPct);
   applyGrowth('revenue-growth', DASHBOARD.revenueGrowthPct);
 
-  // Lists
   renderFastMoving(DASHBOARD.fastMoving || []);
   renderSlowMoving(DASHBOARD.slowMoving || []);
   renderRecentSales(DASHBOARD.recentSales || []);
   renderAlerts(DASHBOARD.alerts || []);
   renderOptimization(DASHBOARD.forecastReorder || [], DASHBOARD.serviceLevel || {});
 
-  // Charts
   renderSalesTrendChart(DASHBOARD.trendLabels || [], DASHBOARD.trendSales || [], DASHBOARD.trendRevenue || []);
   renderCategoryChart(DASHBOARD.categoryLabels || [], DASHBOARD.categoryRevenue || []);
 }
@@ -285,19 +299,18 @@ function applyGrowth(elementId, value) {
   el.querySelector('i').className = num >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
 }
 
-// Render functions
 function renderFastMoving(data) {
     const container = document.getElementById('fast-moving-list');
     if (!data || data.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500 py-4">No fast moving medicines</p>';
+        container.innerHTML = `<p class="text-center text-gray-500 py-4">${I18N.noFastMoving}</p>`;
         return;
     }
-    
+
     container.innerHTML = data.map(item => `
         <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
             <div class="flex-1">
-                <p class="font-medium text-gray-900">${item.medicine__name || 'N/A'}</p>
-                <p class="text-sm text-gray-600">${item.total_quantity || 0} units sold</p>
+                <p class="font-medium text-gray-900">${item.medicine__name || I18N.notAvailable}</p>
+                <p class="text-sm text-gray-600">${item.total_quantity || 0} ${I18N.unitsSold}</p>
             </div>
             <div class="text-right">
                 <p class="font-semibold text-orange-600">${formatUZS(item.total_revenue_uzs || 0)}</p>
@@ -309,18 +322,18 @@ function renderFastMoving(data) {
 function renderSlowMoving(data) {
     const container = document.getElementById('slow-moving-list');
     if (!data || data.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500 py-4">No slow moving medicines</p>';
+        container.innerHTML = `<p class="text-center text-gray-500 py-4">${I18N.noSlowMoving}</p>`;
         return;
     }
-    
+
     container.innerHTML = data.map(item => `
         <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
             <div class="flex-1">
-                <p class="font-medium text-gray-900">${item.medicine_name || 'N/A'}</p>
-                <p class="text-sm text-gray-600">${item.total_quantity || 0} units sold</p>
+                <p class="font-medium text-gray-900">${item.medicine_name || I18N.notAvailable}</p>
+                <p class="text-sm text-gray-600">${item.total_quantity || 0} ${I18N.unitsSold}</p>
             </div>
             <div class="text-right">
-                <span class="px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded">Low</span>
+                <span class="px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded">${I18N.low}</span>
             </div>
         </div>
     `).join('');
@@ -329,17 +342,17 @@ function renderSlowMoving(data) {
 function renderRecentSales(sales) {
     const container = document.getElementById('recent-sales-list');
     if (!sales || sales.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500 py-4">No recent sales</p>';
+        container.innerHTML = `<p class="text-center text-gray-500 py-4">${I18N.noRecentSales}</p>`;
         return;
     }
-    
+
     container.innerHTML = sales.map(sale => {
         const date = new Date(sale.date);
         return `
             <div class="flex items-center justify-between p-3 border-b border-gray-100">
                 <div class="flex-1">
-                    <p class="font-medium text-gray-900">Sale #${sale.id}</p>
-                    <p class="text-sm text-gray-600">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</p>
+                    <p class="font-medium text-gray-900">${I18N.sale} #${sale.id}</p>
+                    <p class="text-sm text-gray-600">${date.toLocaleDateString(APP_LOCALE)} ${date.toLocaleTimeString(APP_LOCALE)}</p>
                 </div>
                 <div class="text-right">
                     <p class="font-semibold text-gray-900">${formatUZS(sale.total_amount_uzs || 0)}</p>
@@ -352,10 +365,10 @@ function renderRecentSales(sales) {
 function renderAlerts(recommendations) {
     const container = document.getElementById('alerts-list');
     if (!recommendations || recommendations.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500 py-4">No alerts</p>';
+        container.innerHTML = `<p class="text-center text-gray-500 py-4">${I18N.noAlerts}</p>`;
         return;
     }
-    
+
     container.innerHTML = recommendations.slice(0, 5).map(rec => {
         const priorityColors = {
             'URGENT': 'bg-red-100 text-red-800',
@@ -366,8 +379,8 @@ function renderAlerts(recommendations) {
         return `
             <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div class="flex-1">
-                    <p class="font-medium text-gray-900">${rec.medicine_name || 'N/A'}</p>
-                    <p class="text-sm text-gray-600">Reorder ${rec.recommended_quantity} units</p>
+                    <p class="font-medium text-gray-900">${rec.medicine_name || I18N.notAvailable}</p>
+                    <p class="text-sm text-gray-600">${I18N.reorder} ${rec.recommended_quantity} ${I18N.units}</p>
                 </div>
                 <span class="px-2 py-1 ${priorityColors[rec.priority] || 'bg-gray-100 text-gray-800'} text-xs rounded">
                     ${rec.priority}
@@ -377,9 +390,7 @@ function renderAlerts(recommendations) {
     }).join('');
 }
 
-// Chart rendering
 function renderSalesTrendChart(data) {
-    // Backwards compatible: accept either array-of-objects or arrays
     let labels = [];
     let salesData = [];
     let revenueData = [];
@@ -389,13 +400,11 @@ function renderSalesTrendChart(data) {
       salesData = data.map(item => Number(item.total_sales || 0));
       revenueData = data.map(item => Number(item.total_amount || 0));
     } else {
-      // new signature renderSalesTrendChart(labels, sales, revenue)
       labels = (arguments[0] || []).map(x => x);
       salesData = (arguments[1] || []).map(x => Number(x || 0));
       revenueData = (arguments[2] || []).map(x => Number(x || 0));
     }
 
-    // Destroy existing instance
     if (salesTrendChartInstance) {
       salesTrendChartInstance.destroy();
       salesTrendChartInstance = null;
@@ -409,7 +418,7 @@ function renderSalesTrendChart(data) {
 
     const minLen = Math.min(labels.length, salesData.length, revenueData.length);
     labels = labels.slice(0, minLen).map(d => {
-      try { return new Date(d).toLocaleDateString(); } catch { return d; }
+      try { return new Date(d).toLocaleDateString(APP_LOCALE); } catch { return d; }
     });
     salesData = salesData.slice(0, minLen).map(Number);
     revenueData = revenueData.slice(0, minLen).map(Number);
@@ -428,14 +437,14 @@ function renderSalesTrendChart(data) {
       data: {
         labels,
         datasets: [{
-          label: 'Sales Count',
+          label: I18N.salesCount,
           data: salesData,
           borderColor: 'rgb(59, 130, 246)',
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
           tension: 0.4,
           yAxisID: 'y'
         }, {
-          label: 'Revenue (UZS)',
+          label: I18N.revenueUZS,
           data: revenueData,
           borderColor: 'rgb(34, 197, 94)',
           backgroundColor: 'rgba(34, 197, 94, 0.1)',
@@ -467,7 +476,7 @@ function renderSalesTrendChart(data) {
             ticks: { precision: 0 },
             title: {
               display: true,
-              text: 'Sales Count'
+              text: I18N.salesCount
             }
           },
           y1: {
@@ -479,7 +488,7 @@ function renderSalesTrendChart(data) {
             },
             title: {
               display: true,
-              text: 'Revenue (UZS)'
+              text: I18N.revenueUZS
             },
             grid: { drawOnChartArea: false }
           }
@@ -519,19 +528,19 @@ function renderOptimization(items, serviceLevel) {
     if (zEl) zEl.textContent = `${serviceLevel.z_value ?? 1.65}`;
 
     if (!items || !items.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-3 text-sm text-gray-500">No optimization data available.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-3 text-sm text-gray-500">${I18N.noOptimizationData}</td></tr>`;
         return;
     }
 
     tbody.innerHTML = items.map((item) => {
         const model = (item.selected_method || '').replaceAll('_', ' ');
-        const mape = item.mape === null || item.mape === undefined ? 'N/A' : `${Number(item.mape).toFixed(2)}%`;
+        const mape = item.mape === null || item.mape === undefined ? I18N.notAvailable : `${Number(item.mape).toFixed(2)}%`;
         return `
             <tr>
-                <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.medicine_name || 'N/A'}</td>
+                <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.medicine_name || I18N.notAvailable}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">${Number(item.forecasted_demand_30_days || 0).toFixed(2)}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">${item.recommended_reorder_quantity || 0}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">${model || 'N/A'}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">${model || I18N.notAvailable}</td>
                 <td class="px-4 py-3 text-sm text-gray-700">${mape}</td>
             </tr>
         `;
@@ -542,7 +551,7 @@ function renderCategoryChart(data) {
     let labels = [];
     let revenueData = [];
     if (Array.isArray(data) && data.length && typeof data[0] === 'object') {
-      labels = data.map(item => item.medicine__category__name || 'Uncategorized');
+      labels = data.map(item => item.medicine__category__name || "{% trans 'Uncategorized' %}");
       revenueData = data.map(item => Number(item.total_revenue || 0));
     } else {
       labels = (arguments[0] || []).map(x => x);
@@ -616,12 +625,10 @@ function renderCategoryChart(data) {
     });
 }
 
-// Utility function
 function formatUZS(amount) {
   return `${UZS_NUMBER.format(Number(amount || 0))} UZS`;
 }
 
-// Initialize dashboard once
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadDashboardData);
 } else {
@@ -629,3 +636,4 @@ if (document.readyState === 'loading') {
 }
 </script>
 {% endblock %}
+

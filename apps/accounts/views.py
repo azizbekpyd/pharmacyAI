@@ -12,6 +12,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
 from .models import User
 from .serializers import UserSerializer, UserCreateSerializer, LoginSerializer
@@ -106,7 +107,7 @@ def login_view(request):
             login(request, user)
             user_serializer = UserSerializer(user)
             return Response({
-                'message': 'Login successful',
+                'message': _('Login successful'),
                 'user': user_serializer.data
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -120,10 +121,13 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
-            messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
+            messages.success(
+                request,
+                _("Welcome back, %(name)s!") % {"name": user.get_full_name() or user.username},
+            )
             return redirect('dashboard')  # Changed from 'dashboard:index' to 'dashboard'
         else:
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, _('Invalid username or password.'))
     
     # GET request - show login form
     return render(request, 'accounts/login.html')
@@ -139,10 +143,10 @@ def logout_view(request):
     
     # Check if this is an API request
     if request.content_type == 'application/json' or request.headers.get('Accept') == 'application/json':
-        return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+        return Response({'message': _('Logout successful')}, status=status.HTTP_200_OK)
     
     # Template-based logout - redirect to login
-    messages.success(request, 'You have been logged out successfully.')
+    messages.success(request, _('You have been logged out successfully.'))
     from django.urls import reverse
     return redirect(reverse('login'))
 
@@ -168,21 +172,21 @@ def start_trial_view(request):
 
         errors = {}
         if not pharmacy_name:
-            errors["pharmacy_name"] = "Pharmacy name is required."
+            errors["pharmacy_name"] = _("Pharmacy name is required.")
         if not username:
-            errors["username"] = "Username is required."
+            errors["username"] = _("Username is required.")
         if not email:
-            errors["email"] = "Email is required."
+            errors["email"] = _("Email is required.")
         if not password:
-            errors["password"] = "Password is required."
+            errors["password"] = _("Password is required.")
         if password and len(password) < 8:
-            errors["password"] = "Password must be at least 8 characters."
+            errors["password"] = _("Password must be at least 8 characters.")
         if password != password_confirm:
-            errors["password_confirm"] = "Passwords do not match."
+            errors["password_confirm"] = _("Passwords do not match.")
         if username and User.objects.filter(username=username).exists():
-            errors["username"] = "Username already exists."
+            errors["username"] = _("Username already exists.")
         if email and User.objects.filter(email=email).exists():
-            errors["email"] = "Email already exists."
+            errors["email"] = _("Email already exists.")
 
         if errors:
             context["errors"] = errors
@@ -215,7 +219,7 @@ def start_trial_view(request):
             user.save(update_fields=["pharmacy"])
 
         login(request, user)
-        messages.success(request, "Trial started successfully. Welcome to PharmacyAI.")
+        messages.success(request, _("Trial started successfully. Welcome to PharmacyAI."))
         return redirect("dashboard")
 
     return render(request, "accounts/start_trial.html", context)

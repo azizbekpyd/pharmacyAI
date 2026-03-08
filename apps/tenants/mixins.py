@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext_lazy as _
 
 from .utils import require_user_pharmacy
 
@@ -47,8 +48,7 @@ class TenantScopedQuerysetMixin:
             return
 
         if self.pharmacy_field in serializer.validated_data:
-            raise PermissionDenied("Changing pharmacy is not allowed.")
+            raise PermissionDenied(_("Changing pharmacy is not allowed."))
 
         pharmacy = require_user_pharmacy(user)
         serializer.save(**{self.pharmacy_field: pharmacy})
-

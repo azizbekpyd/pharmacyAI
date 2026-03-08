@@ -1,19 +1,35 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Login - Pharmacy Analytic AI{% endblock %}
+{% block title %}{% trans "Login - Pharmacy Analytic AI" %}{% endblock %}
 
 {% block auth_content %}
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
         <div class="bg-white rounded-lg shadow-xl p-8">
+            <div class="mb-4 flex justify-end">
+                <form action="{% url 'set_language' %}" method="post">
+                    {% csrf_token %}
+                    {% if request.path|slice:":4" == "/uz/" or request.path|slice:":4" == "/ru/" or request.path|slice:":4" == "/en/" %}
+                    <input type="hidden" name="next" value="{{ request.path|slice:'3:' }}">
+                    {% else %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    {% endif %}
+                    <select name="language" onchange="this.form.submit()" class="rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-700">
+                        <option value="uz" {% if request.LANGUAGE_CODE == 'uz' %}selected{% endif %}>Oʻzbekcha</option>
+                        <option value="ru" {% if request.LANGUAGE_CODE == 'ru' %}selected{% endif %}>Русский</option>
+                        <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
+                    </select>
+                </form>
+            </div>
             <div class="text-center mb-8">
                 <div class="flex justify-center mb-4">
                     <div class="bg-blue-500 rounded-full p-4">
                         <i class="fas fa-pills text-4xl text-white"></i>
                     </div>
                 </div>
-                <h2 class="text-3xl font-bold text-gray-900">Pharmacy Analytic AI</h2>
-                <p class="mt-2 text-sm text-gray-600">Sign in to your account</p>
+                <h2 class="text-3xl font-bold text-gray-900">{% trans "Pharmacy Analytic AI" %}</h2>
+                <p class="mt-2 text-sm text-gray-600">{% trans "Sign in to your account" %}</p>
             </div>
 
             <form method="post" action="{% url 'login' %}" class="space-y-6">
@@ -24,8 +40,8 @@
                     <div class="flex">
                         <i class="fas fa-exclamation-circle text-red-400 mt-1 mr-3"></i>
                         <div class="text-sm text-red-700">
-                            <p class="font-medium">Invalid credentials</p>
-                            <p class="mt-1">Please check your username and password.</p>
+                            <p class="font-medium">{% trans "Invalid credentials" %}</p>
+                            <p class="mt-1">{% trans "Please check your username and password." %}</p>
                         </div>
                     </div>
                 </div>
@@ -33,7 +49,7 @@
 
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                        Username or Email
+                        {% trans "Username or Email" %}
                     </label>
                     <input
                         type="text"
@@ -42,13 +58,13 @@
                         required
                         autofocus
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        placeholder="Enter your username or email"
+                        placeholder="{% trans 'Enter your username or email' %}"
                     >
                 </div>
 
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                        Password
+                        {% trans "Password" %}
                     </label>
                     <input
                         type="password"
@@ -56,7 +72,7 @@
                         name="password"
                         required
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        placeholder="Enter your password"
+                        placeholder="{% trans 'Enter your password' %}"
                     >
                 </div>
 
@@ -69,7 +85,7 @@
                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         >
                         <label for="remember-me" class="ml-2 block text-sm text-gray-700">
-                            Remember me
+                            {% trans "Remember me" %}
                         </label>
                     </div>
                 </div>
@@ -79,26 +95,27 @@
                     class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
                 >
                     <i class="fas fa-sign-in-alt mr-2"></i>
-                    Sign in
+                    {% trans "Sign in" %}
                 </button>
             </form>
 
             <div class="mt-4 text-center">
                 <a href="{% url 'start-trial' %}" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                    Start your free 14-day trial
+                    {% trans "Start your free 14-day trial" %}
                 </a>
             </div>
 
             <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                <p class="text-xs text-gray-600 mb-2 font-medium">Demo Credentials:</p>
-                <p class="text-xs text-gray-500">Username: <span class="font-mono">admin</span></p>
-                <p class="text-xs text-gray-500">Password: <span class="font-mono">12345</span></p>
+                <p class="text-xs text-gray-600 mb-2 font-medium">{% trans "Demo Credentials:" %}</p>
+                <p class="text-xs text-gray-500">{% trans "Username:" %} <span class="font-mono">admin</span></p>
+                <p class="text-xs text-gray-500">{% trans "Password:" %} <span class="font-mono">12345</span></p>
             </div>
         </div>
 
         <p class="text-center text-white text-sm">
-            &copy; 2026 Pharmacy Analytic AI. University Diploma Project.
+            &copy; 2026 {% trans "Pharmacy Analytic AI. University Diploma Project." %}
         </p>
     </div>
 </div>
 {% endblock %}
+

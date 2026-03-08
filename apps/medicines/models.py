@@ -8,6 +8,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.utils.translation import gettext_lazy as _
 
 
 class Category(models.Model):
@@ -117,7 +118,7 @@ class Medicine(models.Model):
     def clean(self):
         super().clean()
         if self.category_id and self.pharmacy_id and self.category.pharmacy_id != self.pharmacy_id:
-            raise ValidationError({"category": "Category must belong to the same pharmacy."})
+            raise ValidationError({"category": _("Category must belong to the same pharmacy.")})
     
     def is_expiring_soon(self, days=30):
         """

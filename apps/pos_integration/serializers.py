@@ -6,6 +6,7 @@ Handles serialization of POS data for ingestion.
 from rest_framework import serializers
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from apps.sales.models import Sale, SaleItem
 from apps.medicines.models import Medicine
 from apps.tenants.services import SubscriptionService
@@ -39,7 +40,9 @@ class POSSaleItemSerializer(serializers.Serializer):
         if pharmacy is not None:
             queryset = queryset.filter(pharmacy=pharmacy)
         if not queryset.exists():
-            raise serializers.ValidationError(f"Medicine with SKU '{value}' not found.")
+            raise serializers.ValidationError(
+                _("Medicine with SKU '%(sku)s' not found.") % {"sku": value}
+            )
         return value
 
 
@@ -57,7 +60,7 @@ class POSSaleSerializer(serializers.Serializer):
     def validate_items(self, value):
         """Validate that items list is not empty."""
         if not value:
-            raise serializers.ValidationError("Sale must have at least one item.")
+            raise serializers.ValidationError(_("Sale must have at least one item."))
         return value
     
     def create(self, validated_data):
@@ -75,7 +78,7 @@ class POSSaleSerializer(serializers.Serializer):
             if user and user.is_authenticated and not user.is_superuser:
                 pharmacy = require_user_pharmacy(user)
             elif user and user.is_authenticated and user.is_superuser:
-                raise serializers.ValidationError({"pharmacy": "Superuser must provide pharmacy context."})
+                raise serializers.ValidationError({"pharmacy": _("Superuser must provide pharmacy context.")})
 
         if not (user and user.is_authenticated and user.is_superuser):
             try:

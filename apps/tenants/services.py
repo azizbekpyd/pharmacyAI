@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class SubscriptionService:
@@ -23,9 +24,9 @@ class SubscriptionService:
     }
 
     RESOURCE_LABELS = {
-        RESOURCE_USERS: "users",
-        RESOURCE_MEDICINES: "medicines",
-        RESOURCE_MONTHLY_SALES: "monthly sales",
+        RESOURCE_USERS: _("users"),
+        RESOURCE_MEDICINES: _("medicines"),
+        RESOURCE_MONTHLY_SALES: _("monthly sales"),
     }
 
     @staticmethod
@@ -57,14 +58,14 @@ class SubscriptionService:
 
             now = timezone.now()
             return Sale.objects.filter(pharmacy=pharmacy, date__year=now.year, date__month=now.month).count()
-        raise ValidationError({"resource_type": "Invalid resource type."})
+        raise ValidationError({"resource_type": _("Invalid resource type.")})
 
     @staticmethod
     def check_limit(pharmacy, resource_type):
         if resource_type not in SubscriptionService.VALID_RESOURCES:
-            raise ValidationError({"resource_type": "Invalid resource type."})
+            raise ValidationError({"resource_type": _("Invalid resource type.")})
         if pharmacy is None:
-            raise ValidationError({"pharmacy": "Pharmacy is required."})
+            raise ValidationError({"pharmacy": _("Pharmacy is required.")})
 
         field_name = SubscriptionService.RESOURCE_TO_FIELD[resource_type]
         limit = getattr(pharmacy, field_name, None)
@@ -77,17 +78,24 @@ class SubscriptionService:
                 "used": used,
                 "limit": None,
                 "remaining": None,
-                "message": "Unlimited plan limit.",
+                "message": _("Unlimited plan limit."),
             }
 
         remaining = limit - used
         allowed = used < limit
         label = SubscriptionService.RESOURCE_LABELS[resource_type]
-        message = (
-            f"Plan limit reached for {label}: {used}/{limit}. Upgrade your subscription to continue."
-            if not allowed
-            else f"{label.capitalize()} usage: {used}/{limit}."
-        )
+        if not allowed and resource_type == SubscriptionService.RESOURCE_MONTHLY_SALES:
+            message = _("Monthly sales limit exceeded.")
+        elif not allowed:
+            message = _(
+                "Plan limit reached for %(label)s: %(used)s/%(limit)s. Upgrade your subscription to continue."
+            ) % {"label": label, "used": used, "limit": limit}
+        else:
+            message = _("%(label)s usage: %(used)s/%(limit)s.") % {
+                "label": str(label).capitalize(),
+                "used": used,
+                "limit": limit,
+            }
         return {
             "resource_type": resource_type,
             "allowed": allowed,
@@ -101,17 +109,19 @@ class SubscriptionService:
     def enforce_limits(pharmacy, resource_type):
         limit_status = SubscriptionService.check_limit(pharmacy, resource_type)
         if not limit_status["allowed"]:
+            if resource_type == SubscriptionService.RESOURCE_MONTHLY_SALES:
+                raise ValidationError(_("Monthly sales limit exceeded."))
             raise ValidationError({"subscription": limit_status["message"]})
         return limit_status
 
     @staticmethod
     def apply_plan_defaults(pharmacy, plan_type=None):
         if pharmacy is None:
-            raise ValidationError({"pharmacy": "Pharmacy is required."})
+            raise ValidationError({"pharmacy": _("Pharmacy is required.")})
 
         resolved_plan = plan_type or pharmacy.plan_type or "BASIC"
         if resolved_plan not in SubscriptionService.PLAN_LIMITS:
-            raise ValidationError({"plan_type": "Invalid plan type."})
+            raise ValidationError({"plan_type": _("Invalid plan type.")})
 
         limits = SubscriptionService.PLAN_LIMITS[resolved_plan]
         now = timezone.now()

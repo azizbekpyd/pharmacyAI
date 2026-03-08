@@ -1,0 +1,1374 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-27 11:35+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+#: .\apps\accounts\permissions.py:42
+msgid "You do not have permission to manage categories."
+msgstr ""
+
+#: .\apps\accounts\permissions.py:54
+msgid "You do not have permission to manage medicines."
+msgstr "You do not have permission gacha manage dorilar."
+
+#: .\apps\accounts\permissions.py:69
+msgid "You do not have permission to manage sales."
+msgstr "You do not have permission gacha manage savdolar."
+
+#: .\apps\accounts\permissions.py:85
+msgid "You do not have permission to manage inventory."
+msgstr "You do not have permission gacha manage zaxira."
+
+#: .\apps\accounts\permissions.py:97
+msgid "You do not have permission to manage reorder recommendations."
+msgstr "You do not have permission gacha manage qayta buyurtma tavsiyalar."
+
+#: .\apps\accounts\serializers.py:61 .\apps\accounts\views.py:185
+msgid "Passwords do not match."
+msgstr "Parollar mos emas."
+
+#: .\apps\accounts\serializers.py:116
+msgid "Invalid username/email or password."
+msgstr "Notogri username/email or parol."
+
+#: .\apps\accounts\serializers.py:121
+msgid "User account is disabled."
+msgstr "User account is ochirilgan."
+
+#: .\apps\accounts\serializers.py:127
+msgid "Must include \"username\" and \"password\"."
+msgstr "Must include \"foydalanuvchi\" and \"parol\"."
+
+#: .\apps\accounts\views.py:110
+msgid "Login successful"
+msgstr "Kirish successful"
+
+#: .\apps\accounts\views.py:126
+#, python-format
+msgid "Welcome back, %(name)s!"
+msgstr "Welcome orqaga, %(name)s!"
+
+#: .\apps\accounts\views.py:130
+msgid "Invalid username or password."
+msgstr "Notogri foydalanuvchi or parol."
+
+#: .\apps\accounts\views.py:146
+msgid "Logout successful"
+msgstr "Chiqish successful"
+
+#: .\apps\accounts\views.py:149
+msgid "You have been logged out successfully."
+msgstr "You have been logged out muvaffaqiyatli."
+
+#: .\apps\accounts\views.py:175
+msgid "Pharmacy name is required."
+msgstr "Dorixona nom is kerak."
+
+#: .\apps\accounts\views.py:177
+msgid "Username is required."
+msgstr "Foydalanuvchi is kerak."
+
+#: .\apps\accounts\views.py:179
+msgid "Email is required."
+msgstr "Email is kerak."
+
+#: .\apps\accounts\views.py:181
+msgid "Password is required."
+msgstr "Parol is kerak."
+
+#: .\apps\accounts\views.py:183
+msgid "Password must be at least 8 characters."
+msgstr "Parol must be at least 8 characters."
+
+#: .\apps\accounts\views.py:187
+msgid "Username already exists."
+msgstr "Foydalanuvchi already exists."
+
+#: .\apps\accounts\views.py:189
+msgid "Email already exists."
+msgstr "Email allaqachon mavjud."
+
+#: .\apps\accounts\views.py:222
+msgid "Trial started successfully. Welcome to PharmacyAI."
+msgstr "Sinov started muvaffaqiyatli. Welcome gacha PharmacyAI."
+
+#: .\apps\inventory\models.py:68 .\apps\inventory\models.py:181
+#: .\apps\sales\models.py:134
+msgid "Medicine must belong to the same pharmacy."
+msgstr "Dori must belong gacha the same dorixona."
+
+#: .\apps\inventory\views.py:60
+msgid "Quantity is required"
+msgstr "Quantity is kerak"
+
+#: .\apps\inventory\views.py:65
+msgid "Quantity must be an integer"
+msgstr "Miqdor butun son bolishi kerak"
+
+#: .\apps\inventory\views.py:75
+msgid "Invalid operation. Use \"set\", \"add\", or \"subtract\""
+msgstr "Notogri operation. Use \"set\", \"add\", or \"subtract\""
+
+#: .\apps\inventory\views.py:91
+msgid "pharmacy_id is required for superuser"
+msgstr "dorixona_id is kerak for superuser"
+
+#: .\apps\inventory\views.py:96 .\apps\sales\views.py:72
+#: .\apps\sales\views.py:83 .\apps\sales\views.py:100 .\apps\sales\views.py:120
+#: .\apps\sales\views.py:140 .\apps\sales\views.py:160
+#: .\apps\sales\views.py:180 .\apps\sales\views.py:191
+msgid "Pharmacy not found"
+msgstr "Dorixona not found"
+
+#: .\apps\inventory\views.py:136
+msgid "Only pending recommendations can be approved"
+msgstr "Faqat pending tavsiyalar can be approved"
+
+#: .\apps\inventory\views.py:161
+msgid "Only pending recommendations can be rejected"
+msgstr "Faqat pending tavsiyalar can be rejected"
+
+#: .\apps\medicines\models.py:121 .\apps\medicines\services.py:35
+msgid "Category must belong to the same pharmacy."
+msgstr "Kategoriya must belong gacha the same dorixona."
+
+#: .\apps\medicines\services.py:20 .\apps\sales\serializers.py:125
+#: .\apps\tenants\services.py:68 .\apps\tenants\services.py:120
+msgid "Pharmacy is required."
+msgstr "Dorixona is kerak."
+
+#: .\apps\medicines\services.py:28 .\apps\medicines\views_template.py:168
+msgid "Initial stock must be an integer."
+msgstr "Initial zaxira must be an integer."
+
+#: .\apps\medicines\services.py:31 .\apps\medicines\views_template.py:166
+msgid "Initial stock must be non-negative."
+msgstr "Initial zaxira must be non-negative."
+
+#: .\apps\medicines\services.py:42 .\apps\medicines\views_template.py:176
+msgid "Unit price is invalid."
+msgstr "Unit narx is notogri."
+
+#: .\apps\medicines\views_template.py:35
+msgid "Current stock quantity"
+msgstr "Joriy zaxira quantity"
+
+#: .\apps\medicines\views_template.py:110
+#: .\apps\medicines\views_template.py:114
+msgid "You do not have permission to create medicines."
+msgstr "You do not have permission gacha yaratish dorilar."
+
+#: .\apps\medicines\views_template.py:122
+msgid "Invalid JSON payload."
+msgstr "Notogri JSON payload."
+
+#: .\apps\medicines\views_template.py:135
+msgid "Pharmacy is required for medicine creation."
+msgstr "Dorixona is kerak for dori creation."
+
+#: .\apps\medicines\views_template.py:151
+msgid "Medicine name is required."
+msgstr "Dori nom is kerak."
+
+#: .\apps\medicines\views_template.py:153
+msgid "SKU is required."
+msgstr "SKU is kerak."
+
+#: .\apps\medicines\views_template.py:155
+msgid "Unit price is required."
+msgstr "Unit narx is kerak."
+
+#: .\apps\medicines\views_template.py:161
+msgid "Selected category is invalid for this pharmacy."
+msgstr "Selected kategoriya is notogri for this dorixona."
+
+#: .\apps\medicines\views_template.py:174
+msgid "Unit price must be greater than 0."
+msgstr "Unit narx must be greater than 0."
+
+#: .\apps\medicines\views_template.py:182
+msgid "Expiry date is invalid."
+msgstr "Expiry sana is notogri."
+
+#: .\apps\medicines\views_template.py:221
+msgid "A medicine with this SKU already exists in this pharmacy."
+msgstr "A dori with this SKU already exists in this dorixona."
+
+#: .\apps\medicines\views_template.py:239 .\templates\medicines\create.html:107
+msgid "Medicine created successfully"
+msgstr "Dori created muvaffaqiyatli"
+
+#: .\apps\medicines\views_template.py:255
+msgid "You do not have permission to update medicines."
+msgstr "You do not have permission gacha yangilash dorilar."
+
+#: .\apps\medicines\views_template.py:265
+msgid "Medicine updated successfully"
+msgstr "Dori updated muvaffaqiyatli"
+
+#: .\apps\medicines\views_template.py:285
+msgid "You do not have permission to delete medicines."
+msgstr "You do not have permission gacha ochirish dorilar."
+
+#: .\apps\medicines\views_template.py:291
+msgid "Medicine deleted successfully."
+msgstr "Dori deleted muvaffaqiyatli."
+
+#: .\apps\medicines\views_template.py:295
+msgid ""
+"This medicine cannot be deleted because it is used in existing sales records."
+msgstr "This dori cannot be deleted because it is used in existing savdolar records."
+
+#: .\apps\pos_integration\serializers.py:44
+#, python-format
+msgid "Medicine with SKU '%(sku)s' not found."
+msgstr "Dori with SKU '%(sku)s' not found."
+
+#: .\apps\pos_integration\serializers.py:63
+msgid "Sale must have at least one item."
+msgstr "Savdo must have at least one item."
+
+#: .\apps\pos_integration\serializers.py:81
+msgid "Superuser must provide pharmacy context."
+msgstr "Superuser must provide dorixona context."
+
+#: .\apps\pos_integration\views.py:56 .\apps\pos_integration\views.py:94
+#: .\apps\pos_integration\views.py:129
+msgid "pharmacy or pharmacy_id is required for superuser requests"
+msgstr "dorixona or dorixona_id is kerak for superuser requests"
+
+#: .\apps\pos_integration\views.py:65
+msgid "Sale received successfully"
+msgstr "Savdo received muvaffaqiyatli"
+
+#: .\apps\pos_integration\views.py:103
+#, python-format
+msgid "%(count)s sales received successfully"
+msgstr "%(count)s savdolar received muvaffaqiyatli"
+
+#: .\apps\pos_integration\views.py:135
+msgid "CSV file is required"
+msgstr "CSV file is kerak"
+
+#: .\apps\pos_integration\views.py:148
+#, python-format
+msgid "Error reading CSV file: %(error)s"
+msgstr "CSV faylni oqishda xatolik: %(error)s"
+
+#: .\apps\pos_integration\views.py:171
+#, python-format
+msgid "Row %(row)s: medicine_sku is required"
+msgstr "Row %(row)s: dori_sku is kerak"
+
+#: .\apps\pos_integration\views.py:179
+#, python-format
+msgid "Row %(row)s: Medicine with SKU \"%(sku)s\" not found"
+msgstr "Row %(row)s: Dori with SKU \"%(sku)s\" not found"
+
+#: .\apps\pos_integration\views.py:199
+#, python-format
+msgid "Row %(row)s: %(message)s"
+msgstr "Qator %(row)s: %(message)s"
+
+#: .\apps\pos_integration\views.py:242
+#, python-format
+msgid "Row %(row)s: %(error)s"
+msgstr "Qator %(row)s: %(error)s"
+
+#: .\apps\pos_integration\views.py:246
+#, python-format
+msgid "Imported %(count)s sales"
+msgstr "Imported %(count)s savdolar"
+
+#: .\apps\sales\models.py:132
+msgid "Sale must belong to the same pharmacy."
+msgstr "Savdo must belong gacha the same dorixona."
+
+#: .\apps\sales\serializers.py:119
+msgid "Superuser must provide pharmacy."
+msgstr "Superuser must provide dorixona."
+
+#: .\apps\sales\serializers.py:141
+msgid "At least one valid sale item is required."
+msgstr "At least one valid savdo item is kerak."
+
+#: .\apps\sales\serializers.py:151
+msgid "Medicine does not belong to sale pharmacy."
+msgstr "Dori does not belong gacha savdo dorixona."
+
+#: .\apps\sales\views.py:40 .\apps\sales\views_template.py:28
+msgid "Sale created successfully"
+msgstr "Savdo created muvaffaqiyatli"
+
+#: .\apps\sales\views.py:105 .\apps\sales\views.py:165
+msgid "medicine_id parameter is required"
+msgstr "dori_id parameter is kerak"
+
+#: .\apps\sales\views.py:113 .\apps\sales\views.py:173
+msgid "Medicine not found"
+msgstr "Dori not found"
+
+#: .\apps\sales\views_template.py:110 .\templates\dashboard\index.html:554
+#: .\templates\medicines\create.html:41 .\templates\medicines\detail.html:27
+#: .\templates\medicines\list.html:105 .\templates\sales\analytics.html:105
+msgid "Uncategorized"
+msgstr "Kategoriyasiz"
+
+#: .\apps\tenants\middleware.py:28 .\apps\tenants\utils.py:16
+msgid "User is not assigned to a pharmacy."
+msgstr "User is not assigned gacha a dorixona."
+
+#: .\apps\tenants\middleware.py:103
+msgid "Demo mode is read-only."
+msgstr "Demo rejim is read-only."
+
+#: .\apps\tenants\middleware.py:117
+msgid "Subscription expired. Your account is currently in read-only mode."
+msgstr "Obuna tugagan. Your account is currently in read-only rejim."
+
+#: .\apps\tenants\mixins.py:51
+msgid "Changing pharmacy is not allowed."
+msgstr "Changing dorixona is not allowed."
+
+#: .\apps\tenants\services.py:27
+msgid "users"
+msgstr "foydalanuvchilar"
+
+#: .\apps\tenants\services.py:28
+msgid "medicines"
+msgstr "dorilar"
+
+#: .\apps\tenants\services.py:29
+msgid "monthly sales"
+msgstr "oylik savdolar"
+
+#: .\apps\tenants\services.py:61 .\apps\tenants\services.py:66
+msgid "Invalid resource type."
+msgstr "Notogri resource type."
+
+#: .\apps\tenants\services.py:81
+msgid "Unlimited plan limit."
+msgstr "Tarif limiti cheklanmagan."
+
+#: .\apps\tenants\services.py:88 .\apps\tenants\services.py:113
+msgid "Monthly sales limit exceeded."
+msgstr "Oylik savdolar limit oshib ketdi."
+
+#: .\apps\tenants\services.py:91
+#, python-format
+msgid ""
+"Plan limit reached for %(label)s: %(used)s/%(limit)s. Upgrade your "
+"subscription to continue."
+msgstr "Plan limit reached for %(label)s: %(used)s/%(limit)s. Upgrade your obuna gacha continue."
+
+#: .\apps\tenants\services.py:94
+#, python-format
+msgid "%(label)s usage: %(used)s/%(limit)s."
+msgstr "%(label)s foydalanish: %(used)s/%(limit)s."
+
+#: .\apps\tenants\services.py:124
+msgid "Invalid plan type."
+msgstr "Notogri plan type."
+
+#: .\templates\accounts\login.html:4
+msgid "Login - Pharmacy Analytic AI"
+msgstr "Kirish - Dorixona Analytic AI"
+
+#: .\templates\accounts\login.html:31 .\templates\base.html:7
+msgid "Pharmacy Analytic AI"
+msgstr "Dorixona Analytic AI"
+
+#: .\templates\accounts\login.html:32
+msgid "Sign in to your account"
+msgstr "Sign in gacha your account"
+
+#: .\templates\accounts\login.html:43
+msgid "Invalid credentials"
+msgstr "Notogri credentials"
+
+#: .\templates\accounts\login.html:44
+msgid "Please check your username and password."
+msgstr "Please check your foydalanuvchi and parol."
+
+#: .\templates\accounts\login.html:52
+msgid "Username or Email"
+msgstr "Foydalanuvchi or Email"
+
+#: .\templates\accounts\login.html:61
+msgid "Enter your username or email"
+msgstr "Enter your foydalanuvchi or email"
+
+#: .\templates\accounts\login.html:67 .\templates\accounts\start_trial.html:68
+msgid "Password"
+msgstr "Parol"
+
+#: .\templates\accounts\login.html:75
+msgid "Enter your password"
+msgstr "Enter your parol"
+
+#: .\templates\accounts\login.html:88
+msgid "Remember me"
+msgstr "Meni eslab qol"
+
+#: .\templates\accounts\login.html:98
+msgid "Sign in"
+msgstr "Kirish"
+
+#: .\templates\accounts\login.html:104
+msgid "Start your free 14-day trial"
+msgstr "Boshlash your bepul 14-day sinov"
+
+#: .\templates\accounts\login.html:109
+msgid "Demo Credentials:"
+msgstr "Demo malumotlari:"
+
+#: .\templates\accounts\login.html:110
+msgid "Username:"
+msgstr "Foydalanuvchi:"
+
+#: .\templates\accounts\login.html:111
+msgid "Password:"
+msgstr "Parol:"
+
+#: .\templates\accounts\login.html:116
+msgid "Pharmacy Analytic AI. University Diploma Project."
+msgstr "Dorixona Analytic AI. University Diploma Project."
+
+#: .\templates\accounts\start_trial.html:7
+msgid "Start Free Trial - PharmacyAI"
+msgstr "Boshlash Bepul Sinov - PharmacyAI"
+
+#: .\templates\accounts\start_trial.html:38
+msgid "Start your 14-day free trial"
+msgstr "Boshlash your 14-day bepul sinov"
+
+#: .\templates\accounts\start_trial.html:56
+msgid "Pharmacy Name"
+msgstr "Dorixona Nom"
+
+#: .\templates\accounts\start_trial.html:60
+msgid "Admin Username"
+msgstr "Admin Foydalanuvchi"
+
+#: .\templates\accounts\start_trial.html:64
+msgid "Admin Email"
+msgstr "Admin email"
+
+#: .\templates\accounts\start_trial.html:72
+msgid "Confirm Password"
+msgstr "Tasdiqlash Parol"
+
+#: .\templates\accounts\start_trial.html:76
+msgid "Create Trial Workspace"
+msgstr "Yaratish Sinov Ish joyi"
+
+#: .\templates\accounts\start_trial.html:83
+msgid "Already have an account? Login"
+msgstr "Already have an account? Kirish"
+
+#: .\templates\base.html:76 .\templates\base.html:151
+msgid "Dashboard"
+msgstr "Boshqaruv paneli"
+
+#: .\templates\base.html:82 .\templates\dashboard\index.html:43
+msgid "Medicines"
+msgstr "Dorilar"
+
+#: .\templates\base.html:88
+msgid "Sales"
+msgstr "Savdolar"
+
+#: .\templates\base.html:94
+msgid "Analytics"
+msgstr "Analitika"
+
+#: .\templates\base.html:100 .\templates\inventory\list.html:10
+msgid "Inventory"
+msgstr "Zaxira"
+
+#: .\templates\base.html:106 .\templates\inventory\list.html:14
+msgid "Reorder Alerts"
+msgstr "Qayta buyurtma ogohlantirishlari"
+
+#: .\templates\base.html:113
+msgid "Admin Panel"
+msgstr "Admin paneli"
+
+#: .\templates\base.html:133
+msgid "Logout"
+msgstr "Chiqish"
+
+#: .\templates\base.html:161
+msgid "Language"
+msgstr "Til"
+
+#: .\templates\base.html:180
+msgid "Demo mode is active. All write operations are disabled."
+msgstr "Demo rejimi faol. Barcha yozish amallari ochirilgan."
+
+#: .\templates\base.html:186
+msgid "Subscription expired. Your workspace is currently in read-only mode."
+msgstr "Obuna muddati tugagan. Ish joyingiz hozir faqat oqish rejimida."
+
+#: .\templates\dashboard\index.html:4
+msgid "Dashboard - Pharmacy Analytic AI"
+msgstr "Boshqaruv - Dorixona Analytic AI"
+
+#: .\templates\dashboard\index.html:5
+msgid "Dashboard Overview"
+msgstr "Boshqaruv paneli umumiy korinishi"
+
+#: .\templates\dashboard\index.html:13 .\templates\sales\analytics.html:15
+msgid "Total Sales"
+msgstr "Jami savdolar"
+
+#: .\templates\dashboard\index.html:28 .\templates\sales\analytics.html:19
+msgid "Total Revenue"
+msgstr "Jami tushum"
+
+#: .\templates\dashboard\index.html:46
+msgid "expiring soon"
+msgstr "tez orada muddati tugaydi"
+
+#: .\templates\dashboard\index.html:58 .\templates\inventory\list.html:44
+#: .\templates\medicines\list.html:34 .\templates\medicines\list.html:106
+msgid "Low Stock"
+msgstr "Kam zaxira"
+
+#: .\templates\dashboard\index.html:61
+msgid "Needs reorder"
+msgstr "Qayta buyurtma kerak"
+
+#: .\templates\dashboard\index.html:77
+msgid "Sales Trend (Last 7 Days)"
+msgstr "Savdo trendi (songgi 7 kun)"
+
+#: .\templates\dashboard\index.html:80
+msgid "No sales trend data available."
+msgstr "Yoq savdolar trend data available."
+
+#: .\templates\dashboard\index.html:91
+msgid "Sales by Category"
+msgstr "Kategoriya boyicha savdo"
+
+#: .\templates\dashboard\index.html:94
+msgid "No category data available."
+msgstr "Yoq kategoriya data available."
+
+#: .\templates\dashboard\index.html:109 .\templates\sales\analytics.html:57
+msgid "Fast Moving Medicines"
+msgstr "Tez sotiladigan dorilar"
+
+#: .\templates\dashboard\index.html:112 .\templates\dashboard\index.html:131
+#: .\templates\dashboard\index.html:186 .\templates\dashboard\index.html:205
+msgid "View All"
+msgstr "Barchasini korish"
+
+#: .\templates\dashboard\index.html:118 .\templates\dashboard\index.html:137
+#: .\templates\dashboard\index.html:192 .\templates\dashboard\index.html:211
+#: .\templates\inventory\list.html:32
+#: .\templates\inventory\reorder_recommendations.html:32
+#: .\templates\sales\list.html:45
+msgid "Loading..."
+msgstr "Yuklanmoqda..."
+
+#: .\templates\dashboard\index.html:128 .\templates\sales\analytics.html:75
+msgid "Slow Moving Medicines"
+msgstr "Sekin sotiladigan dorilar"
+
+#: .\templates\dashboard\index.html:148
+msgid "Inventory Optimization Forecast"
+msgstr "Zaxirani optimallashtirish prognozi"
+
+#: .\templates\dashboard\index.html:151
+msgid "Service Level Target:"
+msgstr "Xizmat Daraja Maqsad:"
+
+#: .\templates\dashboard\index.html:160 .\templates\inventory\list.html:23
+#: .\templates\inventory\reorder_recommendations.html:23
+#: .\templates\medicines\list.html:47
+msgid "Medicine"
+msgstr "Dori"
+
+#: .\templates\dashboard\index.html:161
+msgid "Forecast (30d)"
+msgstr "Prognoz (30d)"
+
+#: .\templates\dashboard\index.html:162
+msgid "Reorder Qty"
+msgstr "Qayta buyurtma Qty"
+
+#: .\templates\dashboard\index.html:163
+msgid "Model"
+msgstr "Model"
+
+#: .\templates\dashboard\index.html:169
+msgid "Loading optimization data..."
+msgstr "Yuklanmoqda optimization data..."
+
+#: .\templates\dashboard\index.html:183
+msgid "Recent Sales"
+msgstr "Songgi savdolar"
+
+#: .\templates\dashboard\index.html:202
+msgid "Alerts & Notifications"
+msgstr "Ogohlantirishlar va bildirishnomalar"
+
+#: .\templates\dashboard\index.html:228 .\templates\sales\analytics.html:70
+msgid "No fast moving medicines"
+msgstr "Yoq tez sotiladigan dorilar"
+
+#: .\templates\dashboard\index.html:229 .\templates\sales\analytics.html:88
+msgid "No slow moving medicines"
+msgstr "Yoq sekin sotiladigan dorilar"
+
+#: .\templates\dashboard\index.html:230
+msgid "No recent sales"
+msgstr "Yoq songgi savdolar"
+
+#: .\templates\dashboard\index.html:231
+msgid "No alerts"
+msgstr "Yoq ogohlantirishlar"
+
+#: .\templates\dashboard\index.html:232
+msgid "Reorder"
+msgstr "Qayta buyurtma"
+
+#: .\templates\dashboard\index.html:233 .\templates\sales\analytics.html:64
+#: .\templates\sales\analytics.html:82
+msgid "units"
+msgstr "birlik"
+
+#: .\templates\dashboard\index.html:234
+msgid "units sold"
+msgstr "birlik sold"
+
+#: .\templates\dashboard\index.html:235
+msgid "Low"
+msgstr "Kam"
+
+#: .\templates\dashboard\index.html:236
+msgid "Sale"
+msgstr "Savdo"
+
+#: .\templates\dashboard\index.html:237 .\templates\inventory\list.html:47
+#: .\templates\inventory\reorder_recommendations.html:44
+#: .\templates\medicines\list.html:104 .\templates\sales\analytics.html:29
+#: .\templates\sales\list.html:60
+msgid "N/A"
+msgstr "N/A"
+
+#: .\templates\dashboard\index.html:238
+msgid "No optimization data available."
+msgstr "Yoq optimization data available."
+
+#: .\templates\dashboard\index.html:239 .\templates\sales\analytics.html:103
+msgid "Sales Count"
+msgstr "Savdolar Soni"
+
+#: .\templates\dashboard\index.html:240 .\templates\sales\analytics.html:104
+msgid "Revenue (UZS)"
+msgstr "Tushum (UZS)"
+
+#: .\templates\inventory\list.html:4
+msgid "Inventory - Pharmacy Analytic AI"
+msgstr "Zaxira - Dorixona Analytic AI"
+
+#: .\templates\inventory\list.html:5
+msgid "Inventory Management"
+msgstr "Zaxira Management"
+
+#: .\templates\inventory\list.html:11
+msgid "Monitor stock levels and manage inventory"
+msgstr "Monitor zaxira levels and manage zaxira"
+
+#: .\templates\inventory\list.html:24
+#: .\templates\inventory\reorder_recommendations.html:24
+msgid "Current Stock"
+msgstr "Joriy Zaxira"
+
+#: .\templates\inventory\list.html:25
+msgid "Min Level"
+msgstr "Min Daraja"
+
+#: .\templates\inventory\list.html:26
+msgid "Max Level"
+msgstr "Maks Daraja"
+
+#: .\templates\inventory\list.html:27
+#: .\templates\inventory\reorder_recommendations.html:27
+msgid "Status"
+msgstr "Holat"
+
+#: .\templates\inventory\list.html:28
+#: .\templates\inventory\reorder_recommendations.html:28
+#: .\templates\medicines\list.html:52 .\templates\sales\list.html:41
+msgid "Actions"
+msgstr "Amallar"
+
+#: .\templates\inventory\list.html:43
+msgid "No inventory records"
+msgstr "Yoq zaxira records"
+
+#: .\templates\inventory\list.html:45
+msgid "Medium"
+msgstr "Orta"
+
+#: .\templates\inventory\list.html:46
+msgid "Good"
+msgstr "Yaxshi"
+
+#: .\templates\inventory\list.html:48
+msgid "Enter new stock quantity:"
+msgstr "Enter new zaxira quantity:"
+
+#: .\templates\inventory\reorder_recommendations.html:4
+msgid "Reorder Recommendations - Pharmacy Analytic AI"
+msgstr "Qayta buyurtma Tavsiyalar - Dorixona Analytic AI"
+
+#: .\templates\inventory\reorder_recommendations.html:5
+#: .\templates\inventory\reorder_recommendations.html:10
+msgid "Reorder Recommendations"
+msgstr "Qayta buyurtma Tavsiyalar"
+
+#: .\templates\inventory\reorder_recommendations.html:11
+msgid "Automatic reorder suggestions based on inventory levels"
+msgstr "Automatic qayta buyurtma suggestions based on zaxira levels"
+
+#: .\templates\inventory\reorder_recommendations.html:14
+msgid "Generate Recommendations"
+msgstr "Yaratish Tavsiyalar"
+
+#: .\templates\inventory\reorder_recommendations.html:25
+msgid "Recommended Qty"
+msgstr "Tavsiya etilgan miqdor"
+
+#: .\templates\inventory\reorder_recommendations.html:26
+msgid "Priority"
+msgstr "Ustuvorlik"
+
+#: .\templates\inventory\reorder_recommendations.html:43
+msgid "No pending recommendations"
+msgstr "Yoq pending tavsiyalar"
+
+#: .\templates\inventory\reorder_recommendations.html:45
+msgid "Approve"
+msgstr "Tasdiqlash"
+
+#: .\templates\inventory\reorder_recommendations.html:46
+msgid "Reject"
+msgstr "Rad etish"
+
+#: .\templates\inventory\reorder_recommendations.html:47
+msgid "Approve this reorder recommendation?"
+msgstr "Tasdiqlash this qayta buyurtma recommendation?"
+
+#: .\templates\inventory\reorder_recommendations.html:48
+msgid "Reject this reorder recommendation?"
+msgstr "Rad etish this qayta buyurtma recommendation?"
+
+#: .\templates\inventory\reorder_recommendations.html:49
+msgid "Recommendation approved and inventory updated!"
+msgstr "Recommendation approved and zaxira updated!"
+
+#: .\templates\inventory\reorder_recommendations.html:50
+msgid "Generated"
+msgstr "Yaratildi"
+
+#: .\templates\inventory\reorder_recommendations.html:51
+msgid "recommendations"
+msgstr "tavsiyalar"
+
+#: .\templates\medicines\confirm_delete.html:4
+msgid "Delete Medicine - Pharmacy Analytic AI"
+msgstr "Ochirish Dori - Dorixona Analytic AI"
+
+#: .\templates\medicines\confirm_delete.html:5
+#: .\templates\medicines\confirm_delete.html:33
+#: .\templates\medicines\list.html:72
+msgid "Delete Medicine"
+msgstr "Ochirish Dori"
+
+#: .\templates\medicines\confirm_delete.html:17
+msgid "Confirm Deletion"
+msgstr "Tasdiqlash Deletion"
+
+#: .\templates\medicines\confirm_delete.html:18
+msgid "Are you sure you want to delete this medicine?"
+msgstr "Are you sure you want gacha ochirish this dori?"
+
+#: .\templates\medicines\confirm_delete.html:20
+msgid "Name:"
+msgstr "Nom:"
+
+#: .\templates\medicines\confirm_delete.html:26
+#, python-format
+msgid ""
+"This medicine is linked to %(count)s sale record(s). Deletion will be "
+"blocked."
+msgstr "This dori is linked gacha %(count)s savdo record(s). Deletion will be blocked."
+
+#: .\templates\medicines\confirm_delete.html:32
+#: .\templates\medicines\create.html:91 .\templates\medicines\edit.html:17
+#: .\templates\medicines\edit.html:67 .\templates\medicines\list.html:81
+msgid "Cancel"
+msgstr "Bekor qilish"
+
+#: .\templates\medicines\create.html:4
+msgid "Add Medicine - Pharmacy Analytic AI"
+msgstr "Add Dori - Dorixona Analytic AI"
+
+#: .\templates\medicines\create.html:5 .\templates\medicines\list.html:19
+msgid "Add Medicine"
+msgstr "Add Dori"
+
+#: .\templates\medicines\create.html:11
+msgid "Create New Medicine"
+msgstr "Yaratish New Dori"
+
+#: .\templates\medicines\create.html:12
+msgid "Enter medicine details for your pharmacy catalog."
+msgstr "Enter dori tafsilotlar for your dorixona catalog."
+
+#: .\templates\medicines\create.html:15 .\templates\medicines\detail.html:15
+#: .\templates\medicines\update.html:17
+msgid "Back to List"
+msgstr "Orqaga gacha Royxat"
+
+#: .\templates\medicines\create.html:23 .\templates\medicines\update.html:32
+msgid "Medicine Name"
+msgstr "Dori Nom"
+
+#: .\templates\medicines\create.html:26
+msgid "e.g. Paracetamol 500mg"
+msgstr "masalan, Paracetamol 500mg"
+
+#: .\templates\medicines\create.html:32
+msgid "e.g. MED011"
+msgstr "masalan, MED011"
+
+#: .\templates\medicines\create.html:38 .\templates\medicines\detail.html:22
+#: .\templates\medicines\edit.html:36 .\templates\medicines\list.html:48
+#: .\templates\medicines\update.html:40
+msgid "Category"
+msgstr "Kategoriya"
+
+#: .\templates\medicines\create.html:45 .\templates\medicines\detail.html:36
+#: .\templates\medicines\edit.html:54 .\templates\medicines\update.html:64
+msgid "Expiry Date"
+msgstr "Expiry Sana"
+
+#: .\templates\medicines\create.html:53 .\templates\medicines\update.html:56
+msgid "Unit Price (UZS)"
+msgstr "Unit Narx (UZS)"
+
+#: .\templates\medicines\create.html:56
+msgid "e.g. 25000"
+msgstr "masalan, 25000"
+
+#: .\templates\medicines\create.html:57
+msgid "Enter numeric value only; displayed as UZS in the UI."
+msgstr "Enter numeric value faqat; displayed as UZS in the UI."
+
+#: .\templates\medicines\create.html:60
+msgid "Initial Stock"
+msgstr "Initial Zaxira"
+
+#: .\templates\medicines\create.html:63
+msgid "e.g. 100"
+msgstr "masalan, 100"
+
+#: .\templates\medicines\create.html:64
+msgid "Current quantity available in inventory."
+msgstr "Joriy quantity available in zaxira."
+
+#: .\templates\medicines\create.html:71
+msgid "Preview"
+msgstr "Korib chiqish"
+
+#: .\templates\medicines\create.html:78 .\templates\medicines\detail.html:50
+#: .\templates\medicines\edit.html:60 .\templates\medicines\update.html:72
+msgid "Description"
+msgstr "Tavsif"
+
+#: .\templates\medicines\create.html:81
+msgid "Optional notes about this medicine"
+msgstr "Optional notes about this dori"
+
+#: .\templates\medicines\create.html:86
+msgid "Please fix the following:"
+msgstr "Quyidagilarni togirlang:"
+
+#: .\templates\medicines\create.html:93
+msgid "Create Medicine"
+msgstr "Dori yaratish"
+
+#: .\templates\medicines\create.html:105
+msgid "Could not load categories."
+msgstr "Kategoriyalarni yuklab bolmadi."
+
+#: .\templates\medicines\create.html:106
+msgid "Stock must be a non-negative integer."
+msgstr "Zaxira must be a non-negative integer."
+
+#: .\templates\medicines\create.html:108
+msgid "Failed to create medicine."
+msgstr "Failed gacha yaratish dori."
+
+#: .\templates\medicines\create.html:109
+msgid "Please review the form errors."
+msgstr "Forma xatolarini tekshiring."
+
+#: .\templates\medicines\create.html:110
+msgid "Network error while creating medicine."
+msgstr "Network error while creating dori."
+
+#: .\templates\medicines\detail.html:4
+msgid "Medicine Details - Pharmacy Analytic AI"
+msgstr "Dori Tafsilotlar - Dorixona Analytic AI"
+
+#: .\templates\medicines\detail.html:5
+msgid "Medicine Details"
+msgstr "Dori tafsilotlari"
+
+#: .\templates\medicines\detail.html:32
+msgid "Unit Price"
+msgstr "Unit Narx"
+
+#: .\templates\medicines\detail.html:41
+msgid "Not set"
+msgstr "Ornatilmagan"
+
+#: .\templates\medicines\detail.html:46
+msgid "Created"
+msgstr "Yaratilgan"
+
+#: .\templates\medicines\detail.html:55
+msgid "No description provided."
+msgstr "Yoq tavsif provided."
+
+#: .\templates\medicines\edit.html:4
+msgid "Edit Medicine - Pharmacy Analytic AI"
+msgstr "Edit Dori - Dorixona Analytic AI"
+
+#: .\templates\medicines\edit.html:5 .\templates\medicines\edit.html:16
+#: .\templates\medicines\update.html:16
+msgid "Edit Medicine"
+msgstr "Edit Dori"
+
+#: .\templates\medicines\edit.html:30
+msgid "Name"
+msgstr "Nom"
+
+#: .\templates\medicines\edit.html:42 .\templates\medicines\list.html:49
+msgid "Price"
+msgstr "Narx"
+
+#: .\templates\medicines\edit.html:48 .\templates\medicines\list.html:50
+msgid "Stock"
+msgstr "Zaxira"
+
+#: .\templates\medicines\edit.html:66
+msgid "Save"
+msgstr "Saqlash"
+
+#: .\templates\medicines\list.html:4
+msgid "Medicines - Pharmacy Analytic AI"
+msgstr "Dorilar - Dorixona Analytic AI"
+
+#: .\templates\medicines\list.html:5 .\templates\medicines\list.html:14
+msgid "Medicines Management"
+msgstr "Dorilar Management"
+
+#: .\templates\medicines\list.html:15
+msgid "Track catalog, pricing, stock levels, and expiry status"
+msgstr "Track catalog, pricing, zaxira levels, and expiry holat"
+
+#: .\templates\medicines\list.html:26
+msgid "Search by name or SKU"
+msgstr "Search by nom or SKU"
+
+#: .\templates\medicines\list.html:28
+msgid "All Categories"
+msgstr "Barcha Categories"
+
+#: .\templates\medicines\list.html:31
+msgid "All Status"
+msgstr "Barcha Holat"
+
+#: .\templates\medicines\list.html:32 .\templates\medicines\list.html:109
+msgid "Expiring Soon"
+msgstr "Tez orada muddati tugaydi"
+
+#: .\templates\medicines\list.html:33 .\templates\medicines\list.html:108
+msgid "Expired"
+msgstr "Tugagan"
+
+#: .\templates\medicines\list.html:37
+msgid "Apply Filters"
+msgstr "Filtrlarni qollash"
+
+#: .\templates\medicines\list.html:51
+msgid "Expiry"
+msgstr "Yaroqlilik muddati"
+
+#: .\templates\medicines\list.html:59
+msgid "Loading medicines..."
+msgstr "Yuklanmoqda dorilar..."
+
+#: .\templates\medicines\list.html:77
+msgid ""
+"Are you sure you want to delete <span id=\"delete-medicine-name\" class=\"fw-"
+"semibold\"></span>?"
+msgstr "Are you sure you want gacha ochirish <span id=\"delete-medicine-name\" class=\"fw-semibold\"></span>?"
+
+#: .\templates\medicines\list.html:84 .\templates\medicines\update.html:80
+msgid "Delete"
+msgstr "Ochirish"
+
+#: .\templates\medicines\list.html:103
+msgid "No medicines found"
+msgstr "Yoq dorilar found"
+
+#: .\templates\medicines\list.html:107
+msgid "In Stock"
+msgstr "In Zaxira"
+
+#: .\templates\medicines\list.html:110
+msgid "Valid"
+msgstr "Yaroqli"
+
+#: .\templates\medicines\list.html:111
+msgid "Edit medicine"
+msgstr "Edit dori"
+
+#: .\templates\medicines\list.html:112
+msgid "Delete medicine"
+msgstr "Ochirish dori"
+
+#: .\templates\medicines\list.html:113
+msgid "this medicine"
+msgstr "this dori"
+
+#: .\templates\medicines\list.html:114
+msgid "Showing"
+msgstr "Korsatilmoqda"
+
+#: .\templates\medicines\list.html:115
+msgid "to"
+msgstr "gacha"
+
+#: .\templates\medicines\list.html:116
+msgid "of"
+msgstr "dan"
+
+#: .\templates\medicines\list.html:117
+msgid "results"
+msgstr "natijalar"
+
+#: .\templates\medicines\list.html:118 .\templates\sales\list.html:63
+msgid "Previous"
+msgstr "Oldingi"
+
+#: .\templates\medicines\list.html:119 .\templates\sales\list.html:64
+msgid "Next"
+msgstr "Keyingi"
+
+#: .\templates\medicines\update.html:4
+msgid "Update Medicine - Pharmacy Analytic AI"
+msgstr "Yangilash Dori - Dorixona Analytic AI"
+
+#: .\templates\medicines\update.html:5 .\templates\medicines\update.html:81
+msgid "Update Medicine"
+msgstr "Dorini yangilash"
+
+#: .\templates\public\landing.html:7
+msgid "PharmacyAI - Smart Pharmacy SaaS"
+msgstr "PharmacyAI - Smart Dorixona SaaS"
+
+#: .\templates\public\landing.html:46 .\templates\public\landing.html:60
+#: .\templates\public\landing.html:216
+msgid "Login"
+msgstr "Kirish"
+
+#: .\templates\public\landing.html:47 .\templates\public\landing.html:59
+#: .\templates\public\landing.html:152 .\templates\public\landing.html:167
+#: .\templates\public\landing.html:217
+msgid "Start Free Trial"
+msgstr "Boshlash Bepul Sinov"
+
+#: .\templates\public\landing.html:56
+msgid "AI-Powered Inventory SaaS for Modern Pharmacies"
+msgstr "AI-Powered Zaxira SaaS for Modern Pharmacies"
+
+#: .\templates\public\landing.html:57
+msgid ""
+"Forecast demand, optimize stock levels, and manage pharmacy teams with role-"
+"based, multi-tenant control."
+msgstr "Prognoz demand, optimize zaxira levels, and manage dorixona teams with role-based, multi-tenant control."
+
+#: .\templates\public\landing.html:66
+msgid "Built for Pharmacy Operations"
+msgstr "Built for Dorixona Amallar"
+
+#: .\templates\public\landing.html:68
+msgid "Multi-branch tenancy"
+msgstr "Kop filialli ijarachilik"
+
+#: .\templates\public\landing.html:69
+msgid "Forecasting and reorder intelligence"
+msgstr "Forecasting and qayta buyurtma intelligence"
+
+#: .\templates\public\landing.html:70
+msgid "Role-based permissions"
+msgstr "Role-based ruxsatlar"
+
+#: .\templates\public\landing.html:71
+msgid "Operational dashboards"
+msgstr "Operatsion panellar"
+
+#: .\templates\public\landing.html:83
+msgid "Core Features"
+msgstr "Asosiy imkoniyatlar"
+
+#: .\templates\public\landing.html:84
+msgid "Everything you need to scale pharmacy operations."
+msgstr "Everything you need gacha scale dorixona amallar."
+
+#: .\templates\public\landing.html:93
+msgid "AI Forecasting"
+msgstr "AI prognozlash"
+
+#: .\templates\public\landing.html:94
+msgid "Model-driven demand projections with measurable forecast accuracy."
+msgstr "Model-driven demand projections with measurable prognoz accuracy."
+
+#: .\templates\public\landing.html:104
+msgid "Inventory Optimization"
+msgstr "Zaxira Optimization"
+
+#: .\templates\public\landing.html:105
+msgid "Automated reorder recommendations based on service-level targets."
+msgstr "Automated qayta buyurtma tavsiyalar based on service-level targets."
+
+#: .\templates\public\landing.html:115
+msgid "Multi-branch SaaS"
+msgstr "Kop filialli SaaS"
+
+#: .\templates\public\landing.html:116
+msgid "Secure tenant isolation for independent pharmacies and branch networks."
+msgstr "Mustaqil dorixonalar va filial tarmoqlari uchun xavfsiz tenant izolatsiyasi."
+
+#: .\templates\public\landing.html:126
+msgid "Role-based Access"
+msgstr "Role-based Kirish"
+
+#: .\templates\public\landing.html:127
+msgid "Granular admin, manager, and pharmacist controls for safe operations."
+msgstr "Granular admin, manager, and pharmacist controls for safe amallar."
+
+#: .\templates\public\landing.html:138
+msgid "Pricing"
+msgstr "Narxlar"
+
+#: .\templates\public\landing.html:139
+msgid "Choose a plan that matches your pharmacy growth stage."
+msgstr "Choose a plan that matches your dorixona growth stage."
+
+#: .\templates\public\landing.html:145
+msgid "Basic"
+msgstr "Asosiy"
+
+#: .\templates\public\landing.html:146
+msgid "Ideal for small pharmacies."
+msgstr "Kichik dorixonalar uchun ideal."
+
+#: .\templates\public\landing.html:148
+msgid "Up to 3 users"
+msgstr "Up gacha 3 foydalanuvchilar"
+
+#: .\templates\public\landing.html:149
+msgid "Up to 200 medicines"
+msgstr "Up gacha 200 dorilar"
+
+#: .\templates\public\landing.html:150
+msgid "Up to 1,000 monthly sales"
+msgstr "Up gacha 1,000 oylik savdolar"
+
+#: .\templates\public\landing.html:159
+msgid "Most Popular"
+msgstr "Eng mashhur"
+
+#: .\templates\public\landing.html:160
+msgid "Pro"
+msgstr "Pro"
+
+#: .\templates\public\landing.html:161
+msgid "For scaling operations."
+msgstr "For scaling amallar."
+
+#: .\templates\public\landing.html:163
+msgid "Up to 10 users"
+msgstr "Up gacha 10 foydalanuvchilar"
+
+#: .\templates\public\landing.html:164
+msgid "Up to 2,000 medicines"
+msgstr "Up gacha 2,000 dorilar"
+
+#: .\templates\public\landing.html:165
+msgid "Up to 10,000 monthly sales"
+msgstr "Up gacha 10,000 oylik savdolar"
+
+#: .\templates\public\landing.html:174
+msgid "Enterprise"
+msgstr "Korporativ"
+
+#: .\templates\public\landing.html:175
+msgid "Unlimited scale."
+msgstr "Cheksiz miqyos."
+
+#: .\templates\public\landing.html:177
+msgid "Unlimited users"
+msgstr "Unlimited foydalanuvchilar"
+
+#: .\templates\public\landing.html:178
+msgid "Unlimited medicines"
+msgstr "Unlimited dorilar"
+
+#: .\templates\public\landing.html:179
+msgid "Unlimited monthly sales"
+msgstr "Unlimited oylik savdolar"
+
+#: .\templates\public\landing.html:181
+msgid "Talk to Sales"
+msgstr "Talk gacha Savdolar"
+
+#: .\templates\public\landing.html:192
+msgid "What Customers Say"
+msgstr "Mijozlar fikri"
+
+#: .\templates\public\landing.html:193
+msgid "Testimonials placeholder for production rollout."
+msgstr "Ishlab chiqarish uchun vaqtinchalik fikrlar bloki."
+
+#: .\templates\public\landing.html:198
+msgid "PharmacyAI helped us reduce stock-outs and streamline decisions."
+msgstr "PharmacyAI zaxira tanqisligini kamaytirish va qarorlarni soddalashtirishga yordam berdi."
+
+#: .\templates\public\landing.html:199 .\templates\public\landing.html:205
+msgid "Demo testimonial"
+msgstr "Demo fikr"
+
+#: .\templates\public\landing.html:204
+msgid "Role-based controls made multi-branch management safer and faster."
+msgstr "Rolga asoslangan boshqaruv kop filialli boshqaruvni xavfsizroq va tezroq qildi."
+
+#: .\templates\public\landing.html:214
+msgid "All rights reserved."
+msgstr "Barcha rights reserved."
+
+#: .\templates\sales\analytics.html:4
+msgid "Sales Analytics - Pharmacy Analytic AI"
+msgstr "Savdolar Analitika - Dorixona Analytic AI"
+
+#: .\templates\sales\analytics.html:5 .\templates\sales\analytics.html:9
+msgid "Sales Analytics"
+msgstr "Savdolar Analitika"
+
+#: .\templates\sales\analytics.html:10
+msgid "Comprehensive sales analysis and insights"
+msgstr "Comprehensive savdolar analysis and insights"
+
+#: .\templates\sales\analytics.html:23
+msgid "Average Sale"
+msgstr "Average Savdo"
+
+#: .\templates\sales\analytics.html:27
+msgid "Growth"
+msgstr "Osish"
+
+#: .\templates\sales\analytics.html:36
+msgid "Sales Trend"
+msgstr "Savdolar Trend"
+
+#: .\templates\sales\analytics.html:38
+msgid "No sales trend data for the selected period."
+msgstr "Yoq savdolar trend data for the selected period."
+
+#: .\templates\sales\analytics.html:45
+msgid "Category Distribution"
+msgstr "Kategoriya Distribution"
+
+#: .\templates\sales\analytics.html:47
+msgid "No category data for the selected period."
+msgstr "Yoq kategoriya data for the selected period."
+
+#: .\templates\sales\list.html:4
+msgid "Sales - Pharmacy Analytic AI"
+msgstr "Savdolar - Dorixona Analytic AI"
+
+#: .\templates\sales\list.html:5 .\templates\sales\list.html:10
+msgid "Sales Records"
+msgstr "Savdolar Records"
+
+#: .\templates\sales\list.html:11
+msgid "View and manage sales transactions"
+msgstr "Korish and manage savdolar transactions"
+
+#: .\templates\sales\list.html:14
+msgid "View Analytics"
+msgstr "Korish Analitika"
+
+#: .\templates\sales\list.html:23
+msgid "Filter"
+msgstr "Filtr"
+
+#: .\templates\sales\list.html:26
+msgid "Reset"
+msgstr "Tiklash"
+
+#: .\templates\sales\list.html:36
+msgid "Sale ID"
+msgstr "Savdo ID"
+
+#: .\templates\sales\list.html:37
+msgid "Date"
+msgstr "Sana"
+
+#: .\templates\sales\list.html:38
+msgid "User"
+msgstr "Foydalanuvchi"
+
+#: .\templates\sales\list.html:39
+msgid "Items"
+msgstr "Elementlar"
+
+#: .\templates\sales\list.html:40
+msgid "Total Amount"
+msgstr "Jami Amount"
+
+#: .\templates\sales\list.html:59
+msgid "No sales found"
+msgstr "Yoq savdolar found"
+
+#: .\templates\sales\list.html:61
+msgid "items"
+msgstr "elementlar"
+
+#: .\templates\sales\list.html:62
+msgid "Page"
+msgstr "Sahifa"

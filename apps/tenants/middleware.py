@@ -4,6 +4,7 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
 
 from .models import Pharmacy
 from .services import SubscriptionService
@@ -24,7 +25,7 @@ class TenantMiddleware:
             else:
                 pharmacy = require_user_pharmacy(user)
                 if pharmacy is None:
-                    raise PermissionDenied("User is not assigned to a pharmacy.")
+                    raise PermissionDenied(_("User is not assigned to a pharmacy."))
                 request.pharmacy = pharmacy
 
         response = self.get_response(request)
@@ -99,7 +100,7 @@ class SubscriptionAccessMiddleware:
             return self.get_response(request)
 
         if getattr(request, "demo_mode", False) and request.method in self.UNSAFE_METHODS:
-            return self._blocked_response(request, "Demo mode is read-only.")
+            return self._blocked_response(request, _("Demo mode is read-only."))
 
         if user.is_superuser:
             return self.get_response(request)
@@ -113,7 +114,7 @@ class SubscriptionAccessMiddleware:
             if request.method in self.UNSAFE_METHODS:
                 return self._blocked_response(
                     request,
-                    "Subscription expired. Your account is currently in read-only mode.",
+                    _("Subscription expired. Your account is currently in read-only mode."),
                 )
 
         return self.get_response(request)

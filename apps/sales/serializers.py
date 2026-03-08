@@ -8,6 +8,7 @@ from decimal import Decimal
 from rest_framework import serializers
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 from .models import Sale, SaleItem
 from apps.medicines.models import Medicine
 from apps.inventory.models import Inventory
@@ -115,13 +116,13 @@ class SaleCreateSerializer(serializers.ModelSerializer):
         elif request and request.user.is_authenticated and request.user.is_superuser:
             pharmacy = validated_data.get("pharmacy")
             if pharmacy is None:
-                raise serializers.ValidationError({"pharmacy": "Superuser must provide pharmacy."})
+                raise serializers.ValidationError({"pharmacy": _("Superuser must provide pharmacy.")})
             if "user" not in validated_data:
                 validated_data["user"] = request.user
         else:
             pharmacy = validated_data.get("pharmacy")
             if pharmacy is None:
-                raise serializers.ValidationError({"pharmacy": "Pharmacy is required."})
+                raise serializers.ValidationError({"pharmacy": _("Pharmacy is required.")})
             if "user" not in validated_data:
                 validated_data["user"] = user
 
@@ -137,7 +138,7 @@ class SaleCreateSerializer(serializers.ModelSerializer):
         for item_data in items_data:
             initial_total += item_data["quantity"] * item_data["unit_price"]
         if initial_total <= 0:
-            raise serializers.ValidationError({"items": "At least one valid sale item is required."})
+            raise serializers.ValidationError({"items": _("At least one valid sale item is required.")})
 
         with transaction.atomic():
             sale = Sale.objects.create(total_amount=initial_total, **validated_data)
@@ -147,7 +148,7 @@ class SaleCreateSerializer(serializers.ModelSerializer):
                 item_data["pharmacy"] = sale.pharmacy
                 if item_data["medicine"].pharmacy_id != sale.pharmacy_id:
                     raise serializers.ValidationError(
-                        {"items": "Medicine does not belong to sale pharmacy."}
+                        {"items": _("Medicine does not belong to sale pharmacy.")}
                     )
                 item = SaleItem.objects.create(sale=sale, **item_data)
                 total_amount += item.subtotal
