@@ -43,12 +43,13 @@ DEBUG = env_bool("DEBUG", default=True)
 
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
-    default="127.0.0.1,localhost",
+    default="127.0.0.1,localhost,.trycloudflare.com",
     cast=Csv(),
+    
 )
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
-    default="http://127.0.0.1:8000,http://localhost:8000",
+    default="http://127.0.0.1:8000,http://localhost:8000,https://clip-drives-cho-pharmaceuticals.trycloudflare.com",
     cast=Csv(),
 )
 
