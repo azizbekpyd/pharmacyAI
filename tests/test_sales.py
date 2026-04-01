@@ -1,13 +1,21 @@
 import json
 from decimal import Decimal
 
+from django.conf import settings
 from django.test import TestCase
+from django.utils import translation
+from django.utils.translation import gettext as _
 
 from apps.accounts.models import User
 from apps.inventory.models import Inventory
 from apps.medicines.models import Medicine
 from apps.sales.models import Sale, SaleItem
 from apps.tenants.models import Pharmacy
+
+
+def translated(message):
+    with translation.override(settings.LANGUAGE_CODE):
+        return _(message)
 
 
 class SalesFlowTests(TestCase):
@@ -58,7 +66,7 @@ class SalesFlowTests(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json().get("message"), "Sale created successfully")
+        self.assertEqual(response.json().get("message"), translated("Sale created successfully"))
 
         sale = Sale.objects.get()
         item = SaleItem.objects.get(sale=sale)

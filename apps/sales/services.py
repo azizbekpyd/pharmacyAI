@@ -12,6 +12,8 @@ from .models import Sale, SaleItem
 
 
 class SalesAnalyticsService:
+    """Read-oriented analytics service for pharmacy-scoped sales reporting."""
+
     @staticmethod
     def _scope_sales(pharmacy=None):
         queryset = Sale.objects.all()

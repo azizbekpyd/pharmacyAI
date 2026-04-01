@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, F, Sum
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from datetime import timedelta
 import json
 
@@ -89,7 +90,7 @@ def dashboard_view(request):
     category_labels = []
     category_revenue = []
     for row in category_qs:
-        category_labels.append(row.get('medicine__category__name') or 'Uncategorized')
+        category_labels.append(row.get('medicine__category__name') or _("Uncategorized"))
         category_revenue.append(float(row.get('total_revenue') or 0))
 
     # Fast moving medicines (last 30 days, top 5 by quantity)

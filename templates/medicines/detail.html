@@ -9,7 +9,7 @@
     <div class="flex items-start justify-between">
         <div>
             <h2 class="text-2xl font-bold text-gray-900">{{ medicine.name }}</h2>
-            <p class="mt-1 text-sm text-gray-600">SKU: {{ medicine.sku }}</p>
+            <p class="mt-1 text-sm text-gray-600">{% blocktrans with sku=medicine.sku %}SKU: {{ sku }}{% endblocktrans %}</p>
         </div>
         <a href="{% url 'medicines-list' %}" class="inline-flex items-center rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
             <i class="fas fa-arrow-left mr-2"></i>{% trans "Back to List" %}

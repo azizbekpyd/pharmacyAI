@@ -5,6 +5,7 @@ Handles serialization/deserialization of Category and Medicine models.
 """
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
 
 from .models import Category, Medicine
 from .services import MedicineService
@@ -46,7 +47,7 @@ class MedicineSerializer(serializers.ModelSerializer):
         required=False,
         min_value=0,
         default=0,
-        help_text="Initial stock to create Inventory.current_stock.",
+        help_text=_("Initial stock to create inventory.current_stock."),
     )
     is_expiring_soon = serializers.SerializerMethodField()
     is_expired = serializers.SerializerMethodField()

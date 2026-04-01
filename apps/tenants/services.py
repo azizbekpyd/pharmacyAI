@@ -6,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class SubscriptionService:
+    """Plan-limit and subscription lifecycle utilities for tenant pharmacies."""
+
     RESOURCE_USERS = "users"
     RESOURCE_MEDICINES = "medicines"
     RESOURCE_MONTHLY_SALES = "monthly_sales"

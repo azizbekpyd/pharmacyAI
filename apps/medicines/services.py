@@ -11,6 +11,8 @@ from .models import Medicine
 
 
 class MedicineService:
+    """Application service for medicine creation flows tied to tenant inventory."""
+
     @staticmethod
     def create_medicine_with_inventory(*, pharmacy, medicine_data, initial_stock=0, enforce_limits=True):
         """

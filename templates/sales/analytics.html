@@ -97,7 +97,7 @@
 <script>
 let salesTrendChartInstance = null;
 let categoryChartInstance = null;
-const APP_LOCALE = "{{ LANGUAGE_CODE|default:'uz'|escapejs }}".replace('_', '-');
+const APP_LOCALE = "{{ request.LANGUAGE_CODE|default:LANGUAGE_CODE|escapejs }}".replace('_', '-');
 const UZS_NUMBER = new Intl.NumberFormat(APP_LOCALE, { maximumFractionDigits: 0 });
 const I18N = {
     salesCount: "{% trans 'Sales Count' %}",

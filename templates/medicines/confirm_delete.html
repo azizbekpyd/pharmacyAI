@@ -18,7 +18,7 @@
                     <p class="mb-2">{% trans "Are you sure you want to delete this medicine?" %}</p>
                     <ul class="mb-3">
                         <li><strong>{% trans "Name:" %}</strong> {{ medicine.name }}</li>
-                        <li><strong>SKU:</strong> {{ medicine.sku }}</li>
+                        <li><strong>{% trans "SKU:" %}</strong> {{ medicine.sku }}</li>
                     </ul>
 
                     {% if has_protected_relations %}

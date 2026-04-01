@@ -1,16 +1,24 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.test import TestCase
+from django.utils import translation
+from django.utils.translation import gettext as _
 
 from apps.accounts.models import User
 from apps.tenants.models import Pharmacy
+
+
+def translated(message):
+    with translation.override(settings.LANGUAGE_CODE):
+        return _(message)
 
 
 class TrialOnboardingTests(TestCase):
     def test_landing_page_for_anonymous_user(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Start Free Trial")
+        self.assertContains(response, translated("Start Free Trial"))
 
     def test_root_redirects_authenticated_user_to_dashboard(self):
         user = User.objects.create_user(username="root_user", password="pass12345", role=User.ROLE_ADMIN)

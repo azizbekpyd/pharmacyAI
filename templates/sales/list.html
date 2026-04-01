@@ -54,7 +54,7 @@
 {% block extra_js %}
 <script>
 let currentPage = 1;
-const APP_LOCALE = "{{ LANGUAGE_CODE|default:'uz'|escapejs }}".replace('_', '-');
+const APP_LOCALE = "{{ request.LANGUAGE_CODE|default:LANGUAGE_CODE|escapejs }}".replace('_', '-');
 const I18N = {
     noSales: "{% trans 'No sales found' %}",
     na: "{% trans 'N/A' %}",

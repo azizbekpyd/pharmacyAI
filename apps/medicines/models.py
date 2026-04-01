@@ -19,25 +19,25 @@ class Category(models.Model):
     """
     name = models.CharField(
         max_length=100,
-        help_text="Category name (e.g., Antibiotics, Pain Relief)"
+        help_text=_("Category name (e.g., Antibiotics, Pain Relief)"),
     )
     pharmacy = models.ForeignKey(
         "tenants.Pharmacy",
         on_delete=models.CASCADE,
         related_name="categories",
-        help_text="Pharmacy that owns this category",
+        help_text=_("Pharmacy that owns this category"),
     )
     description = models.TextField(
         blank=True,
         null=True,
-        help_text="Optional description of the category"
+        help_text=_("Optional description of the category"),
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "Category"
-        verbose_name_plural = "Categories"
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
         ordering = ['name']
         constraints = [
             models.UniqueConstraint(
@@ -58,47 +58,47 @@ class Medicine(models.Model):
     """
     name = models.CharField(
         max_length=200,
-        help_text="Medicine name (e.g., Paracetamol 500mg)"
+        help_text=_("Medicine name (e.g., Paracetamol 500mg)"),
     )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         null=True,
         related_name='medicines',
-        help_text="Medicine category"
+        help_text=_("Medicine category"),
     )
     pharmacy = models.ForeignKey(
         "tenants.Pharmacy",
         on_delete=models.CASCADE,
         related_name="medicines",
-        help_text="Pharmacy that owns this medicine",
+        help_text=_("Pharmacy that owns this medicine"),
     )
     sku = models.CharField(
         max_length=50,
-        help_text="Stock Keeping Unit - unique identifier for the medicine"
+        help_text=_("Stock Keeping Unit - unique identifier for the medicine"),
     )
     description = models.TextField(
         blank=True,
         null=True,
-        help_text="Optional description of the medicine"
+        help_text=_("Optional description of the medicine"),
     )
     unit_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(Decimal('0.01'))],
-        help_text="Price per unit"
+        help_text=_("Price per unit"),
     )
     expiry_date = models.DateField(
         null=True,
         blank=True,
-        help_text="Expiry date of the medicine batch"
+        help_text=_("Expiry date of the medicine batch"),
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "Medicine"
-        verbose_name_plural = "Medicines"
+        verbose_name = _("Medicine")
+        verbose_name_plural = _("Medicines")
         ordering = ['name']
         constraints = [
             models.UniqueConstraint(

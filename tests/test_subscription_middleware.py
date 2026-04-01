@@ -2,13 +2,21 @@ import json
 from decimal import Decimal
 from datetime import timedelta
 
+from django.conf import settings
 from django.test import TestCase
 from django.utils import timezone
+from django.utils import translation
+from django.utils.translation import gettext as _
 
 from apps.accounts.models import User
 from apps.inventory.models import Inventory
 from apps.medicines.models import Medicine
 from apps.tenants.models import Pharmacy
+
+
+def translated(message):
+    with translation.override(settings.LANGUAGE_CODE):
+        return _(message)
 
 
 class SubscriptionMiddlewareTests(TestCase):
@@ -80,7 +88,10 @@ class SubscriptionMiddlewareTests(TestCase):
             content_type="application/json",
         )
         self.assertEqual(write_api.status_code, 403)
-        self.assertIn("Subscription expired", write_api.json().get("detail", ""))
+        self.assertEqual(
+            write_api.json().get("detail"),
+            translated("Subscription expired. Your account is currently in read-only mode."),
+        )
 
     def test_demo_mode_blocks_write_then_allows_after_disable(self):
         self.client.force_login(self.manager)
@@ -101,7 +112,7 @@ class SubscriptionMiddlewareTests(TestCase):
             content_type="application/json",
         )
         self.assertEqual(blocked.status_code, 403)
-        self.assertEqual(blocked.json().get("detail"), "Demo mode is read-only.")
+        self.assertEqual(blocked.json().get("detail"), translated("Demo mode is read-only."))
 
         disable_demo = self.client.get("/dashboard/?demo=false")
         self.assertEqual(disable_demo.status_code, 200)

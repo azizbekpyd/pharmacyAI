@@ -1,0 +1,28 @@
+{% load i18n pharmacy_i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+{% get_available_languages as AVAILABLE_LANGUAGES %}
+{% get_language_info_list for AVAILABLE_LANGUAGES as LANGUAGE_INFO_LIST %}
+{% with active_language=request.LANGUAGE_CODE|default:CURRENT_LANGUAGE %}
+<form action="{% url 'set_language' %}" method="post" class="{{ form_class|default:'d-inline-flex align-items-center gap-2' }}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% language_switch_path request %}">
+    {% if show_label %}
+    <label for="{{ element_id|default:'language-switcher' }}" class="{{ label_class|default:'form-label small text-muted mb-0' }}">
+        {% trans "Language" %}
+    </label>
+    {% endif %}
+    <select
+        id="{{ element_id|default:'language-switcher' }}"
+        name="language"
+        onchange="this.form.submit()"
+        class="{{ select_class|default:'form-select form-select-sm' }}"
+        aria-label="{% trans 'Language' %}"
+    >
+        {% for language in LANGUAGE_INFO_LIST %}
+        <option value="{{ language.code }}" {% if language.code == active_language %}selected{% endif %}>
+            {{ language.name_local|capfirst }}
+        </option>
+        {% endfor %}
+    </select>
+</form>
+{% endwith %}

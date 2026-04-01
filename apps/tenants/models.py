@@ -1,14 +1,15 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
 
 
 class Pharmacy(models.Model):
     class PlanType(models.TextChoices):
-        BASIC = "BASIC", "Basic"
-        PRO = "PRO", "Pro"
-        ENTERPRISE = "ENTERPRISE", "Enterprise"
+        BASIC = "BASIC", _("Basic")
+        PRO = "PRO", _("Pro")
+        ENTERPRISE = "ENTERPRISE", _("Enterprise")
 
     name = models.CharField(max_length=255)
     owner = models.ForeignKey(

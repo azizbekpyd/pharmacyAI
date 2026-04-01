@@ -19,8 +19,8 @@ class POSSaleItemSerializer(serializers.Serializer):
     
     Accepts flexible input formats from POS systems.
     """
-    medicine_sku = serializers.CharField(help_text="Medicine SKU")
-    medicine_name = serializers.CharField(required=False, help_text="Medicine name (optional)")
+    medicine_sku = serializers.CharField(help_text=_("Medicine SKU"))
+    medicine_name = serializers.CharField(required=False, help_text=_("Medicine name (optional)"))
     quantity = serializers.IntegerField(min_value=1)
     unit_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
 
@@ -52,8 +52,8 @@ class POSSaleSerializer(serializers.Serializer):
     
     Accepts sales data from external POS systems.
     """
-    sale_id = serializers.CharField(required=False, help_text="External sale ID from POS system")
-    date = serializers.DateTimeField(required=False, help_text="Sale date (defaults to now)")
+    sale_id = serializers.CharField(required=False, help_text=_("External sale ID from POS system"))
+    date = serializers.DateTimeField(required=False, help_text=_("Sale date (defaults to now)"))
     items = POSSaleItemSerializer(many=True)
     notes = serializers.CharField(required=False, allow_blank=True)
     

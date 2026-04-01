@@ -1,6 +1,7 @@
-﻿{% load i18n %}
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
 <!DOCTYPE html>
-<html lang="{{ request.LANGUAGE_CODE|default:'uz' }}">
+<html lang="{{ request.LANGUAGE_CODE|default:LANGUAGE_CODE|default:CURRENT_LANGUAGE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,68 +9,172 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .hero-gradient {
-            background: linear-gradient(135deg, #0d6efd 0%, #2b8aef 45%, #5aa6ff 100%);
+        :root {
+            --landing-navy: #0f172a;
+            --landing-blue: #2563eb;
+            --landing-sky: #38bdf8;
         }
-        .feature-icon {
-            width: 56px;
-            height: 56px;
+
+        body {
+            color: var(--landing-navy);
+            background:
+                radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 25%),
+                radial-gradient(circle at top left, rgba(37, 99, 235, 0.16), transparent 22%),
+                linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%);
         }
-        .pricing-card {
-            border: 1px solid #e9ecef;
-            transition: transform .2s ease, box-shadow .2s ease;
+
+        .hero-shell {
+            padding: 6.5rem 0 5rem;
+            position: relative;
+            overflow: hidden;
         }
-        .pricing-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08);
+
+        .hero-shell::after {
+            content: "";
+            position: absolute;
+            inset: auto -10% -18% 45%;
+            height: 380px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.18), transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-card,
+        .feature-card,
+        .pricing-card,
+        .testimonial-card {
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 1.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+        }
+
+        .feature-icon,
+        .pricing-icon {
+            width: 3.25rem;
+            height: 3.25rem;
+            border-radius: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--landing-blue);
+        }
+
+        .hero-signal {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: 999px;
+            padding: 0.45rem 0.9rem;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--landing-blue);
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .pricing-card.is-featured {
+            border-color: rgba(37, 99, 235, 0.3);
+            transform: translateY(-6px);
+        }
+
+        @media (max-width: 991.98px) {
+            .hero-shell {
+                padding-top: 5rem;
+            }
+
+            .pricing-card.is-featured {
+                transform: none;
+            }
         }
     </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">PharmacyAI</a>
-        <div class="ms-auto d-flex gap-2 align-items-center">
-            <form action="{% url 'set_language' %}" method="post" class="me-2">
-                {% csrf_token %}
-                {% if request.path|slice:":4" == "/uz/" or request.path|slice:":4" == "/ru/" or request.path|slice:":4" == "/en/" %}
-                <input type="hidden" name="next" value="{{ request.path|slice:'3:' }}">
-                {% else %}
-                <input type="hidden" name="next" value="{{ request.path }}">
-                {% endif %}
-                <select name="language" onchange="this.form.submit()" class="form-select form-select-sm">
-                    <option value="uz" {% if request.LANGUAGE_CODE == 'uz' %}selected{% endif %}>Oʻzbekcha</option>
-                    <option value="ru" {% if request.LANGUAGE_CODE == 'ru' %}selected{% endif %}>Русский</option>
-                    <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-                </select>
-            </form>
-            <a class="btn btn-outline-primary" href="{% url 'login' %}">{% trans "Login" %}</a>
-            <a class="btn btn-primary" href="{% url 'start-trial' %}">{% trans "Start Free Trial" %}</a>
+    <div class="container py-2">
+        <a class="navbar-brand fw-bold fs-4" href="{% url 'landing' %}">{% trans "PharmacyAI" %}</a>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+            {% include "includes/language_switcher.html" with form_class="d-inline-flex align-items-center" select_class="form-select form-select-sm rounded-pill border-0 bg-light shadow-none" element_id="landing-language-switcher" %}
+            <a class="btn btn-outline-secondary rounded-pill px-4" href="{% url 'login' %}">{% trans "Login" %}</a>
+            <a class="btn btn-primary rounded-pill px-4" href="{% url 'start-trial' %}">{% trans "Start Free Trial" %}</a>
         </div>
     </div>
 </nav>
 
-<section class="hero-gradient text-white py-5 py-lg-6">
-    <div class="container py-5">
-        <div class="row align-items-center g-4">
-            <div class="col-lg-7">
-                <h1 class="display-5 fw-bold mb-3">{% trans "AI-Powered Inventory SaaS for Modern Pharmacies" %}</h1>
-                <p class="lead mb-4">{% trans "Forecast demand, optimize stock levels, and manage pharmacy teams with role-based, multi-tenant control." %}</p>
-                <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-light btn-lg text-primary fw-semibold" href="{% url 'start-trial' %}">{% trans "Start Free Trial" %}</a>
-                    <a class="btn btn-outline-light btn-lg" href="{% url 'login' %}">{% trans "Login" %}</a>
+<section class="hero-shell">
+    <div class="container position-relative">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6">
+                <span class="hero-signal mb-3">
+                    <i class="fas fa-bolt"></i>{% trans "AI Forecasting" %}
+                </span>
+                <h1 class="display-4 fw-bold mb-3">{% trans "AI-Powered Inventory SaaS for Modern Pharmacies" %}</h1>
+                <p class="lead text-secondary mb-4">{% trans "Forecast demand, optimize stock levels, and manage pharmacy teams with role-based, multi-tenant control." %}</p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a class="btn btn-primary btn-lg rounded-pill px-4" href="{% url 'start-trial' %}">{% trans "Start Free Trial" %}</a>
+                    <a class="btn btn-outline-dark btn-lg rounded-pill px-4" href="{% url 'login' %}">{% trans "Login" %}</a>
+                </div>
+                <div class="row g-3">
+                    <div class="col-sm-4">
+                        <div class="hero-card p-3 h-100">
+                            <div class="small text-uppercase text-muted fw-semibold mb-1">{% trans "Tenants" %}</div>
+                            <div class="h4 mb-0">{% trans "Multi-tenant" %}</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="hero-card p-3 h-100">
+                            <div class="small text-uppercase text-muted fw-semibold mb-1">{% trans "Languages" %}</div>
+                            <div class="h4 mb-0">{% trans "UZ / RU / EN" %}</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="hero-card p-3 h-100">
+                            <div class="small text-uppercase text-muted fw-semibold mb-1">{% trans "Modes" %}</div>
+                            <div class="h4 mb-0">{% trans "Demo + Live" %}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-5">
-                <div class="card shadow-lg border-0">
-                    <div class="card-body p-4">
-                        <h5 class="fw-semibold text-dark mb-3">{% trans "Built for Pharmacy Operations" %}</h5>
-                        <ul class="list-unstyled mb-0 text-dark">
-                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>{% trans "Multi-branch tenancy" %}</li>
-                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>{% trans "Forecasting and reorder intelligence" %}</li>
-                            <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>{% trans "Role-based permissions" %}</li>
-                            <li><i class="fa-solid fa-check text-success me-2"></i>{% trans "Operational dashboards" %}</li>
-                        </ul>
+
+            <div class="col-lg-6">
+                <div class="hero-card p-4 p-lg-5">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div>
+                            <div class="text-uppercase small text-primary fw-semibold mb-1">{% trans "Startup-ready demo" %}</div>
+                            <h2 class="h3 fw-bold mb-0">{% trans "Built for Pharmacy Operations" %}</h2>
+                        </div>
+                        <span class="feature-icon">
+                            <i class="fas fa-pills fa-lg"></i>
+                        </span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="feature-card p-3 h-100">
+                                <div class="feature-icon mb-3"><i class="fas fa-building"></i></div>
+                                <h3 class="h5">{% trans "Multi-branch tenancy" %}</h3>
+                                <p class="text-secondary mb-0">{% trans "Secure tenant isolation for independent pharmacies and branch networks." %}</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="feature-card p-3 h-100">
+                                <div class="feature-icon mb-3"><i class="fas fa-boxes-stacked"></i></div>
+                                <h3 class="h5">{% trans "Inventory Optimization" %}</h3>
+                                <p class="text-secondary mb-0">{% trans "Automated reorder recommendations based on service-level targets." %}</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="feature-card p-3 h-100">
+                                <div class="feature-icon mb-3"><i class="fas fa-chart-line"></i></div>
+                                <h3 class="h5">{% trans "Forecasting and reorder intelligence" %}</h3>
+                                <p class="text-secondary mb-0">{% trans "Model-driven demand projections with measurable forecast accuracy." %}</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="feature-card p-3 h-100">
+                                <div class="feature-icon mb-3"><i class="fas fa-user-shield"></i></div>
+                                <h3 class="h5">{% trans "Role-based Access" %}</h3>
+                                <p class="text-secondary mb-0">{% trans "Granular admin, manager, and pharmacist controls for safe operations." %}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,147 +182,128 @@
     </div>
 </section>
 
-<section class="py-5">
+<section class="pb-5">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">{% trans "Core Features" %}</h2>
-            <p class="text-muted">{% trans "Everything you need to scale pharmacy operations." %}</p>
+            <span class="hero-signal mb-3">{% trans "Core Features" %}</span>
+            <h2 class="display-6 fw-bold">{% trans "Everything you need to scale pharmacy operations." %}</h2>
         </div>
         <div class="row g-4">
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <div class="feature-icon rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center mb-3">
-                            <i class="fa-solid fa-chart-line text-primary"></i>
-                        </div>
-                        <h5 class="fw-semibold">{% trans "AI Forecasting" %}</h5>
-                        <p class="text-muted mb-0">{% trans "Model-driven demand projections with measurable forecast accuracy." %}</p>
-                    </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="feature-card p-4 h-100">
+                    <div class="feature-icon mb-3"><i class="fas fa-chart-column"></i></div>
+                    <h3 class="h5">{% trans "Operational dashboards" %}</h3>
+                    <p class="text-secondary mb-0">{% trans "Track revenue, fast movers, slow movers, alerts, and recent sales in one place." %}</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <div class="feature-icon rounded-circle bg-success-subtle d-flex align-items-center justify-content-center mb-3">
-                            <i class="fa-solid fa-boxes-stacked text-success"></i>
-                        </div>
-                        <h5 class="fw-semibold">{% trans "Inventory Optimization" %}</h5>
-                        <p class="text-muted mb-0">{% trans "Automated reorder recommendations based on service-level targets." %}</p>
-                    </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="feature-card p-4 h-100">
+                    <div class="feature-icon mb-3"><i class="fas fa-credit-card"></i></div>
+                    <h3 class="h5">{% trans "Subscription system" %}</h3>
+                    <p class="text-secondary mb-0">{% trans "Apply plan limits, monitor trial periods, and protect expired workspaces with read-only access." %}</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <div class="feature-icon rounded-circle bg-warning-subtle d-flex align-items-center justify-content-center mb-3">
-                            <i class="fa-solid fa-building text-warning"></i>
-                        </div>
-                        <h5 class="fw-semibold">{% trans "Multi-branch SaaS" %}</h5>
-                        <p class="text-muted mb-0">{% trans "Secure tenant isolation for independent pharmacies and branch networks." %}</p>
-                    </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="feature-card p-4 h-100">
+                    <div class="feature-icon mb-3"><i class="fas fa-store"></i></div>
+                    <h3 class="h5">{% trans "POS integration" %}</h3>
+                    <p class="text-secondary mb-0">{% trans "Receive sales from external POS systems and keep inventory synchronized automatically." %}</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <div class="feature-icon rounded-circle bg-danger-subtle d-flex align-items-center justify-content-center mb-3">
-                            <i class="fa-solid fa-user-shield text-danger"></i>
-                        </div>
-                        <h5 class="fw-semibold">{% trans "Role-based Access" %}</h5>
-                        <p class="text-muted mb-0">{% trans "Granular admin, manager, and pharmacist controls for safe operations." %}</p>
-                    </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="feature-card p-4 h-100">
+                    <div class="feature-icon mb-3"><i class="fas fa-globe"></i></div>
+                    <h3 class="h5">{% trans "Multilingual support" %}</h3>
+                    <p class="text-secondary mb-0">{% trans "Uzbek, Russian, and English remain available across the full workflow." %}</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-5 bg-light">
+<section class="pb-5">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold">{% trans "Pricing" %}</h2>
-            <p class="text-muted">{% trans "Choose a plan that matches your pharmacy growth stage." %}</p>
+            <span class="hero-signal mb-3">{% trans "Pricing" %}</span>
+            <h2 class="display-6 fw-bold">{% trans "Choose a plan that matches your pharmacy growth stage." %}</h2>
         </div>
-        <div class="row g-4">
+        <div class="row g-4 align-items-stretch">
             <div class="col-lg-4">
-                <div class="card pricing-card h-100">
-                    <div class="card-body p-4">
-                        <h4 class="fw-bold">{% trans "Basic" %}</h4>
-                        <p class="text-muted">{% trans "Ideal for small pharmacies." %}</p>
-                        <ul class="list-unstyled small">
-                            <li class="mb-2">{% trans "Up to 3 users" %}</li>
-                            <li class="mb-2">{% trans "Up to 200 medicines" %}</li>
-                            <li>{% trans "Up to 1,000 monthly sales" %}</li>
-                        </ul>
-                        <a href="{% url 'start-trial' %}" class="btn btn-outline-primary w-100 mt-3">{% trans "Start Free Trial" %}</a>
-                    </div>
+                <div class="pricing-card p-4 h-100">
+                    <div class="pricing-icon mb-3"><i class="fas fa-seedling"></i></div>
+                    <h3 class="h4 fw-bold">{% trans "Basic" %}</h3>
+                    <p class="text-secondary">{% trans "Ideal for small pharmacies." %}</p>
+                    <ul class="list-unstyled text-secondary mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{% trans "Up to 3 users" %}</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{% trans "Up to 200 medicines" %}</li>
+                        <li><i class="fas fa-check text-success me-2"></i>{% trans "Up to 1,000 monthly sales" %}</li>
+                    </ul>
+                    <a href="{% url 'start-trial' %}" class="btn btn-outline-primary w-100 rounded-pill">{% trans "Start Free Trial" %}</a>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card pricing-card h-100 border-primary">
-                    <div class="card-body p-4">
-                        <span class="badge text-bg-primary mb-2">{% trans "Most Popular" %}</span>
-                        <h4 class="fw-bold">{% trans "Pro" %}</h4>
-                        <p class="text-muted">{% trans "For scaling operations." %}</p>
-                        <ul class="list-unstyled small">
-                            <li class="mb-2">{% trans "Up to 10 users" %}</li>
-                            <li class="mb-2">{% trans "Up to 2,000 medicines" %}</li>
-                            <li>{% trans "Up to 10,000 monthly sales" %}</li>
-                        </ul>
-                        <a href="{% url 'start-trial' %}" class="btn btn-primary w-100 mt-3">{% trans "Start Free Trial" %}</a>
-                    </div>
+                <div class="pricing-card is-featured p-4 h-100">
+                    <span class="badge text-bg-primary rounded-pill mb-3">{% trans "Most Popular" %}</span>
+                    <div class="pricing-icon mb-3"><i class="fas fa-rocket"></i></div>
+                    <h3 class="h4 fw-bold">{% trans "Pro" %}</h3>
+                    <p class="text-secondary">{% trans "For scaling operations." %}</p>
+                    <ul class="list-unstyled text-secondary mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{% trans "Up to 10 users" %}</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{% trans "Up to 2,000 medicines" %}</li>
+                        <li><i class="fas fa-check text-success me-2"></i>{% trans "Up to 10,000 monthly sales" %}</li>
+                    </ul>
+                    <a href="{% url 'start-trial' %}" class="btn btn-primary w-100 rounded-pill">{% trans "Start Free Trial" %}</a>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card pricing-card h-100">
-                    <div class="card-body p-4">
-                        <h4 class="fw-bold">{% trans "Enterprise" %}</h4>
-                        <p class="text-muted">{% trans "Unlimited scale." %}</p>
-                        <ul class="list-unstyled small">
-                            <li class="mb-2">{% trans "Unlimited users" %}</li>
-                            <li class="mb-2">{% trans "Unlimited medicines" %}</li>
-                            <li>{% trans "Unlimited monthly sales" %}</li>
-                        </ul>
-                        <a href="{% url 'start-trial' %}" class="btn btn-outline-primary w-100 mt-3">{% trans "Talk to Sales" %}</a>
-                    </div>
+                <div class="pricing-card p-4 h-100">
+                    <div class="pricing-icon mb-3"><i class="fas fa-crown"></i></div>
+                    <h3 class="h4 fw-bold">{% trans "Enterprise" %}</h3>
+                    <p class="text-secondary">{% trans "Unlimited scale." %}</p>
+                    <ul class="list-unstyled text-secondary mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{% trans "Unlimited users" %}</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{% trans "Unlimited medicines" %}</li>
+                        <li><i class="fas fa-check text-success me-2"></i>{% trans "Unlimited monthly sales" %}</li>
+                    </ul>
+                    <a href="{% url 'start-trial' %}" class="btn btn-outline-dark w-100 rounded-pill">{% trans "Talk to Sales" %}</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-5">
+<section class="pb-5">
     <div class="container">
-        <div class="text-center mb-4">
-            <h2 class="fw-bold">{% trans "What Customers Say" %}</h2>
-            <p class="text-muted">{% trans "Testimonials placeholder for production rollout." %}</p>
-        </div>
         <div class="row g-4">
-            <div class="col-md-6">
-                <div class="border rounded p-4 h-100">
-                    <p class="mb-2">"{% trans "PharmacyAI helped us reduce stock-outs and streamline decisions." %}"</p>
-                    <small class="text-muted">{% trans "Demo testimonial" %}</small>
+            <div class="col-lg-6">
+                <div class="testimonial-card p-4 h-100">
+                    <div class="small text-uppercase text-primary fw-semibold mb-2">{% trans "What Customers Say" %}</div>
+                    <p class="fs-5 mb-3">"{% trans "PharmacyAI helped us reduce stock-outs and streamline decisions." %}"</p>
+                    <div class="text-secondary small">{% trans "Demo testimonial" %}</div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="border rounded p-4 h-100">
-                    <p class="mb-2">"{% trans "Role-based controls made multi-branch management safer and faster." %}"</p>
-                    <small class="text-muted">{% trans "Demo testimonial" %}</small>
+            <div class="col-lg-6">
+                <div class="testimonial-card p-4 h-100">
+                    <div class="small text-uppercase text-primary fw-semibold mb-2">{% trans "What Customers Say" %}</div>
+                    <p class="fs-5 mb-3">"{% trans "Role-based controls made multi-branch management safer and faster." %}"</p>
+                    <div class="text-secondary small">{% trans "Demo testimonial" %}</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<footer class="border-top py-4">
-    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-        <p class="mb-2 mb-md-0 text-muted">&copy; 2026 PharmacyAI. {% trans "All rights reserved." %}</p>
-        <div class="d-flex gap-2">
-            <a class="btn btn-sm btn-outline-secondary" href="{% url 'login' %}">{% trans "Login" %}</a>
-            <a class="btn btn-sm btn-primary" href="{% url 'start-trial' %}">{% trans "Start Free Trial" %}</a>
+<footer class="border-top py-4 bg-white">
+    <div class="container d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3">
+        <div>
+            <div class="fw-semibold">{% trans "PharmacyAI" %}</div>
+            <div class="text-muted small">{% trans "All rights reserved." %}</div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary rounded-pill px-4" href="{% url 'login' %}">{% trans "Login" %}</a>
+            <a class="btn btn-primary rounded-pill px-4" href="{% url 'start-trial' %}">{% trans "Start Free Trial" %}</a>
         </div>
     </div>
 </footer>
 </body>
 </html>
-

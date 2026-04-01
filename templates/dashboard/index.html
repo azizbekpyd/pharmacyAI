@@ -1,227 +1,226 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Dashboard - Pharmacy Analytic AI" %}{% endblock %}
 {% block page_title %}{% trans "Dashboard Overview" %}{% endblock %}
 
 {% block content %}
-<!-- Stats Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div class="bg-white rounded-lg shadow-md p-6 card-hover">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-600">{% trans "Total Sales" %}</p>
-                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-sales">-</p>
-                <p class="text-sm text-green-600 mt-2" id="sales-growth">
-                    <i class="fas fa-arrow-up"></i> <span>-</span>%
-                </p>
-            </div>
-            <div class="bg-blue-100 rounded-full p-4">
-                <i class="fas fa-shopping-cart text-2xl text-blue-600"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-md p-6 card-hover">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-600">{% trans "Total Revenue" %}</p>
-                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-revenue">-</p>
-                <p class="text-sm text-green-600 mt-2" id="revenue-growth">
-                    <i class="fas fa-arrow-up"></i> <span>-</span>%
-                </p>
-            </div>
-            <div class="bg-green-100 rounded-full p-4">
-                <i class="fas fa-money-bill-wave text-2xl text-green-600"></i>
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xxl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Total Sales" %}</div>
+                    <div class="display-6 fw-bold mb-2" id="total-sales">-</div>
+                    <div id="sales-growth" class="small text-success">
+                        <i class="fas fa-arrow-up me-1"></i><span>-</span>%
+                    </div>
+                </div>
+                <span class="status-pill bg-primary-subtle text-primary">
+                    <i class="fas fa-cart-shopping"></i>
+                </span>
             </div>
         </div>
     </div>
-
-    <div class="bg-white rounded-lg shadow-md p-6 card-hover">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-600">{% trans "Medicines" %}</p>
-                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-medicines">-</p>
-                <p class="text-sm text-orange-600 mt-2">
-                    <i class="fas fa-exclamation-triangle"></i> <span id="expiring-count">-</span> {% trans "expiring soon" %}
-                </p>
-            </div>
-            <div class="bg-purple-100 rounded-full p-4">
-                <i class="fas fa-pills text-2xl text-purple-600"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-lg shadow-md p-6 card-hover">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-600">{% trans "Low Stock" %}</p>
-                <p class="text-3xl font-bold text-gray-900 mt-2" id="low-stock-count">-</p>
-                <p class="text-sm text-red-600 mt-2">
-                    <i class="fas fa-boxes"></i> {% trans "Needs reorder" %}
-                </p>
-            </div>
-            <div class="bg-red-100 rounded-full p-4">
-                <i class="fas fa-exclamation-circle text-2xl text-red-600"></i>
+    <div class="col-sm-6 col-xxl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Total Revenue" %}</div>
+                    <div class="display-6 fw-bold mb-2" id="total-revenue">-</div>
+                    <div id="revenue-growth" class="small text-success">
+                        <i class="fas fa-arrow-up me-1"></i><span>-</span>%
+                    </div>
+                </div>
+                <span class="status-pill bg-success-subtle text-success">
+                    <i class="fas fa-money-bill-wave"></i>
+                </span>
             </div>
         </div>
     </div>
-</div>
-
-<!-- Charts Row -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <!-- Sales Trend Chart -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">
-            <i class="fas fa-chart-line text-blue-500 mr-2"></i>
-            {% trans "Sales Trend (Last 7 Days)" %}
-        </h3>
-        <p id="dashboard-sales-trend-empty" class="hidden text-sm text-gray-500 text-center py-6">
-            {% trans "No sales trend data available." %}
-        </p>
-        <div id="dashboard-sales-trend-wrap" class="relative h-80">
-            <canvas id="salesTrendChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Category Distribution -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">
-            <i class="fas fa-chart-pie text-green-500 mr-2"></i>
-            {% trans "Sales by Category" %}
-        </h3>
-        <p id="dashboard-category-empty" class="hidden text-sm text-gray-500 text-center py-6">
-            {% trans "No category data available." %}
-        </p>
-        <div id="dashboard-category-wrap" class="relative h-80">
-            <canvas id="categoryChart"></canvas>
-        </div>
-    </div>
-</div>
-
-<!-- Fast Moving & Slow Moving Medicines -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <!-- Fast Moving Medicines -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">
-                <i class="fas fa-fire text-orange-500 mr-2"></i>
-                {% trans "Fast Moving Medicines" %}
-            </h3>
-            <a href="{% url 'sales-analytics' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                {% trans "View All" %} <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-        <div id="fast-moving-list" class="space-y-3">
-            <div class="text-center text-gray-500 py-8">
-                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>{% trans "Loading..." %}</p>
+    <div class="col-sm-6 col-xxl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Medicines" %}</div>
+                    <div class="display-6 fw-bold mb-2" id="total-medicines">-</div>
+                    <div class="small text-warning">
+                        <i class="fas fa-clock me-1"></i><span id="expiring-count">-</span> {% trans "expiring soon" %}
+                    </div>
+                </div>
+                <span class="status-pill bg-warning-subtle text-warning-emphasis">
+                    <i class="fas fa-capsules"></i>
+                </span>
             </div>
         </div>
     </div>
-
-    <!-- Slow Moving Medicines -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">
-                <i class="fas fa-snowflake text-blue-500 mr-2"></i>
-                {% trans "Slow Moving Medicines" %}
-            </h3>
-            <a href="{% url 'sales-analytics' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                {% trans "View All" %} <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-        <div id="slow-moving-list" class="space-y-3">
-            <div class="text-center text-gray-500 py-8">
-                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>{% trans "Loading..." %}</p>
+    <div class="col-sm-6 col-xxl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Low Stock" %}</div>
+                    <div class="display-6 fw-bold mb-2" id="low-stock-count">-</div>
+                    <div class="small text-danger">
+                        <i class="fas fa-triangle-exclamation me-1"></i>{% trans "Needs reorder" %}
+                    </div>
+                </div>
+                <span class="status-pill bg-danger-subtle text-danger">
+                    <i class="fas fa-boxes-stacked"></i>
+                </span>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Inventory Optimization -->
-<div class="bg-white rounded-lg shadow-md p-6 mb-8">
-    <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-800">
-            <i class="fas fa-calculator text-indigo-500 mr-2"></i>
-            {% trans "Inventory Optimization Forecast" %}
-        </h3>
-        <div class="text-sm text-gray-600">
+<div class="row g-4 mb-4">
+    <div class="col-xl-7">
+        <div class="surface-card p-4 h-100">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">{% trans "Sales Trend (Last 7 Days)" %}</h2>
+                    <p class="text-muted small mb-0">{% trans "Track sales count and revenue movement over the last week." %}</p>
+                </div>
+                <span class="status-pill bg-light text-secondary">
+                    <i class="fas fa-chart-line"></i>{% trans "Live snapshot" %}
+                </span>
+            </div>
+            <p id="dashboard-sales-trend-empty" class="empty-state d-none mb-0">{% trans "No sales trend data available." %}</p>
+            <div id="dashboard-sales-trend-wrap" class="position-relative" style="height: 340px;">
+                <canvas id="salesTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="surface-card p-4 h-100">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">{% trans "Sales by Category" %}</h2>
+                    <p class="text-muted small mb-0">{% trans "See how revenue is distributed across medicine categories." %}</p>
+                </div>
+                <span class="status-pill bg-light text-secondary">
+                    <i class="fas fa-chart-pie"></i>{% trans "Last 30 days" %}
+                </span>
+            </div>
+            <p id="dashboard-category-empty" class="empty-state d-none mb-0">{% trans "No category data available." %}</p>
+            <div id="dashboard-category-wrap" class="position-relative" style="height: 340px;">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-6">
+        <div class="surface-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">{% trans "Fast Moving Medicines" %}</h2>
+                    <p class="text-muted small mb-0">{% trans "Top performers by quantity and revenue." %}</p>
+                </div>
+                <a href="{% url 'sales-analytics' %}" class="btn btn-outline-secondary btn-sm rounded-pill">{% trans "View All" %}</a>
+            </div>
+            <div id="fast-moving-list">
+                <div class="empty-state">
+                    <div class="spinner-border spinner-border-sm text-primary mb-2" role="status" aria-hidden="true"></div>
+                    <div>{% trans "Loading..." %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="surface-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">{% trans "Slow Moving Medicines" %}</h2>
+                    <p class="text-muted small mb-0">{% trans "Identify products that need pricing, stocking, or merchandising attention." %}</p>
+                </div>
+                <a href="{% url 'sales-analytics' %}" class="btn btn-outline-secondary btn-sm rounded-pill">{% trans "View All" %}</a>
+            </div>
+            <div id="slow-moving-list">
+                <div class="empty-state">
+                    <div class="spinner-border spinner-border-sm text-primary mb-2" role="status" aria-hidden="true"></div>
+                    <div>{% trans "Loading..." %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="surface-card p-4 mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+        <div>
+            <h2 class="h5 fw-bold mb-1">{% trans "Inventory Optimization Forecast" %}</h2>
+            <p class="text-muted small mb-0">{% trans "Forecast demand, compare model accuracy, and surface reorder quantities from one table." %}</p>
+        </div>
+        <div class="text-muted small">
             {% trans "Service Level Target:" %}
-            <span class="font-semibold" id="service-level-target">95%</span>
-            (Z=<span id="service-level-z">1.65</span>)
+            <strong id="service-level-target">95%</strong>
+            <span class="ms-1">(Z=<span id="service-level-z">1.65</span>)</span>
         </div>
     </div>
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Medicine" %}</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Forecast (30d)" %}</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Reorder Qty" %}</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Model" %}</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">MAPE</th>
+                    <th>{% trans "Medicine" %}</th>
+                    <th>{% trans "Forecast (30d)" %}</th>
+                    <th>{% trans "Reorder Qty" %}</th>
+                    <th>{% trans "Model" %}</th>
+                    <th>{% trans "MAPE" %}</th>
                 </tr>
             </thead>
-            <tbody id="optimization-list" class="bg-white divide-y divide-gray-200">
+            <tbody id="optimization-list">
                 <tr>
-                    <td colspan="5" class="px-4 py-3 text-sm text-gray-500">{% trans "Loading optimization data..." %}</td>
+                    <td colspan="5" class="py-4 text-center text-muted">{% trans "Loading optimization data..." %}</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- Recent Sales & Alerts -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Recent Sales -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">
-                <i class="fas fa-clock text-indigo-500 mr-2"></i>
-                {% trans "Recent Sales" %}
-            </h3>
-            <a href="{% url 'sales-list' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                {% trans "View All" %} <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-        <div id="recent-sales-list" class="space-y-3">
-            <div class="text-center text-gray-500 py-8">
-                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>{% trans "Loading..." %}</p>
+<div class="row g-4">
+    <div class="col-xl-6">
+        <div class="surface-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">{% trans "Recent Sales" %}</h2>
+                    <p class="text-muted small mb-0">{% trans "A quick operational view of the latest transactions." %}</p>
+                </div>
+                <a href="{% url 'sales-list' %}" class="btn btn-outline-secondary btn-sm rounded-pill">{% trans "View All" %}</a>
+            </div>
+            <div id="recent-sales-list">
+                <div class="empty-state">
+                    <div class="spinner-border spinner-border-sm text-primary mb-2" role="status" aria-hidden="true"></div>
+                    <div>{% trans "Loading..." %}</div>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Alerts -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">
-                <i class="fas fa-bell text-yellow-500 mr-2"></i>
-                {% trans "Alerts & Notifications" %}
-            </h3>
-            <a href="{% url 'inventory-reorder-recommendations' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                {% trans "View All" %} <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
-        <div id="alerts-list" class="space-y-3">
-            <div class="text-center text-gray-500 py-8">
-                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                <p>{% trans "Loading..." %}</p>
+    <div class="col-xl-6">
+        <div class="surface-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">{% trans "Alerts & Notifications" %}</h2>
+                    <p class="text-muted small mb-0">{% trans "Keep an eye on pending reorder actions." %}</p>
+                </div>
+                <a href="{% url 'inventory-reorder-recommendations' %}" class="btn btn-outline-secondary btn-sm rounded-pill">{% trans "View All" %}</a>
+            </div>
+            <div id="alerts-list">
+                <div class="empty-state">
+                    <div class="spinner-border spinner-border-sm text-primary mb-2" role="status" aria-hidden="true"></div>
+                    <div>{% trans "Loading..." %}</div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Chart instances (render once)
 let salesTrendChartInstance = null;
 let categoryChartInstance = null;
-const APP_LOCALE = "{{ LANGUAGE_CODE|default:'uz'|escapejs }}".replace('_', '-');
+const APP_LOCALE = window.APP_LOCALE || "{{ request.LANGUAGE_CODE|default:LANGUAGE_CODE|escapejs }}".replace("_", "-");
 const UZS_NUMBER = new Intl.NumberFormat(APP_LOCALE, { maximumFractionDigits: 0 });
 
 const I18N = {
@@ -233,6 +232,9 @@ const I18N = {
   units: "{% trans 'units' %}",
   unitsSold: "{% trans 'units sold' %}",
   low: "{% trans 'Low' %}",
+  medium: "{% trans 'Medium' %}",
+  high: "{% trans 'High' %}",
+  urgent: "{% trans 'Urgent' %}",
   sale: "{% trans 'Sale' %}",
   notAvailable: "{% trans 'N/A' %}",
   noOptimizationData: "{% trans 'No optimization data available.' %}",
@@ -240,10 +242,6 @@ const I18N = {
   revenueUZS: "{% trans 'Revenue (UZS)' %}",
 };
 
-// Fallback for environments where Decimal might be referenced by libs/plugins
-const Decimal = Number;
-
-// Data from backend context (JSON-safe)
 const DASHBOARD = {
   totalSales: {{ total_sales|default:0 }},
   totalRevenueUZS: {{ total_revenue_uzs|default:0|floatformat:0 }},
@@ -267,14 +265,14 @@ const DASHBOARD = {
 };
 
 function loadDashboardData() {
-  document.getElementById('total-sales').textContent = DASHBOARD.totalSales || 0;
-  document.getElementById('total-revenue').textContent = formatUZS(DASHBOARD.totalRevenueUZS || 0);
-  document.getElementById('total-medicines').textContent = DASHBOARD.medicinesCount || 0;
-  document.getElementById('expiring-count').textContent = DASHBOARD.expiringSoonCount || 0;
-  document.getElementById('low-stock-count').textContent = DASHBOARD.lowStockCount || 0;
+  document.getElementById("total-sales").textContent = DASHBOARD.totalSales || 0;
+  document.getElementById("total-revenue").textContent = formatUZS(DASHBOARD.totalRevenueUZS || 0);
+  document.getElementById("total-medicines").textContent = DASHBOARD.medicinesCount || 0;
+  document.getElementById("expiring-count").textContent = DASHBOARD.expiringSoonCount || 0;
+  document.getElementById("low-stock-count").textContent = DASHBOARD.lowStockCount || 0;
 
-  applyGrowth('sales-growth', DASHBOARD.salesGrowthPct);
-  applyGrowth('revenue-growth', DASHBOARD.revenueGrowthPct);
+  applyGrowth("sales-growth", DASHBOARD.salesGrowthPct);
+  applyGrowth("revenue-growth", DASHBOARD.revenueGrowthPct);
 
   renderFastMoving(DASHBOARD.fastMoving || []);
   renderSlowMoving(DASHBOARD.slowMoving || []);
@@ -289,105 +287,109 @@ function loadDashboardData() {
 function applyGrowth(elementId, value) {
   const el = document.getElementById(elementId);
   if (!el) return;
+  const icon = el.querySelector("i");
+  const text = el.querySelector("span");
   if (value === null || value === undefined) {
-    el.querySelector('span').textContent = '0.0';
+    text.textContent = "0.0";
     return;
   }
   const num = Number(value);
-  el.querySelector('span').textContent = Math.abs(num).toFixed(1);
-  el.className = num >= 0 ? 'text-sm text-green-600 mt-2' : 'text-sm text-red-600 mt-2';
-  el.querySelector('i').className = num >= 0 ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
+  text.textContent = Math.abs(num).toFixed(1);
+  el.className = num >= 0 ? "small text-success" : "small text-danger";
+  icon.className = num >= 0 ? "fas fa-arrow-up me-1" : "fas fa-arrow-down me-1";
 }
 
 function renderFastMoving(data) {
-    const container = document.getElementById('fast-moving-list');
+    const container = document.getElementById("fast-moving-list");
     if (!data || data.length === 0) {
-        container.innerHTML = `<p class="text-center text-gray-500 py-4">${I18N.noFastMoving}</p>`;
+        container.innerHTML = `<div class="empty-state">${I18N.noFastMoving}</div>`;
         return;
     }
 
-    container.innerHTML = data.map(item => `
-        <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-            <div class="flex-1">
-                <p class="font-medium text-gray-900">${item.medicine__name || I18N.notAvailable}</p>
-                <p class="text-sm text-gray-600">${item.total_quantity || 0} ${I18N.unitsSold}</p>
-            </div>
-            <div class="text-right">
-                <p class="font-semibold text-orange-600">${formatUZS(item.total_revenue_uzs || 0)}</p>
+    container.innerHTML = `<div class="list-group list-group-flush">${data.map(item => `
+        <div class="list-group-item px-0 py-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-center gap-3">
+                <div>
+                    <div class="fw-semibold">${item.medicine__name || I18N.notAvailable}</div>
+                    <div class="text-muted small">${item.total_quantity || 0} ${I18N.unitsSold}</div>
+                </div>
+                <div class="text-end">
+                    <div class="fw-semibold text-primary">${formatUZS(item.total_revenue_uzs || 0)}</div>
+                </div>
             </div>
         </div>
-    `).join('');
+    `).join("")}</div>`;
 }
 
 function renderSlowMoving(data) {
-    const container = document.getElementById('slow-moving-list');
+    const container = document.getElementById("slow-moving-list");
     if (!data || data.length === 0) {
-        container.innerHTML = `<p class="text-center text-gray-500 py-4">${I18N.noSlowMoving}</p>`;
+        container.innerHTML = `<div class="empty-state">${I18N.noSlowMoving}</div>`;
         return;
     }
 
-    container.innerHTML = data.map(item => `
-        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-            <div class="flex-1">
-                <p class="font-medium text-gray-900">${item.medicine_name || I18N.notAvailable}</p>
-                <p class="text-sm text-gray-600">${item.total_quantity || 0} ${I18N.unitsSold}</p>
-            </div>
-            <div class="text-right">
-                <span class="px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded">${I18N.low}</span>
+    container.innerHTML = `<div class="list-group list-group-flush">${data.map(item => `
+        <div class="list-group-item px-0 py-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-center gap-3">
+                <div>
+                    <div class="fw-semibold">${item.medicine_name || I18N.notAvailable}</div>
+                    <div class="text-muted small">${item.total_quantity || 0} ${I18N.unitsSold}</div>
+                </div>
+                <span class="badge rounded-pill text-bg-warning">${I18N.low}</span>
             </div>
         </div>
-    `).join('');
+    `).join("")}</div>`;
 }
 
 function renderRecentSales(sales) {
-    const container = document.getElementById('recent-sales-list');
+    const container = document.getElementById("recent-sales-list");
     if (!sales || sales.length === 0) {
-        container.innerHTML = `<p class="text-center text-gray-500 py-4">${I18N.noRecentSales}</p>`;
+        container.innerHTML = `<div class="empty-state">${I18N.noRecentSales}</div>`;
         return;
     }
 
-    container.innerHTML = sales.map(sale => {
+    container.innerHTML = `<div class="list-group list-group-flush">${sales.map(sale => {
         const date = new Date(sale.date);
         return `
-            <div class="flex items-center justify-between p-3 border-b border-gray-100">
-                <div class="flex-1">
-                    <p class="font-medium text-gray-900">${I18N.sale} #${sale.id}</p>
-                    <p class="text-sm text-gray-600">${date.toLocaleDateString(APP_LOCALE)} ${date.toLocaleTimeString(APP_LOCALE)}</p>
-                </div>
-                <div class="text-right">
-                    <p class="font-semibold text-gray-900">${formatUZS(sale.total_amount_uzs || 0)}</p>
+            <div class="list-group-item px-0 py-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-center gap-3">
+                    <div>
+                        <div class="fw-semibold">${I18N.sale} #${sale.id}</div>
+                        <div class="text-muted small">${date.toLocaleDateString(APP_LOCALE)} ${date.toLocaleTimeString(APP_LOCALE)}</div>
+                    </div>
+                    <div class="fw-semibold">${formatUZS(sale.total_amount_uzs || 0)}</div>
                 </div>
             </div>
         `;
-    }).join('');
+    }).join("")}</div>`;
 }
 
 function renderAlerts(recommendations) {
-    const container = document.getElementById('alerts-list');
+    const container = document.getElementById("alerts-list");
     if (!recommendations || recommendations.length === 0) {
-        container.innerHTML = `<p class="text-center text-gray-500 py-4">${I18N.noAlerts}</p>`;
+        container.innerHTML = `<div class="empty-state">${I18N.noAlerts}</div>`;
         return;
     }
 
-    container.innerHTML = recommendations.slice(0, 5).map(rec => {
-        const priorityColors = {
-            'URGENT': 'bg-red-100 text-red-800',
-            'HIGH': 'bg-orange-100 text-orange-800',
-            'MEDIUM': 'bg-yellow-100 text-yellow-800',
-            'LOW': 'bg-blue-100 text-blue-800'
+    container.innerHTML = `<div class="list-group list-group-flush">${recommendations.slice(0, 5).map(rec => {
+        const priorityClasses = {
+            URGENT: "text-bg-danger",
+            HIGH: "text-bg-warning",
+            MEDIUM: "text-bg-info",
+            LOW: "text-bg-secondary",
         };
         return `
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div class="flex-1">
-                    <p class="font-medium text-gray-900">${rec.medicine_name || I18N.notAvailable}</p>
-                    <p class="text-sm text-gray-600">${I18N.reorder} ${rec.recommended_quantity} ${I18N.units}</p>
+            <div class="list-group-item px-0 py-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-center gap-3">
+                    <div>
+                        <div class="fw-semibold">${rec.medicine_name || I18N.notAvailable}</div>
+                        <div class="text-muted small">${I18N.reorder} ${rec.recommended_quantity} ${I18N.units}</div>
+                    </div>
+                    <span class="badge rounded-pill ${priorityClasses[rec.priority] || "text-bg-secondary"}">${I18N[(rec.priority || "").toLowerCase()] || rec.priority}</span>
                 </div>
-                <span class="px-2 py-1 ${priorityColors[rec.priority] || 'bg-gray-100 text-gray-800'} text-xs rounded">
-                    ${rec.priority}
-                </span>
             </div>
         `;
-    }).join('');
+    }).join("")}</div>`;
 }
 
 function renderSalesTrendChart(data) {
@@ -395,7 +397,7 @@ function renderSalesTrendChart(data) {
     let salesData = [];
     let revenueData = [];
 
-    if (Array.isArray(data) && data.length && typeof data[0] === 'object') {
+    if (Array.isArray(data) && data.length && typeof data[0] === "object") {
       labels = data.map(item => item.day);
       salesData = data.map(item => Number(item.total_sales || 0));
       revenueData = data.map(item => Number(item.total_amount || 0));
@@ -410,11 +412,11 @@ function renderSalesTrendChart(data) {
       salesTrendChartInstance = null;
     }
 
-    const canvas = document.getElementById('salesTrendChart');
-    const chartWrap = document.getElementById('dashboard-sales-trend-wrap');
-    const emptyState = document.getElementById('dashboard-sales-trend-empty');
+    const canvas = document.getElementById("salesTrendChart");
+    const chartWrap = document.getElementById("dashboard-sales-trend-wrap");
+    const emptyState = document.getElementById("dashboard-sales-trend-empty");
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     const minLen = Math.min(labels.length, salesData.length, revenueData.length);
     labels = labels.slice(0, minLen).map(d => {
@@ -424,89 +426,62 @@ function renderSalesTrendChart(data) {
     revenueData = revenueData.slice(0, minLen).map(Number);
 
     if (minLen === 0) {
-      if (chartWrap) chartWrap.classList.add('hidden');
-      if (emptyState) emptyState.classList.remove('hidden');
+      if (chartWrap) chartWrap.classList.add("d-none");
+      if (emptyState) emptyState.classList.remove("d-none");
       return;
     }
 
-    if (chartWrap) chartWrap.classList.remove('hidden');
-    if (emptyState) emptyState.classList.add('hidden');
+    if (chartWrap) chartWrap.classList.remove("d-none");
+    if (emptyState) emptyState.classList.add("d-none");
 
     salesTrendChartInstance = new Chart(ctx, {
-      type: 'line',
+      type: "line",
       data: {
         labels,
         datasets: [{
           label: I18N.salesCount,
           data: salesData,
-          borderColor: 'rgb(59, 130, 246)',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          tension: 0.4,
-          yAxisID: 'y'
+          borderColor: "rgb(37, 99, 235)",
+          backgroundColor: "rgba(37, 99, 235, 0.1)",
+          tension: 0.35,
+          yAxisID: "y"
         }, {
           label: I18N.revenueUZS,
           data: revenueData,
-          borderColor: 'rgb(34, 197, 94)',
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
-          tension: 0.4,
-          yAxisID: 'y1'
+          borderColor: "rgb(22, 163, 74)",
+          backgroundColor: "rgba(22, 163, 74, 0.1)",
+          tension: 0.35,
+          yAxisID: "y1"
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        resizeDelay: 150,
-        interaction: {
-          mode: 'index',
-          intersect: false
-        },
-        layout: {
-          padding: {
-            top: 8,
-            right: 8,
-            bottom: 4,
-            left: 4
-          }
-        },
+        interaction: { mode: "index", intersect: false },
         scales: {
           y: {
             beginAtZero: true,
-            position: 'left',
-            grace: '10%',
             ticks: { precision: 0 },
-            title: {
-              display: true,
-              text: I18N.salesCount
-            }
+            title: { display: true, text: I18N.salesCount }
           },
           y1: {
             beginAtZero: true,
-            position: 'right',
-            grace: '10%',
-            ticks: {
-              callback: (value) => formatUZS(value)
-            },
-            title: {
-              display: true,
-              text: I18N.revenueUZS
-            },
+            position: "right",
+            ticks: { callback: value => formatUZS(value) },
+            title: { display: true, text: I18N.revenueUZS },
             grid: { drawOnChartArea: false }
           }
         },
         plugins: {
           legend: {
-            display: true,
-            position: 'bottom',
-            labels: {
-              usePointStyle: true,
-              boxWidth: 10
-            }
+            position: "bottom",
+            labels: { usePointStyle: true, boxWidth: 10 }
           },
           tooltip: {
             callbacks: {
               label: function(context) {
-                const label = context.dataset.label || '';
-                if (context.dataset.yAxisID === 'y1') {
+                const label = context.dataset.label || "";
+                if (context.dataset.yAxisID === "y1") {
                   return `${label}: ${formatUZS(context.parsed.y)}`;
                 }
                 return `${label}: ${context.parsed.y}`;
@@ -519,38 +494,41 @@ function renderSalesTrendChart(data) {
 }
 
 function renderOptimization(items, serviceLevel) {
-    const tbody = document.getElementById('optimization-list');
+    const tbody = document.getElementById("optimization-list");
     if (!tbody) return;
 
-    const targetEl = document.getElementById('service-level-target');
-    const zEl = document.getElementById('service-level-z');
+    const targetEl = document.getElementById("service-level-target");
+    const zEl = document.getElementById("service-level-z");
     if (targetEl) targetEl.textContent = `${serviceLevel.target_percent || 95}%`;
     if (zEl) zEl.textContent = `${serviceLevel.z_value ?? 1.65}`;
 
     if (!items || !items.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-3 text-sm text-gray-500">${I18N.noOptimizationData}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-muted">${I18N.noOptimizationData}</td></tr>`;
         return;
     }
 
     tbody.innerHTML = items.map((item) => {
-        const model = (item.selected_method || '').replaceAll('_', ' ');
+        const model = (item.selected_method || "").replaceAll("_", " ");
         const mape = item.mape === null || item.mape === undefined ? I18N.notAvailable : `${Number(item.mape).toFixed(2)}%`;
         return `
             <tr>
-                <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.medicine_name || I18N.notAvailable}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">${Number(item.forecasted_demand_30_days || 0).toFixed(2)}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">${item.recommended_reorder_quantity || 0}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">${model || I18N.notAvailable}</td>
-                <td class="px-4 py-3 text-sm text-gray-700">${mape}</td>
+                <td>
+                    <div class="fw-semibold">${item.medicine_name || I18N.notAvailable}</div>
+                    <div class="text-muted small">${item.medicine_sku || ""}</div>
+                </td>
+                <td>${Number(item.forecasted_demand_30_days || 0).toFixed(2)}</td>
+                <td><span class="badge rounded-pill text-bg-primary">${item.recommended_reorder_quantity || 0}</span></td>
+                <td class="text-capitalize">${model || I18N.notAvailable}</td>
+                <td>${mape}</td>
             </tr>
         `;
-    }).join('');
+    }).join("");
 }
 
 function renderCategoryChart(data) {
     let labels = [];
     let revenueData = [];
-    if (Array.isArray(data) && data.length && typeof data[0] === 'object') {
+    if (Array.isArray(data) && data.length && typeof data[0] === "object") {
       labels = data.map(item => item.medicine__category__name || "{% trans 'Uncategorized' %}");
       revenueData = data.map(item => Number(item.total_revenue || 0));
     } else {
@@ -563,59 +541,55 @@ function renderCategoryChart(data) {
       categoryChartInstance = null;
     }
 
-    const canvas = document.getElementById('categoryChart');
-    const categoryWrap = document.getElementById('dashboard-category-wrap');
-    const categoryEmpty = document.getElementById('dashboard-category-empty');
+    const canvas = document.getElementById("categoryChart");
+    const categoryWrap = document.getElementById("dashboard-category-wrap");
+    const categoryEmpty = document.getElementById("dashboard-category-empty");
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     const minLen = Math.min(labels.length, revenueData.length);
     labels = labels.slice(0, minLen);
     revenueData = revenueData.slice(0, minLen).map(Number);
 
     if (minLen === 0) {
-      if (categoryWrap) categoryWrap.classList.add('hidden');
-      if (categoryEmpty) categoryEmpty.classList.remove('hidden');
+      if (categoryWrap) categoryWrap.classList.add("d-none");
+      if (categoryEmpty) categoryEmpty.classList.remove("d-none");
       return;
     }
 
-    if (categoryWrap) categoryWrap.classList.remove('hidden');
-    if (categoryEmpty) categoryEmpty.classList.add('hidden');
+    if (categoryWrap) categoryWrap.classList.remove("d-none");
+    if (categoryEmpty) categoryEmpty.classList.add("d-none");
 
     categoryChartInstance = new Chart(ctx, {
-      type: 'doughnut',
+      type: "doughnut",
       data: {
         labels,
         datasets: [{
           data: revenueData,
           backgroundColor: [
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(34, 197, 94, 0.8)',
-            'rgba(251, 146, 60, 0.8)',
-            'rgba(168, 85, 247, 0.8)',
-            'rgba(236, 72, 153, 0.8)',
-            'rgba(20, 184, 166, 0.8)',
+            "rgba(37, 99, 235, 0.82)",
+            "rgba(22, 163, 74, 0.82)",
+            "rgba(249, 115, 22, 0.82)",
+            "rgba(168, 85, 247, 0.82)",
+            "rgba(236, 72, 153, 0.82)",
+            "rgba(20, 184, 166, 0.82)",
           ]
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        resizeDelay: 150,
         plugins: {
           legend: {
-            position: 'bottom',
-            labels: {
-              usePointStyle: true,
-              boxWidth: 10
-            }
+            position: "bottom",
+            labels: { usePointStyle: true, boxWidth: 10 }
           },
           tooltip: {
             callbacks: {
               label: function(context) {
                 const total = context.dataset.data.reduce((sum, item) => sum + Number(item || 0), 0);
                 const value = Number(context.parsed || 0);
-                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
+                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
                 return `${context.label}: ${formatUZS(value)} (${percentage}%)`;
               }
             }
@@ -629,11 +603,10 @@ function formatUZS(amount) {
   return `${UZS_NUMBER.format(Number(amount || 0))} UZS`;
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadDashboardData);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", loadDashboardData);
 } else {
   loadDashboardData();
 }
 </script>
 {% endblock %}
-

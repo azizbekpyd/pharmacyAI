@@ -1,25 +1,56 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# PharmacyAI translations.
+# Copyright (C) 2026 PharmacyAI
+# This file is distributed under the same license as the PharmacyAI package.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: PharmacyAI\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-27 11:35+0500\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2026-03-20 11:25+0500\n"
+"PO-Revision-Date: 2026-03-20 12:45+0500\n"
+"Last-Translator: Codex <codex@openai.com>\n"
+"Language-Team: English\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\apps\accounts\models.py:27
+msgid "Admin"
+msgstr "Admin"
+
+#: .\apps\accounts\models.py:28
+msgid "Manager"
+msgstr "Manager"
+
+#: .\apps\accounts\models.py:29
+msgid "Pharmacist"
+msgstr "Pharmacist"
+
+#: .\apps\accounts\models.py:36
+msgid "User role determines access level"
+msgstr "User role determines access level"
+
+#: .\apps\accounts\models.py:42
+msgid "Contact phone number"
+msgstr "Contact phone number"
+
+#: .\apps\accounts\models.py:50
+msgid "Pharmacy this user belongs to"
+msgstr "Pharmacy this user belongs to"
+
+#: .\apps\accounts\models.py:56 .\templates\sales\list.html:38
+msgid "User"
+msgstr "User"
+
+#: .\apps\accounts\models.py:57
+msgid "Users"
+msgstr "Users"
+
 #: .\apps\accounts\permissions.py:42
 msgid "You do not have permission to manage categories."
-msgstr ""
+msgstr "You do not have permission to manage categories."
 
 #: .\apps\accounts\permissions.py:54
 msgid "You do not have permission to manage medicines."
@@ -37,7 +68,7 @@ msgstr "You do not have permission to manage inventory."
 msgid "You do not have permission to manage reorder recommendations."
 msgstr "You do not have permission to manage reorder recommendations."
 
-#: .\apps\accounts\serializers.py:61 .\apps\accounts\views.py:185
+#: .\apps\accounts\serializers.py:61 .\apps\accounts\views.py:184
 msgid "Passwords do not match."
 msgstr "Passwords do not match."
 
@@ -53,63 +84,174 @@ msgstr "User account is disabled."
 msgid "Must include \"username\" and \"password\"."
 msgstr "Must include \"username\" and \"password\"."
 
-#: .\apps\accounts\views.py:110
+#: .\apps\accounts\views.py:109
 msgid "Login successful"
 msgstr "Login successful"
 
-#: .\apps\accounts\views.py:126
+#: .\apps\accounts\views.py:125
 #, python-format
 msgid "Welcome back, %(name)s!"
 msgstr "Welcome back, %(name)s!"
 
-#: .\apps\accounts\views.py:130
+#: .\apps\accounts\views.py:129
 msgid "Invalid username or password."
 msgstr "Invalid username or password."
 
-#: .\apps\accounts\views.py:146
+#: .\apps\accounts\views.py:145
 msgid "Logout successful"
 msgstr "Logout successful"
 
-#: .\apps\accounts\views.py:149
+#: .\apps\accounts\views.py:148
 msgid "You have been logged out successfully."
 msgstr "You have been logged out successfully."
 
-#: .\apps\accounts\views.py:175
+#: .\apps\accounts\views.py:174
 msgid "Pharmacy name is required."
 msgstr "Pharmacy name is required."
 
-#: .\apps\accounts\views.py:177
+#: .\apps\accounts\views.py:176
 msgid "Username is required."
 msgstr "Username is required."
 
-#: .\apps\accounts\views.py:179
+#: .\apps\accounts\views.py:178
 msgid "Email is required."
 msgstr "Email is required."
 
-#: .\apps\accounts\views.py:181
+#: .\apps\accounts\views.py:180
 msgid "Password is required."
 msgstr "Password is required."
 
-#: .\apps\accounts\views.py:183
+#: .\apps\accounts\views.py:182
 msgid "Password must be at least 8 characters."
 msgstr "Password must be at least 8 characters."
 
-#: .\apps\accounts\views.py:187
+#: .\apps\accounts\views.py:186
 msgid "Username already exists."
 msgstr "Username already exists."
 
-#: .\apps\accounts\views.py:189
+#: .\apps\accounts\views.py:188
 msgid "Email already exists."
 msgstr "Email already exists."
 
-#: .\apps\accounts\views.py:222
+#: .\apps\accounts\views.py:221
 msgid "Trial started successfully. Welcome to PharmacyAI."
 msgstr "Trial started successfully. Welcome to PharmacyAI."
 
+#: .\apps\dashboard\views.py:93 .\apps\sales\views_template.py:110
+#: .\templates\dashboard\index.html:532 .\templates\medicines\create.html:34
+#: .\templates\medicines\detail.html:27 .\templates\medicines\list.html:112
+#: .\templates\sales\analytics.html:105
+msgid "Uncategorized"
+msgstr "Uncategorized"
+
+#: .\apps\inventory\models.py:23
+msgid "Medicine this inventory record belongs to"
+msgstr "Medicine this inventory record belongs to"
+
+#: .\apps\inventory\models.py:29
+msgid "Pharmacy that owns this inventory record"
+msgstr "Pharmacy that owns this inventory record"
+
+#: .\apps\inventory\models.py:34
+msgid "Current quantity in stock"
+msgstr "Current quantity in stock"
+
+#: .\apps\inventory\models.py:39
+msgid "Minimum stock level before reorder is recommended"
+msgstr "Minimum stock level before reorder is recommended"
+
+#: .\apps\inventory\models.py:44
+msgid "Maximum stock level (target restock amount)"
+msgstr "Maximum stock level (target restock amount)"
+
+#: .\apps\inventory\models.py:49
+msgid "Date when inventory was last restocked"
+msgstr "Date when inventory was last restocked"
+
+#: .\apps\inventory\models.py:55 .\templates\base.html:248
+#: .\templates\inventory\list.html:10 .\templates\medicines\edit.html:61
+msgid "Inventory"
+msgstr "Inventory"
+
+#: .\apps\inventory\models.py:56
+msgid "Inventories"
+msgstr "Inventories"
+
 #: .\apps\inventory\models.py:68 .\apps\inventory\models.py:181
-#: .\apps\sales\models.py:134
+#: .\apps\sales\models.py:138
 msgid "Medicine must belong to the same pharmacy."
 msgstr "Medicine must belong to the same pharmacy."
+
+#: .\apps\inventory\models.py:109
+msgid "Pending"
+msgstr "Pending"
+
+#: .\apps\inventory\models.py:110
+msgid "Approved"
+msgstr "Approved"
+
+#: .\apps\inventory\models.py:111
+msgid "Rejected"
+msgstr "Rejected"
+
+#: .\apps\inventory\models.py:112
+msgid "Fulfilled"
+msgstr "Fulfilled"
+
+#: .\apps\inventory\models.py:116 .\templates\dashboard\index.html:234
+msgid "Low"
+msgstr "Low"
+
+#: .\apps\inventory\models.py:117 .\templates\dashboard\index.html:235
+#: .\templates\inventory\list.html:45
+msgid "Medium"
+msgstr "Medium"
+
+#: .\apps\inventory\models.py:118 .\templates\dashboard\index.html:236
+msgid "High"
+msgstr "High"
+
+#: .\apps\inventory\models.py:119 .\templates\dashboard\index.html:237
+msgid "Urgent"
+msgstr "Urgent"
+
+#: .\apps\inventory\models.py:126
+msgid "Medicine that needs reordering"
+msgstr "Medicine that needs reordering"
+
+#: .\apps\inventory\models.py:132
+msgid "Pharmacy that owns this recommendation"
+msgstr "Pharmacy that owns this recommendation"
+
+#: .\apps\inventory\models.py:136
+msgid "Recommended quantity to order"
+msgstr "Recommended quantity to order"
+
+#: .\apps\inventory\models.py:139
+msgid "Reason for the recommendation (e.g., Low stock, High demand)"
+msgstr "Reason for the recommendation (e.g., Low stock, High demand)"
+
+#: .\apps\inventory\models.py:145
+msgid "Priority level of the recommendation"
+msgstr "Priority level of the recommendation"
+
+#: .\apps\inventory\models.py:151
+msgid "Status of the recommendation"
+msgstr "Status of the recommendation"
+
+#: .\apps\inventory\models.py:161
+msgid "User who approved the recommendation"
+msgstr "User who approved the recommendation"
+
+#: .\apps\inventory\models.py:166
+msgid "Reorder Recommendation"
+msgstr "Reorder Recommendation"
+
+#: .\apps\inventory\models.py:167
+#: .\templates\inventory\reorder_recommendations.html:5
+#: .\templates\inventory\reorder_recommendations.html:10
+msgid "Reorder Recommendations"
+msgstr "Reorder Recommendations"
 
 #: .\apps\inventory\views.py:60
 msgid "Quantity is required"
@@ -142,28 +284,96 @@ msgstr "Only pending recommendations can be approved"
 msgid "Only pending recommendations can be rejected"
 msgstr "Only pending recommendations can be rejected"
 
-#: .\apps\medicines\models.py:121 .\apps\medicines\services.py:35
+#: .\apps\medicines\models.py:22
+msgid "Category name (e.g., Antibiotics, Pain Relief)"
+msgstr "Category name (e.g., Antibiotics, Pain Relief)"
+
+#: .\apps\medicines\models.py:28
+msgid "Pharmacy that owns this category"
+msgstr "Pharmacy that owns this category"
+
+#: .\apps\medicines\models.py:33
+msgid "Optional description of the category"
+msgstr "Optional description of the category"
+
+#: .\apps\medicines\models.py:39 .\templates\medicines\create.html:32
+#: .\templates\medicines\detail.html:22 .\templates\medicines\edit.html:39
+#: .\templates\medicines\list.html:27 .\templates\medicines\list.html:55
+#: .\templates\medicines\update.html:40
+msgid "Category"
+msgstr "Category"
+
+#: .\apps\medicines\models.py:40
+msgid "Categories"
+msgstr "Categories"
+
+#: .\apps\medicines\models.py:61
+msgid "Medicine name (e.g., Paracetamol 500mg)"
+msgstr "Medicine name (e.g., Paracetamol 500mg)"
+
+#: .\apps\medicines\models.py:68
+msgid "Medicine category"
+msgstr "Medicine category"
+
+#: .\apps\medicines\models.py:74
+msgid "Pharmacy that owns this medicine"
+msgstr "Pharmacy that owns this medicine"
+
+#: .\apps\medicines\models.py:78
+msgid "Stock Keeping Unit - unique identifier for the medicine"
+msgstr "Stock Keeping Unit - unique identifier for the medicine"
+
+#: .\apps\medicines\models.py:83
+msgid "Optional description of the medicine"
+msgstr "Optional description of the medicine"
+
+#: .\apps\medicines\models.py:89
+msgid "Price per unit"
+msgstr "Price per unit"
+
+#: .\apps\medicines\models.py:94
+msgid "Expiry date of the medicine batch"
+msgstr "Expiry date of the medicine batch"
+
+#: .\apps\medicines\models.py:100 .\templates\dashboard\index.html:165
+#: .\templates\inventory\list.html:23
+#: .\templates\inventory\reorder_recommendations.html:23
+#: .\templates\medicines\list.html:54
+msgid "Medicine"
+msgstr "Medicine"
+
+#: .\apps\medicines\models.py:101 .\templates\base.html:236
+#: .\templates\dashboard\index.html:45
+msgid "Medicines"
+msgstr "Medicines"
+
+#: .\apps\medicines\models.py:121 .\apps\medicines\services.py:37
 msgid "Category must belong to the same pharmacy."
 msgstr "Category must belong to the same pharmacy."
 
-#: .\apps\medicines\services.py:20 .\apps\sales\serializers.py:125
-#: .\apps\tenants\services.py:68 .\apps\tenants\services.py:120
+#: .\apps\medicines\serializers.py:50
+msgid "Initial stock to create inventory.current_stock."
+msgstr "Initial stock to create inventory.current_stock."
+
+#: .\apps\medicines\services.py:22 .\apps\sales\serializers.py:125
+#: .\apps\tenants\services.py:70 .\apps\tenants\services.py:122
 msgid "Pharmacy is required."
 msgstr "Pharmacy is required."
 
-#: .\apps\medicines\services.py:28 .\apps\medicines\views_template.py:168
+#: .\apps\medicines\services.py:30 .\apps\medicines\views_template.py:168
 msgid "Initial stock must be an integer."
 msgstr "Initial stock must be an integer."
 
-#: .\apps\medicines\services.py:31 .\apps\medicines\views_template.py:166
+#: .\apps\medicines\services.py:33 .\apps\medicines\views_template.py:166
 msgid "Initial stock must be non-negative."
 msgstr "Initial stock must be non-negative."
 
-#: .\apps\medicines\services.py:42 .\apps\medicines\views_template.py:176
+#: .\apps\medicines\services.py:44 .\apps\medicines\views_template.py:176
 msgid "Unit price is invalid."
 msgstr "Unit price is invalid."
 
-#: .\apps\medicines\views_template.py:35
+#: .\apps\medicines\views_template.py:35 .\templates\medicines\edit.html:51
+#: .\templates\medicines\edit.html:63
 msgid "Current stock quantity"
 msgstr "Current stock quantity"
 
@@ -208,7 +418,7 @@ msgstr "Expiry date is invalid."
 msgid "A medicine with this SKU already exists in this pharmacy."
 msgstr "A medicine with this SKU already exists in this pharmacy."
 
-#: .\apps\medicines\views_template.py:239 .\templates\medicines\create.html:107
+#: .\apps\medicines\views_template.py:239 .\templates\medicines\create.html:87
 msgid "Medicine created successfully"
 msgstr "Medicine created successfully"
 
@@ -233,10 +443,26 @@ msgid ""
 "This medicine cannot be deleted because it is used in existing sales records."
 msgstr "This medicine cannot be deleted because it is used in existing sales records."
 
+#: .\apps\pos_integration\serializers.py:22
+msgid "Medicine SKU"
+msgstr "Medicine SKU"
+
+#: .\apps\pos_integration\serializers.py:23
+msgid "Medicine name (optional)"
+msgstr "Medicine name (optional)"
+
 #: .\apps\pos_integration\serializers.py:44
 #, python-format
 msgid "Medicine with SKU '%(sku)s' not found."
 msgstr "Medicine with SKU '%(sku)s' not found."
+
+#: .\apps\pos_integration\serializers.py:55
+msgid "External sale ID from POS system"
+msgstr "External sale ID from POS system"
+
+#: .\apps\pos_integration\serializers.py:56
+msgid "Sale date (defaults to now)"
+msgstr "Sale date (defaults to now)"
 
 #: .\apps\pos_integration\serializers.py:63
 msgid "Sale must have at least one item."
@@ -294,7 +520,67 @@ msgstr "Row %(row)s: %(error)s"
 msgid "Imported %(count)s sales"
 msgstr "Imported %(count)s sales"
 
-#: .\apps\sales\models.py:132
+#: .\apps\sales\models.py:26
+msgid "Date and time of the sale"
+msgstr "Date and time of the sale"
+
+#: .\apps\sales\models.py:32
+msgid "Total amount of the sale"
+msgstr "Total amount of the sale"
+
+#: .\apps\sales\models.py:39
+msgid "User who processed the sale (cashier)"
+msgstr "User who processed the sale (cashier)"
+
+#: .\apps\sales\models.py:45
+msgid "Pharmacy where the sale was recorded"
+msgstr "Pharmacy where the sale was recorded"
+
+#: .\apps\sales\models.py:50
+msgid "Optional notes about the sale"
+msgstr "Optional notes about the sale"
+
+#: .\apps\sales\models.py:56 .\templates\dashboard\index.html:238
+msgid "Sale"
+msgstr "Sale"
+
+#: .\apps\sales\models.py:57 .\templates\base.html:240
+msgid "Sales"
+msgstr "Sales"
+
+#: .\apps\sales\models.py:89
+msgid "Parent sale transaction"
+msgstr "Parent sale transaction"
+
+#: .\apps\sales\models.py:95
+msgid "Pharmacy where this item was sold"
+msgstr "Pharmacy where this item was sold"
+
+#: .\apps\sales\models.py:101
+msgid "Medicine that was sold"
+msgstr "Medicine that was sold"
+
+#: .\apps\sales\models.py:105
+msgid "Quantity of medicine sold"
+msgstr "Quantity of medicine sold"
+
+#: .\apps\sales\models.py:111
+msgid "Price per unit at the time of sale"
+msgstr "Price per unit at the time of sale"
+
+#: .\apps\sales\models.py:117
+msgid "Subtotal (quantity x unit price)"
+msgstr "Subtotal (quantity x unit price)"
+
+#: .\apps\sales\models.py:122
+msgid "Sale Item"
+msgstr "Sale Item"
+
+#: .\apps\sales\models.py:123
+msgid "Sale Items"
+msgstr "Sale Items"
+
+#: .\apps\sales\models.py:136
 msgid "Sale must belong to the same pharmacy."
 msgstr "Sale must belong to the same pharmacy."
 
@@ -322,12 +608,6 @@ msgstr "medicine_id parameter is required"
 msgid "Medicine not found"
 msgstr "Medicine not found"
 
-#: .\apps\sales\views_template.py:110 .\templates\dashboard\index.html:554
-#: .\templates\medicines\create.html:41 .\templates\medicines\detail.html:27
-#: .\templates\medicines\list.html:105 .\templates\sales\analytics.html:105
-msgid "Uncategorized"
-msgstr "Uncategorized"
-
 #: .\apps\tenants\middleware.py:28 .\apps\tenants\utils.py:16
 msgid "User is not assigned to a pharmacy."
 msgstr "User is not assigned to a pharmacy."
@@ -344,185 +624,279 @@ msgstr "Subscription expired. Your account is currently in read-only mode."
 msgid "Changing pharmacy is not allowed."
 msgstr "Changing pharmacy is not allowed."
 
-#: .\apps\tenants\services.py:27
+#: .\apps\tenants\models.py:10 .\templates\public\landing.html:234
+msgid "Basic"
+msgstr "Basic"
+
+#: .\apps\tenants\models.py:11 .\templates\public\landing.html:248
+msgid "Pro"
+msgstr "Pro"
+
+#: .\apps\tenants\models.py:12 .\templates\public\landing.html:261
+msgid "Enterprise"
+msgstr "Enterprise"
+
+#: .\apps\tenants\services.py:29
 msgid "users"
 msgstr "users"
 
-#: .\apps\tenants\services.py:28
+#: .\apps\tenants\services.py:30
 msgid "medicines"
 msgstr "medicines"
 
-#: .\apps\tenants\services.py:29
+#: .\apps\tenants\services.py:31
 msgid "monthly sales"
 msgstr "monthly sales"
 
-#: .\apps\tenants\services.py:61 .\apps\tenants\services.py:66
+#: .\apps\tenants\services.py:63 .\apps\tenants\services.py:68
 msgid "Invalid resource type."
 msgstr "Invalid resource type."
 
-#: .\apps\tenants\services.py:81
+#: .\apps\tenants\services.py:83
 msgid "Unlimited plan limit."
 msgstr "Unlimited plan limit."
 
-#: .\apps\tenants\services.py:88 .\apps\tenants\services.py:113
+#: .\apps\tenants\services.py:90 .\apps\tenants\services.py:115
 msgid "Monthly sales limit exceeded."
 msgstr "Monthly sales limit exceeded."
 
-#: .\apps\tenants\services.py:91
+#: .\apps\tenants\services.py:93
 #, python-format
 msgid ""
 "Plan limit reached for %(label)s: %(used)s/%(limit)s. Upgrade your "
 "subscription to continue."
 msgstr "Plan limit reached for %(label)s: %(used)s/%(limit)s. Upgrade your subscription to continue."
 
-#: .\apps\tenants\services.py:94
+#: .\apps\tenants\services.py:96
 #, python-format
 msgid "%(label)s usage: %(used)s/%(limit)s."
 msgstr "%(label)s usage: %(used)s/%(limit)s."
 
-#: .\apps\tenants\services.py:124
+#: .\apps\tenants\services.py:126
 msgid "Invalid plan type."
 msgstr "Invalid plan type."
+
+#: .\pharmacy_ai\settings.py:157
+msgid "Uzbek"
+msgstr "Uzbek"
+
+#: .\pharmacy_ai\settings.py:158
+msgid "Russian"
+msgstr "Russian"
+
+#: .\pharmacy_ai\settings.py:159
+msgid "English"
+msgstr "English"
 
 #: .\templates\accounts\login.html:4
 msgid "Login - Pharmacy Analytic AI"
 msgstr "Login - Pharmacy Analytic AI"
 
-#: .\templates\accounts\login.html:31 .\templates\base.html:7
+#: .\templates\accounts\login.html:12 .\templates\base.html:8
+#: .\templates\base.html:224
 msgid "Pharmacy Analytic AI"
 msgstr "Pharmacy Analytic AI"
 
-#: .\templates\accounts\login.html:32
+#: .\templates\accounts\login.html:13
 msgid "Sign in to your account"
 msgstr "Sign in to your account"
 
-#: .\templates\accounts\login.html:43
-msgid "Invalid credentials"
-msgstr "Invalid credentials"
+#: .\templates\accounts\login.html:14
+msgid ""
+"Access analytics, forecasting, and pharmacy operations from one secure "
+"workspace."
+msgstr "Access analytics, forecasting, and pharmacy operations from one secure workspace."
 
-#: .\templates\accounts\login.html:44
-msgid "Please check your username and password."
-msgstr "Please check your username and password."
+#: .\templates\accounts\login.html:21
+msgid "Multi-tenant dashboards"
+msgstr "Multi-tenant dashboards"
 
-#: .\templates\accounts\login.html:52
+#: .\templates\accounts\login.html:22
+msgid "Switch teams, monitor stock, and track sales performance."
+msgstr "Switch teams, monitor stock, and track sales performance."
+
+#: .\templates\accounts\login.html:30
+msgid "Localized experience"
+msgstr "Localized experience"
+
+#: .\templates\accounts\login.html:31
+msgid "Uzbek, Russian, and English stay available across every request."
+msgstr "Uzbek, Russian, and English stay available across every request."
+
+#: .\templates\accounts\login.html:41 .\templates\accounts\start_trial.html:45
+#: .\templates\base.html:223 .\templates\public\landing.html:94
+#: .\templates\public\landing.html:299
+msgid "PharmacyAI"
+msgstr "PharmacyAI"
+
+#: .\templates\accounts\login.html:56
+msgid "Welcome back"
+msgstr "Welcome back"
+
+#: .\templates\accounts\login.html:57
+msgid "Sign in to continue managing your pharmacy workspace."
+msgstr "Sign in to continue managing your pharmacy workspace."
+
+#: .\templates\accounts\login.html:64
 msgid "Username or Email"
 msgstr "Username or Email"
 
-#: .\templates\accounts\login.html:61
+#: .\templates\accounts\login.html:72
 msgid "Enter your username or email"
 msgstr "Enter your username or email"
 
-#: .\templates\accounts\login.html:67 .\templates\accounts\start_trial.html:68
+#: .\templates\accounts\login.html:77 .\templates\accounts\start_trial.html:95
 msgid "Password"
 msgstr "Password"
 
-#: .\templates\accounts\login.html:75
+#: .\templates\accounts\login.html:84
 msgid "Enter your password"
 msgstr "Enter your password"
 
-#: .\templates\accounts\login.html:88
-msgid "Remember me"
-msgstr "Remember me"
-
-#: .\templates\accounts\login.html:98
+#: .\templates\accounts\login.html:90
 msgid "Sign in"
 msgstr "Sign in"
 
-#: .\templates\accounts\login.html:104
+#: .\templates\accounts\login.html:93
 msgid "Start your free 14-day trial"
 msgstr "Start your free 14-day trial"
 
-#: .\templates\accounts\login.html:109
+#: .\templates\accounts\login.html:99
 msgid "Demo Credentials:"
 msgstr "Demo Credentials:"
 
-#: .\templates\accounts\login.html:110
+#: .\templates\accounts\login.html:101
 msgid "Username:"
 msgstr "Username:"
 
-#: .\templates\accounts\login.html:111
+#: .\templates\accounts\login.html:105
 msgid "Password:"
 msgstr "Password:"
 
-#: .\templates\accounts\login.html:116
+#: .\templates\accounts\login.html:108
+msgid "Use the seeded demo accounts to showcase multi-tenant flows."
+msgstr "Use the seeded demo accounts to showcase multi-tenant flows."
+
+#: .\templates\accounts\login.html:112
 msgid "Pharmacy Analytic AI. University Diploma Project."
 msgstr "Pharmacy Analytic AI. University Diploma Project."
 
-#: .\templates\accounts\start_trial.html:7
+#: .\templates\accounts\start_trial.html:8
 msgid "Start Free Trial - PharmacyAI"
 msgstr "Start Free Trial - PharmacyAI"
 
-#: .\templates\accounts\start_trial.html:38
+#: .\templates\accounts\start_trial.html:46
 msgid "Start your 14-day free trial"
 msgstr "Start your 14-day free trial"
 
-#: .\templates\accounts\start_trial.html:56
-msgid "Pharmacy Name"
-msgstr "Pharmacy Name"
+#: .\templates\accounts\start_trial.html:47
+msgid ""
+"Launch a fully isolated pharmacy workspace with analytics, forecasting, and "
+"role-based team access in minutes."
+msgstr "Launch a fully isolated pharmacy workspace with analytics, forecasting, and role-based team access in minutes."
 
-#: .\templates\accounts\start_trial.html:60
-msgid "Admin Username"
-msgstr "Admin Username"
+#: .\templates\accounts\start_trial.html:50
+msgid "Create one tenant-ready workspace for your pharmacy."
+msgstr "Create one tenant-ready workspace for your pharmacy."
+
+#: .\templates\accounts\start_trial.html:52
+msgid "Use dashboards, inventory optimization, and demo mode from day one."
+msgstr "Use dashboards, inventory optimization, and demo mode from day one."
+
+#: .\templates\accounts\start_trial.html:54
+msgid "Invite admins, managers, and pharmacists under plan limits."
+msgstr "Invite admins, managers, and pharmacists under plan limits."
+
+#: .\templates\accounts\start_trial.html:63
+msgid "Trial Workspace"
+msgstr "Trial Workspace"
 
 #: .\templates\accounts\start_trial.html:64
-msgid "Admin Email"
-msgstr "Admin Email"
-
-#: .\templates\accounts\start_trial.html:72
-msgid "Confirm Password"
-msgstr "Confirm Password"
-
-#: .\templates\accounts\start_trial.html:76
+#: .\templates\accounts\start_trial.html:111
 msgid "Create Trial Workspace"
 msgstr "Create Trial Workspace"
 
 #: .\templates\accounts\start_trial.html:83
+msgid "Pharmacy Name"
+msgstr "Pharmacy Name"
+
+#: .\templates\accounts\start_trial.html:87
+msgid "Admin Username"
+msgstr "Admin Username"
+
+#: .\templates\accounts\start_trial.html:91
+msgid "Admin Email"
+msgstr "Admin Email"
+
+#: .\templates\accounts\start_trial.html:99
+msgid "Confirm Password"
+msgstr "Confirm Password"
+
+#: .\templates\accounts\start_trial.html:105
+msgid "What is included"
+msgstr "What is included"
+
+#: .\templates\accounts\start_trial.html:106
+msgid ""
+"A BASIC plan workspace, admin account, and 14-day trial period are "
+"provisioned automatically."
+msgstr "A BASIC plan workspace, admin account, and 14-day trial period are provisioned automatically."
+
+#: .\templates\accounts\start_trial.html:114
 msgid "Already have an account? Login"
 msgstr "Already have an account? Login"
 
-#: .\templates\base.html:76 .\templates\base.html:151
+#: .\templates\base.html:209 .\templates\dashboard\index.html:125
+#: .\templates\dashboard\index.html:142 .\templates\dashboard\index.html:194
+#: .\templates\dashboard\index.html:211 .\templates\inventory\list.html:32
+#: .\templates\inventory\reorder_recommendations.html:32
+#: .\templates\sales\list.html:45
+msgid "Loading..."
+msgstr "Loading..."
+
+#: .\templates\base.html:228
+msgid "Workspace"
+msgstr "Workspace"
+
+#: .\templates\base.html:232 .\templates\base.html:288
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: .\templates\base.html:82 .\templates\dashboard\index.html:43
-msgid "Medicines"
-msgstr "Medicines"
-
-#: .\templates\base.html:88
-msgid "Sales"
-msgstr "Sales"
-
-#: .\templates\base.html:94
+#: .\templates\base.html:244
 msgid "Analytics"
 msgstr "Analytics"
 
-#: .\templates\base.html:100 .\templates\inventory\list.html:10
-msgid "Inventory"
-msgstr "Inventory"
-
-#: .\templates\base.html:106 .\templates\inventory\list.html:14
+#: .\templates\base.html:252 .\templates\inventory\list.html:14
 msgid "Reorder Alerts"
 msgstr "Reorder Alerts"
 
-#: .\templates\base.html:113
+#: .\templates\base.html:257
 msgid "Admin Panel"
 msgstr "Admin Panel"
 
-#: .\templates\base.html:133
+#: .\templates\base.html:273
 msgid "Logout"
 msgstr "Logout"
 
-#: .\templates\base.html:161
-msgid "Language"
-msgstr "Language"
+#: .\templates\base.html:283
+msgid "Toggle navigation"
+msgstr "Toggle navigation"
 
-#: .\templates\base.html:180
+#: .\templates\base.html:287
+msgid "Operations"
+msgstr "Operations"
+
+#: .\templates\base.html:306
 msgid "Demo mode is active. All write operations are disabled."
 msgstr "Demo mode is active. All write operations are disabled."
 
-#: .\templates\base.html:186
+#: .\templates\base.html:313
 msgid "Subscription expired. Your workspace is currently in read-only mode."
 msgstr "Subscription expired. Your workspace is currently in read-only mode."
+
+#: .\templates\base.html:322 .\templates\medicines\list.html:80
+msgid "Close"
+msgstr "Close"
 
 #: .\templates\dashboard\index.html:4
 msgid "Dashboard - Pharmacy Analytic AI"
@@ -536,153 +910,175 @@ msgstr "Dashboard Overview"
 msgid "Total Sales"
 msgstr "Total Sales"
 
-#: .\templates\dashboard\index.html:28 .\templates\sales\analytics.html:19
+#: .\templates\dashboard\index.html:29 .\templates\sales\analytics.html:19
 msgid "Total Revenue"
 msgstr "Total Revenue"
 
-#: .\templates\dashboard\index.html:46
+#: .\templates\dashboard\index.html:48
 msgid "expiring soon"
 msgstr "expiring soon"
 
-#: .\templates\dashboard\index.html:58 .\templates\inventory\list.html:44
-#: .\templates\medicines\list.html:34 .\templates\medicines\list.html:106
+#: .\templates\dashboard\index.html:61 .\templates\inventory\list.html:44
+#: .\templates\medicines\list.html:38 .\templates\medicines\list.html:113
 msgid "Low Stock"
 msgstr "Low Stock"
 
-#: .\templates\dashboard\index.html:61
+#: .\templates\dashboard\index.html:64
 msgid "Needs reorder"
 msgstr "Needs reorder"
 
-#: .\templates\dashboard\index.html:77
+#: .\templates\dashboard\index.html:80
 msgid "Sales Trend (Last 7 Days)"
 msgstr "Sales Trend (Last 7 Days)"
 
-#: .\templates\dashboard\index.html:80
+#: .\templates\dashboard\index.html:81
+msgid "Track sales count and revenue movement over the last week."
+msgstr "Track sales count and revenue movement over the last week."
+
+#: .\templates\dashboard\index.html:84
+msgid "Live snapshot"
+msgstr "Live snapshot"
+
+#: .\templates\dashboard\index.html:87
 msgid "No sales trend data available."
 msgstr "No sales trend data available."
 
-#: .\templates\dashboard\index.html:91
+#: .\templates\dashboard\index.html:97
 msgid "Sales by Category"
 msgstr "Sales by Category"
 
-#: .\templates\dashboard\index.html:94
+#: .\templates\dashboard\index.html:98
+msgid "See how revenue is distributed across medicine categories."
+msgstr "See how revenue is distributed across medicine categories."
+
+#: .\templates\dashboard\index.html:101
+msgid "Last 30 days"
+msgstr "Last 30 days"
+
+#: .\templates\dashboard\index.html:104
 msgid "No category data available."
 msgstr "No category data available."
 
-#: .\templates\dashboard\index.html:109 .\templates\sales\analytics.html:57
+#: .\templates\dashboard\index.html:117 .\templates\sales\analytics.html:57
 msgid "Fast Moving Medicines"
 msgstr "Fast Moving Medicines"
 
-#: .\templates\dashboard\index.html:112 .\templates\dashboard\index.html:131
-#: .\templates\dashboard\index.html:186 .\templates\dashboard\index.html:205
+#: .\templates\dashboard\index.html:118
+msgid "Top performers by quantity and revenue."
+msgstr "Top performers by quantity and revenue."
+
+#: .\templates\dashboard\index.html:120 .\templates\dashboard\index.html:137
+#: .\templates\dashboard\index.html:189 .\templates\dashboard\index.html:206
 msgid "View All"
 msgstr "View All"
 
-#: .\templates\dashboard\index.html:118 .\templates\dashboard\index.html:137
-#: .\templates\dashboard\index.html:192 .\templates\dashboard\index.html:211
-#: .\templates\inventory\list.html:32
-#: .\templates\inventory\reorder_recommendations.html:32
-#: .\templates\sales\list.html:45
-msgid "Loading..."
-msgstr "Loading..."
-
-#: .\templates\dashboard\index.html:128 .\templates\sales\analytics.html:75
+#: .\templates\dashboard\index.html:134 .\templates\sales\analytics.html:75
 msgid "Slow Moving Medicines"
 msgstr "Slow Moving Medicines"
 
-#: .\templates\dashboard\index.html:148
+#: .\templates\dashboard\index.html:135
+msgid ""
+"Identify products that need pricing, stocking, or merchandising attention."
+msgstr "Identify products that need pricing, stocking, or merchandising attention."
+
+#: .\templates\dashboard\index.html:152
 msgid "Inventory Optimization Forecast"
 msgstr "Inventory Optimization Forecast"
 
-#: .\templates\dashboard\index.html:151
+#: .\templates\dashboard\index.html:153
+msgid ""
+"Forecast demand, compare model accuracy, and surface reorder quantities from "
+"one table."
+msgstr "Forecast demand, compare model accuracy, and surface reorder quantities from one table."
+
+#: .\templates\dashboard\index.html:156
 msgid "Service Level Target:"
 msgstr "Service Level Target:"
 
-#: .\templates\dashboard\index.html:160 .\templates\inventory\list.html:23
-#: .\templates\inventory\reorder_recommendations.html:23
-#: .\templates\medicines\list.html:47
-msgid "Medicine"
-msgstr "Medicine"
-
-#: .\templates\dashboard\index.html:161
+#: .\templates\dashboard\index.html:166
 msgid "Forecast (30d)"
 msgstr "Forecast (30d)"
 
-#: .\templates\dashboard\index.html:162
+#: .\templates\dashboard\index.html:167
 msgid "Reorder Qty"
 msgstr "Reorder Qty"
 
-#: .\templates\dashboard\index.html:163
+#: .\templates\dashboard\index.html:168
 msgid "Model"
 msgstr "Model"
 
-#: .\templates\dashboard\index.html:169
+#: .\templates\dashboard\index.html:174
 msgid "Loading optimization data..."
 msgstr "Loading optimization data..."
 
-#: .\templates\dashboard\index.html:183
+#: .\templates\dashboard\index.html:186
 msgid "Recent Sales"
 msgstr "Recent Sales"
 
-#: .\templates\dashboard\index.html:202
+#: .\templates\dashboard\index.html:187
+msgid "A quick operational view of the latest transactions."
+msgstr "A quick operational view of the latest transactions."
+
+#: .\templates\dashboard\index.html:203
 msgid "Alerts & Notifications"
 msgstr "Alerts & Notifications"
 
-#: .\templates\dashboard\index.html:228 .\templates\sales\analytics.html:70
+#: .\templates\dashboard\index.html:204
+msgid "Keep an eye on pending reorder actions."
+msgstr "Keep an eye on pending reorder actions."
+
+#: .\templates\dashboard\index.html:227 .\templates\sales\analytics.html:70
 msgid "No fast moving medicines"
 msgstr "No fast moving medicines"
 
-#: .\templates\dashboard\index.html:229 .\templates\sales\analytics.html:88
+#: .\templates\dashboard\index.html:228 .\templates\sales\analytics.html:88
 msgid "No slow moving medicines"
 msgstr "No slow moving medicines"
 
-#: .\templates\dashboard\index.html:230
+#: .\templates\dashboard\index.html:229
 msgid "No recent sales"
 msgstr "No recent sales"
 
-#: .\templates\dashboard\index.html:231
+#: .\templates\dashboard\index.html:230
 msgid "No alerts"
 msgstr "No alerts"
 
-#: .\templates\dashboard\index.html:232
+#: .\templates\dashboard\index.html:231
 msgid "Reorder"
 msgstr "Reorder"
 
-#: .\templates\dashboard\index.html:233 .\templates\sales\analytics.html:64
+#: .\templates\dashboard\index.html:232 .\templates\sales\analytics.html:64
 #: .\templates\sales\analytics.html:82
 msgid "units"
 msgstr "units"
 
-#: .\templates\dashboard\index.html:234
+#: .\templates\dashboard\index.html:233
 msgid "units sold"
 msgstr "units sold"
 
-#: .\templates\dashboard\index.html:235
-msgid "Low"
-msgstr "Low"
-
-#: .\templates\dashboard\index.html:236
-msgid "Sale"
-msgstr "Sale"
-
-#: .\templates\dashboard\index.html:237 .\templates\inventory\list.html:47
+#: .\templates\dashboard\index.html:239 .\templates\inventory\list.html:47
 #: .\templates\inventory\reorder_recommendations.html:44
-#: .\templates\medicines\list.html:104 .\templates\sales\analytics.html:29
+#: .\templates\medicines\list.html:110 .\templates\sales\analytics.html:29
 #: .\templates\sales\list.html:60
 msgid "N/A"
 msgstr "N/A"
 
-#: .\templates\dashboard\index.html:238
+#: .\templates\dashboard\index.html:240
 msgid "No optimization data available."
 msgstr "No optimization data available."
 
-#: .\templates\dashboard\index.html:239 .\templates\sales\analytics.html:103
+#: .\templates\dashboard\index.html:241 .\templates\sales\analytics.html:103
 msgid "Sales Count"
 msgstr "Sales Count"
 
-#: .\templates\dashboard\index.html:240 .\templates\sales\analytics.html:104
+#: .\templates\dashboard\index.html:242 .\templates\sales\analytics.html:104
 msgid "Revenue (UZS)"
 msgstr "Revenue (UZS)"
+
+#: .\templates\includes\language_switcher.html:11
+#: .\templates\includes\language_switcher.html:19
+msgid "Language"
+msgstr "Language"
 
 #: .\templates\inventory\list.html:4
 msgid "Inventory - Pharmacy Analytic AI"
@@ -711,22 +1107,19 @@ msgstr "Max Level"
 
 #: .\templates\inventory\list.html:27
 #: .\templates\inventory\reorder_recommendations.html:27
+#: .\templates\medicines\list.html:33
 msgid "Status"
 msgstr "Status"
 
 #: .\templates\inventory\list.html:28
 #: .\templates\inventory\reorder_recommendations.html:28
-#: .\templates\medicines\list.html:52 .\templates\sales\list.html:41
+#: .\templates\medicines\list.html:59 .\templates\sales\list.html:41
 msgid "Actions"
 msgstr "Actions"
 
 #: .\templates\inventory\list.html:43
 msgid "No inventory records"
 msgstr "No inventory records"
-
-#: .\templates\inventory\list.html:45
-msgid "Medium"
-msgstr "Medium"
 
 #: .\templates\inventory\list.html:46
 msgid "Good"
@@ -739,11 +1132,6 @@ msgstr "Enter new stock quantity:"
 #: .\templates\inventory\reorder_recommendations.html:4
 msgid "Reorder Recommendations - Pharmacy Analytic AI"
 msgstr "Reorder Recommendations - Pharmacy Analytic AI"
-
-#: .\templates\inventory\reorder_recommendations.html:5
-#: .\templates\inventory\reorder_recommendations.html:10
-msgid "Reorder Recommendations"
-msgstr "Reorder Recommendations"
 
 #: .\templates\inventory\reorder_recommendations.html:11
 msgid "Automatic reorder suggestions based on inventory levels"
@@ -799,7 +1187,7 @@ msgstr "Delete Medicine - Pharmacy Analytic AI"
 
 #: .\templates\medicines\confirm_delete.html:5
 #: .\templates\medicines\confirm_delete.html:33
-#: .\templates\medicines\list.html:72
+#: .\templates\medicines\list.html:79
 msgid "Delete Medicine"
 msgstr "Delete Medicine"
 
@@ -808,12 +1196,17 @@ msgid "Confirm Deletion"
 msgstr "Confirm Deletion"
 
 #: .\templates\medicines\confirm_delete.html:18
+#: .\templates\medicines\list.html:83
 msgid "Are you sure you want to delete this medicine?"
 msgstr "Are you sure you want to delete this medicine?"
 
 #: .\templates\medicines\confirm_delete.html:20
 msgid "Name:"
 msgstr "Name:"
+
+#: .\templates\medicines\confirm_delete.html:21
+msgid "SKU:"
+msgstr "SKU:"
 
 #: .\templates\medicines\confirm_delete.html:26
 #, python-format
@@ -823,8 +1216,8 @@ msgid ""
 msgstr "This medicine is linked to %(count)s sale record(s). Deletion will be blocked."
 
 #: .\templates\medicines\confirm_delete.html:32
-#: .\templates\medicines\create.html:91 .\templates\medicines\edit.html:17
-#: .\templates\medicines\edit.html:67 .\templates\medicines\list.html:81
+#: .\templates\medicines\create.html:70 .\templates\medicines\edit.html:16
+#: .\templates\medicines\edit.html:76 .\templates\medicines\list.html:87
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -832,110 +1225,113 @@ msgstr "Cancel"
 msgid "Add Medicine - Pharmacy Analytic AI"
 msgstr "Add Medicine - Pharmacy Analytic AI"
 
-#: .\templates\medicines\create.html:5 .\templates\medicines\list.html:19
+#: .\templates\medicines\create.html:5 .\templates\medicines\list.html:15
 msgid "Add Medicine"
 msgstr "Add Medicine"
 
-#: .\templates\medicines\create.html:11
+#: .\templates\medicines\create.html:12
 msgid "Create New Medicine"
 msgstr "Create New Medicine"
 
-#: .\templates\medicines\create.html:12
+#: .\templates\medicines\create.html:13
 msgid "Enter medicine details for your pharmacy catalog."
 msgstr "Enter medicine details for your pharmacy catalog."
 
-#: .\templates\medicines\create.html:15 .\templates\medicines\detail.html:15
+#: .\templates\medicines\create.html:16 .\templates\medicines\detail.html:15
 #: .\templates\medicines\update.html:17
 msgid "Back to List"
 msgstr "Back to List"
 
-#: .\templates\medicines\create.html:23 .\templates\medicines\update.html:32
+#: .\templates\medicines\create.html:24 .\templates\medicines\update.html:32
 msgid "Medicine Name"
 msgstr "Medicine Name"
 
-#: .\templates\medicines\create.html:26
+#: .\templates\medicines\create.html:25
 msgid "e.g. Paracetamol 500mg"
 msgstr "e.g. Paracetamol 500mg"
 
-#: .\templates\medicines\create.html:32
+#: .\templates\medicines\create.html:28 .\templates\medicines\list.html:111
+#: .\templates\medicines\update.html:48
+msgid "SKU"
+msgstr "SKU"
+
+#: .\templates\medicines\create.html:29
 msgid "e.g. MED011"
 msgstr "e.g. MED011"
 
-#: .\templates\medicines\create.html:38 .\templates\medicines\detail.html:22
-#: .\templates\medicines\edit.html:36 .\templates\medicines\list.html:48
-#: .\templates\medicines\update.html:40
-msgid "Category"
-msgstr "Category"
-
-#: .\templates\medicines\create.html:45 .\templates\medicines\detail.html:36
-#: .\templates\medicines\edit.html:54 .\templates\medicines\update.html:64
+#: .\templates\medicines\create.html:38 .\templates\medicines\detail.html:36
+#: .\templates\medicines\edit.html:55 .\templates\medicines\update.html:64
 msgid "Expiry Date"
 msgstr "Expiry Date"
 
-#: .\templates\medicines\create.html:53 .\templates\medicines\update.html:56
+#: .\templates\medicines\create.html:42 .\templates\medicines\update.html:56
 msgid "Unit Price (UZS)"
 msgstr "Unit Price (UZS)"
 
-#: .\templates\medicines\create.html:56
+#: .\templates\medicines\create.html:43
 msgid "e.g. 25000"
 msgstr "e.g. 25000"
 
-#: .\templates\medicines\create.html:57
+#: .\templates\medicines\create.html:44
 msgid "Enter numeric value only; displayed as UZS in the UI."
 msgstr "Enter numeric value only; displayed as UZS in the UI."
 
-#: .\templates\medicines\create.html:60
+#: .\templates\medicines\create.html:47
 msgid "Initial Stock"
 msgstr "Initial Stock"
 
-#: .\templates\medicines\create.html:63
+#: .\templates\medicines\create.html:48
 msgid "e.g. 100"
 msgstr "e.g. 100"
 
-#: .\templates\medicines\create.html:64
+#: .\templates\medicines\create.html:49
 msgid "Current quantity available in inventory."
 msgstr "Current quantity available in inventory."
 
-#: .\templates\medicines\create.html:71
+#: .\templates\medicines\create.html:53
 msgid "Preview"
 msgstr "Preview"
 
-#: .\templates\medicines\create.html:78 .\templates\medicines\detail.html:50
-#: .\templates\medicines\edit.html:60 .\templates\medicines\update.html:72
+#: .\templates\medicines\create.html:58 .\templates\medicines\detail.html:50
+#: .\templates\medicines\edit.html:67 .\templates\medicines\update.html:72
 msgid "Description"
 msgstr "Description"
 
-#: .\templates\medicines\create.html:81
+#: .\templates\medicines\create.html:59
 msgid "Optional notes about this medicine"
 msgstr "Optional notes about this medicine"
 
-#: .\templates\medicines\create.html:86
+#: .\templates\medicines\create.html:65
 msgid "Please fix the following:"
 msgstr "Please fix the following:"
 
-#: .\templates\medicines\create.html:93
+#: .\templates\medicines\create.html:72 .\templates\medicines\create.html:161
 msgid "Create Medicine"
 msgstr "Create Medicine"
 
-#: .\templates\medicines\create.html:105
+#: .\templates\medicines\create.html:85
 msgid "Could not load categories."
 msgstr "Could not load categories."
 
-#: .\templates\medicines\create.html:106
+#: .\templates\medicines\create.html:86
 msgid "Stock must be a non-negative integer."
 msgstr "Stock must be a non-negative integer."
 
-#: .\templates\medicines\create.html:108
+#: .\templates\medicines\create.html:88
 msgid "Failed to create medicine."
 msgstr "Failed to create medicine."
 
-#: .\templates\medicines\create.html:109
+#: .\templates\medicines\create.html:89
 msgid "Please review the form errors."
 msgstr "Please review the form errors."
 
-#: .\templates\medicines\create.html:110
+#: .\templates\medicines\create.html:90
 msgid "Network error while creating medicine."
 msgstr "Network error while creating medicine."
+
+#: .\templates\medicines\create.html:91
+msgid "Creating..."
+msgstr "Creating..."
 
 #: .\templates\medicines\detail.html:4
 msgid "Medicine Details - Pharmacy Analytic AI"
@@ -944,6 +1340,11 @@ msgstr "Medicine Details - Pharmacy Analytic AI"
 #: .\templates\medicines\detail.html:5
 msgid "Medicine Details"
 msgstr "Medicine Details"
+
+#: .\templates\medicines\detail.html:12
+#, python-format
+msgid "SKU: %(sku)s"
+msgstr "SKU: %(sku)s"
 
 #: .\templates\medicines\detail.html:32
 msgid "Unit Price"
@@ -965,24 +1366,29 @@ msgstr "No description provided."
 msgid "Edit Medicine - Pharmacy Analytic AI"
 msgstr "Edit Medicine - Pharmacy Analytic AI"
 
-#: .\templates\medicines\edit.html:5 .\templates\medicines\edit.html:16
+#: .\templates\medicines\edit.html:5 .\templates\medicines\edit.html:12
 #: .\templates\medicines\update.html:16
 msgid "Edit Medicine"
 msgstr "Edit Medicine"
 
-#: .\templates\medicines\edit.html:30
+#: .\templates\medicines\edit.html:34
 msgid "Name"
 msgstr "Name"
 
-#: .\templates\medicines\edit.html:42 .\templates\medicines\list.html:49
+#: .\templates\medicines\edit.html:44 .\templates\medicines\list.html:56
 msgid "Price"
 msgstr "Price"
 
-#: .\templates\medicines\edit.html:48 .\templates\medicines\list.html:50
+#: .\templates\medicines\edit.html:49 .\templates\medicines\list.html:57
 msgid "Stock"
 msgstr "Stock"
 
-#: .\templates\medicines\edit.html:66
+#: .\templates\medicines\edit.html:74 .\templates\medicines\list.html:90
+#: .\templates\medicines\update.html:80
+msgid "Delete"
+msgstr "Delete"
+
+#: .\templates\medicines\edit.html:77
 msgid "Save"
 msgstr "Save"
 
@@ -990,103 +1396,97 @@ msgstr "Save"
 msgid "Medicines - Pharmacy Analytic AI"
 msgstr "Medicines - Pharmacy Analytic AI"
 
-#: .\templates\medicines\list.html:5 .\templates\medicines\list.html:14
+#: .\templates\medicines\list.html:5 .\templates\medicines\list.html:10
 msgid "Medicines Management"
 msgstr "Medicines Management"
 
-#: .\templates\medicines\list.html:15
+#: .\templates\medicines\list.html:11
 msgid "Track catalog, pricing, stock levels, and expiry status"
 msgstr "Track catalog, pricing, stock levels, and expiry status"
 
-#: .\templates\medicines\list.html:26
+#: .\templates\medicines\list.html:23 .\templates\medicines\list.html:24
 msgid "Search by name or SKU"
 msgstr "Search by name or SKU"
 
-#: .\templates\medicines\list.html:28
+#: .\templates\medicines\list.html:29
 msgid "All Categories"
 msgstr "All Categories"
 
-#: .\templates\medicines\list.html:31
+#: .\templates\medicines\list.html:35
 msgid "All Status"
 msgstr "All Status"
 
-#: .\templates\medicines\list.html:32 .\templates\medicines\list.html:109
+#: .\templates\medicines\list.html:36 .\templates\medicines\list.html:116
 msgid "Expiring Soon"
 msgstr "Expiring Soon"
 
-#: .\templates\medicines\list.html:33 .\templates\medicines\list.html:108
+#: .\templates\medicines\list.html:37 .\templates\medicines\list.html:115
 msgid "Expired"
 msgstr "Expired"
 
-#: .\templates\medicines\list.html:37
+#: .\templates\medicines\list.html:43
 msgid "Apply Filters"
 msgstr "Apply Filters"
 
-#: .\templates\medicines\list.html:51
+#: .\templates\medicines\list.html:58
 msgid "Expiry"
 msgstr "Expiry"
 
-#: .\templates\medicines\list.html:59
+#: .\templates\medicines\list.html:66 .\templates\medicines\list.html:127
 msgid "Loading medicines..."
 msgstr "Loading medicines..."
 
-#: .\templates\medicines\list.html:77
-msgid ""
-"Are you sure you want to delete <span id=\"delete-medicine-name\" class=\"fw-"
-"semibold\"></span>?"
-msgstr "Are you sure you want to delete <span id=\"delete-medicine-name\" class=\"fw-semibold\"></span>?"
-
-#: .\templates\medicines\list.html:84 .\templates\medicines\update.html:80
-msgid "Delete"
-msgstr "Delete"
-
-#: .\templates\medicines\list.html:103
+#: .\templates\medicines\list.html:109
 msgid "No medicines found"
 msgstr "No medicines found"
 
-#: .\templates\medicines\list.html:107
+#: .\templates\medicines\list.html:114
 msgid "In Stock"
 msgstr "In Stock"
 
-#: .\templates\medicines\list.html:110
+#: .\templates\medicines\list.html:117
 msgid "Valid"
 msgstr "Valid"
 
-#: .\templates\medicines\list.html:111
+#: .\templates\medicines\list.html:118
 msgid "Edit medicine"
 msgstr "Edit medicine"
 
-#: .\templates\medicines\list.html:112
+#: .\templates\medicines\list.html:119
 msgid "Delete medicine"
 msgstr "Delete medicine"
 
-#: .\templates\medicines\list.html:113
+#: .\templates\medicines\list.html:120
 msgid "this medicine"
 msgstr "this medicine"
 
-#: .\templates\medicines\list.html:114
+#: .\templates\medicines\list.html:121
 msgid "Showing"
 msgstr "Showing"
 
-#: .\templates\medicines\list.html:115
+#: .\templates\medicines\list.html:122
 msgid "to"
 msgstr "to"
 
-#: .\templates\medicines\list.html:116
+#: .\templates\medicines\list.html:123
 msgid "of"
 msgstr "of"
 
-#: .\templates\medicines\list.html:117
+#: .\templates\medicines\list.html:124
 msgid "results"
 msgstr "results"
 
-#: .\templates\medicines\list.html:118 .\templates\sales\list.html:63
+#: .\templates\medicines\list.html:125 .\templates\sales\list.html:63
 msgid "Previous"
 msgstr "Previous"
 
-#: .\templates\medicines\list.html:119 .\templates\sales\list.html:64
+#: .\templates\medicines\list.html:126 .\templates\sales\list.html:64
 msgid "Next"
 msgstr "Next"
+
+#: .\templates\medicines\list.html:128
+msgid "Medicines pagination"
+msgstr "Medicines pagination"
 
 #: .\templates\medicines\update.html:4
 msgid "Update Medicine - Pharmacy Analytic AI"
@@ -1096,188 +1496,226 @@ msgstr "Update Medicine - Pharmacy Analytic AI"
 msgid "Update Medicine"
 msgstr "Update Medicine"
 
-#: .\templates\public\landing.html:7
+#: .\templates\public\landing.html:8
 msgid "PharmacyAI - Smart Pharmacy SaaS"
 msgstr "PharmacyAI - Smart Pharmacy SaaS"
 
-#: .\templates\public\landing.html:46 .\templates\public\landing.html:60
-#: .\templates\public\landing.html:216
+#: .\templates\public\landing.html:97 .\templates\public\landing.html:114
+#: .\templates\public\landing.html:303
 msgid "Login"
 msgstr "Login"
 
-#: .\templates\public\landing.html:47 .\templates\public\landing.html:59
-#: .\templates\public\landing.html:152 .\templates\public\landing.html:167
-#: .\templates\public\landing.html:217
+#: .\templates\public\landing.html:98 .\templates\public\landing.html:113
+#: .\templates\public\landing.html:241 .\templates\public\landing.html:255
+#: .\templates\public\landing.html:304
 msgid "Start Free Trial"
 msgstr "Start Free Trial"
 
-#: .\templates\public\landing.html:56
+#: .\templates\public\landing.html:108
+msgid "AI Forecasting"
+msgstr "AI Forecasting"
+
+#: .\templates\public\landing.html:110
 msgid "AI-Powered Inventory SaaS for Modern Pharmacies"
 msgstr "AI-Powered Inventory SaaS for Modern Pharmacies"
 
-#: .\templates\public\landing.html:57
+#: .\templates\public\landing.html:111
 msgid ""
 "Forecast demand, optimize stock levels, and manage pharmacy teams with role-"
 "based, multi-tenant control."
 msgstr "Forecast demand, optimize stock levels, and manage pharmacy teams with role-based, multi-tenant control."
 
-#: .\templates\public\landing.html:66
+#: .\templates\public\landing.html:119
+msgid "Tenants"
+msgstr "Tenants"
+
+#: .\templates\public\landing.html:120
+msgid "Multi-tenant"
+msgstr "Multi-tenant"
+
+#: .\templates\public\landing.html:125
+msgid "Languages"
+msgstr "Languages"
+
+#: .\templates\public\landing.html:126
+msgid "UZ / RU / EN"
+msgstr "UZ / RU / EN"
+
+#: .\templates\public\landing.html:131
+msgid "Modes"
+msgstr "Modes"
+
+#: .\templates\public\landing.html:132
+msgid "Demo + Live"
+msgstr "Demo + Live"
+
+#: .\templates\public\landing.html:142
+msgid "Startup-ready demo"
+msgstr "Startup-ready demo"
+
+#: .\templates\public\landing.html:143
 msgid "Built for Pharmacy Operations"
 msgstr "Built for Pharmacy Operations"
 
-#: .\templates\public\landing.html:68
+#: .\templates\public\landing.html:153
 msgid "Multi-branch tenancy"
 msgstr "Multi-branch tenancy"
 
-#: .\templates\public\landing.html:69
-msgid "Forecasting and reorder intelligence"
-msgstr "Forecasting and reorder intelligence"
-
-#: .\templates\public\landing.html:70
-msgid "Role-based permissions"
-msgstr "Role-based permissions"
-
-#: .\templates\public\landing.html:71
-msgid "Operational dashboards"
-msgstr "Operational dashboards"
-
-#: .\templates\public\landing.html:83
-msgid "Core Features"
-msgstr "Core Features"
-
-#: .\templates\public\landing.html:84
-msgid "Everything you need to scale pharmacy operations."
-msgstr "Everything you need to scale pharmacy operations."
-
-#: .\templates\public\landing.html:93
-msgid "AI Forecasting"
-msgstr "AI Forecasting"
-
-#: .\templates\public\landing.html:94
-msgid "Model-driven demand projections with measurable forecast accuracy."
-msgstr "Model-driven demand projections with measurable forecast accuracy."
-
-#: .\templates\public\landing.html:104
-msgid "Inventory Optimization"
-msgstr "Inventory Optimization"
-
-#: .\templates\public\landing.html:105
-msgid "Automated reorder recommendations based on service-level targets."
-msgstr "Automated reorder recommendations based on service-level targets."
-
-#: .\templates\public\landing.html:115
-msgid "Multi-branch SaaS"
-msgstr "Multi-branch SaaS"
-
-#: .\templates\public\landing.html:116
+#: .\templates\public\landing.html:154
 msgid "Secure tenant isolation for independent pharmacies and branch networks."
 msgstr "Secure tenant isolation for independent pharmacies and branch networks."
 
-#: .\templates\public\landing.html:126
+#: .\templates\public\landing.html:160
+msgid "Inventory Optimization"
+msgstr "Inventory Optimization"
+
+#: .\templates\public\landing.html:161
+msgid "Automated reorder recommendations based on service-level targets."
+msgstr "Automated reorder recommendations based on service-level targets."
+
+#: .\templates\public\landing.html:167
+msgid "Forecasting and reorder intelligence"
+msgstr "Forecasting and reorder intelligence"
+
+#: .\templates\public\landing.html:168
+msgid "Model-driven demand projections with measurable forecast accuracy."
+msgstr "Model-driven demand projections with measurable forecast accuracy."
+
+#: .\templates\public\landing.html:174
 msgid "Role-based Access"
 msgstr "Role-based Access"
 
-#: .\templates\public\landing.html:127
+#: .\templates\public\landing.html:175
 msgid "Granular admin, manager, and pharmacist controls for safe operations."
 msgstr "Granular admin, manager, and pharmacist controls for safe operations."
 
-#: .\templates\public\landing.html:138
+#: .\templates\public\landing.html:188
+msgid "Core Features"
+msgstr "Core Features"
+
+#: .\templates\public\landing.html:189
+msgid "Everything you need to scale pharmacy operations."
+msgstr "Everything you need to scale pharmacy operations."
+
+#: .\templates\public\landing.html:195
+msgid "Operational dashboards"
+msgstr "Operational dashboards"
+
+#: .\templates\public\landing.html:196
+msgid ""
+"Track revenue, fast movers, slow movers, alerts, and recent sales in one "
+"place."
+msgstr "Track revenue, fast movers, slow movers, alerts, and recent sales in one place."
+
+#: .\templates\public\landing.html:202
+msgid "Subscription system"
+msgstr "Subscription system"
+
+#: .\templates\public\landing.html:203
+msgid ""
+"Apply plan limits, monitor trial periods, and protect expired workspaces "
+"with read-only access."
+msgstr "Apply plan limits, monitor trial periods, and protect expired workspaces with read-only access."
+
+#: .\templates\public\landing.html:209
+msgid "POS integration"
+msgstr "POS integration"
+
+#: .\templates\public\landing.html:210
+msgid ""
+"Receive sales from external POS systems and keep inventory synchronized "
+"automatically."
+msgstr "Receive sales from external POS systems and keep inventory synchronized automatically."
+
+#: .\templates\public\landing.html:216
+msgid "Multilingual support"
+msgstr "Multilingual support"
+
+#: .\templates\public\landing.html:217
+msgid "Uzbek, Russian, and English remain available across the full workflow."
+msgstr "Uzbek, Russian, and English remain available across the full workflow."
+
+#: .\templates\public\landing.html:227
 msgid "Pricing"
 msgstr "Pricing"
 
-#: .\templates\public\landing.html:139
+#: .\templates\public\landing.html:228
 msgid "Choose a plan that matches your pharmacy growth stage."
 msgstr "Choose a plan that matches your pharmacy growth stage."
 
-#: .\templates\public\landing.html:145
-msgid "Basic"
-msgstr "Basic"
-
-#: .\templates\public\landing.html:146
+#: .\templates\public\landing.html:235
 msgid "Ideal for small pharmacies."
 msgstr "Ideal for small pharmacies."
 
-#: .\templates\public\landing.html:148
+#: .\templates\public\landing.html:237
 msgid "Up to 3 users"
 msgstr "Up to 3 users"
 
-#: .\templates\public\landing.html:149
+#: .\templates\public\landing.html:238
 msgid "Up to 200 medicines"
 msgstr "Up to 200 medicines"
 
-#: .\templates\public\landing.html:150
+#: .\templates\public\landing.html:239
 msgid "Up to 1,000 monthly sales"
 msgstr "Up to 1,000 monthly sales"
 
-#: .\templates\public\landing.html:159
+#: .\templates\public\landing.html:246
 msgid "Most Popular"
 msgstr "Most Popular"
 
-#: .\templates\public\landing.html:160
-msgid "Pro"
-msgstr "Pro"
-
-#: .\templates\public\landing.html:161
+#: .\templates\public\landing.html:249
 msgid "For scaling operations."
 msgstr "For scaling operations."
 
-#: .\templates\public\landing.html:163
+#: .\templates\public\landing.html:251
 msgid "Up to 10 users"
 msgstr "Up to 10 users"
 
-#: .\templates\public\landing.html:164
+#: .\templates\public\landing.html:252
 msgid "Up to 2,000 medicines"
 msgstr "Up to 2,000 medicines"
 
-#: .\templates\public\landing.html:165
+#: .\templates\public\landing.html:253
 msgid "Up to 10,000 monthly sales"
 msgstr "Up to 10,000 monthly sales"
 
-#: .\templates\public\landing.html:174
-msgid "Enterprise"
-msgstr "Enterprise"
-
-#: .\templates\public\landing.html:175
+#: .\templates\public\landing.html:262
 msgid "Unlimited scale."
 msgstr "Unlimited scale."
 
-#: .\templates\public\landing.html:177
+#: .\templates\public\landing.html:264
 msgid "Unlimited users"
 msgstr "Unlimited users"
 
-#: .\templates\public\landing.html:178
+#: .\templates\public\landing.html:265
 msgid "Unlimited medicines"
 msgstr "Unlimited medicines"
 
-#: .\templates\public\landing.html:179
+#: .\templates\public\landing.html:266
 msgid "Unlimited monthly sales"
 msgstr "Unlimited monthly sales"
 
-#: .\templates\public\landing.html:181
+#: .\templates\public\landing.html:268
 msgid "Talk to Sales"
 msgstr "Talk to Sales"
 
-#: .\templates\public\landing.html:192
+#: .\templates\public\landing.html:280 .\templates\public\landing.html:287
 msgid "What Customers Say"
 msgstr "What Customers Say"
 
-#: .\templates\public\landing.html:193
-msgid "Testimonials placeholder for production rollout."
-msgstr "Testimonials placeholder for production rollout."
-
-#: .\templates\public\landing.html:198
+#: .\templates\public\landing.html:281
 msgid "PharmacyAI helped us reduce stock-outs and streamline decisions."
 msgstr "PharmacyAI helped us reduce stock-outs and streamline decisions."
 
-#: .\templates\public\landing.html:199 .\templates\public\landing.html:205
+#: .\templates\public\landing.html:282 .\templates\public\landing.html:289
 msgid "Demo testimonial"
 msgstr "Demo testimonial"
 
-#: .\templates\public\landing.html:204
+#: .\templates\public\landing.html:288
 msgid "Role-based controls made multi-branch management safer and faster."
 msgstr "Role-based controls made multi-branch management safer and faster."
 
-#: .\templates\public\landing.html:214
+#: .\templates\public\landing.html:300
 msgid "All rights reserved."
 msgstr "All rights reserved."
 
@@ -1348,10 +1786,6 @@ msgstr "Sale ID"
 #: .\templates\sales\list.html:37
 msgid "Date"
 msgstr "Date"
-
-#: .\templates\sales\list.html:38
-msgid "User"
-msgstr "User"
 
 #: .\templates\sales\list.html:39
 msgid "Items"

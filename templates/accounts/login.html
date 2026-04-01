@@ -1,121 +1,119 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Login - Pharmacy Analytic AI" %}{% endblock %}
 
 {% block auth_content %}
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <div class="bg-white rounded-lg shadow-xl p-8">
-            <div class="mb-4 flex justify-end">
-                <form action="{% url 'set_language' %}" method="post">
-                    {% csrf_token %}
-                    {% if request.path|slice:":4" == "/uz/" or request.path|slice:":4" == "/ru/" or request.path|slice:":4" == "/en/" %}
-                    <input type="hidden" name="next" value="{{ request.path|slice:'3:' }}">
-                    {% else %}
-                    <input type="hidden" name="next" value="{{ request.path }}">
-                    {% endif %}
-                    <select name="language" onchange="this.form.submit()" class="rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-700">
-                        <option value="uz" {% if request.LANGUAGE_CODE == 'uz' %}selected{% endif %}>Oʻzbekcha</option>
-                        <option value="ru" {% if request.LANGUAGE_CODE == 'ru' %}selected{% endif %}>Русский</option>
-                        <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-                    </select>
-                </form>
-            </div>
-            <div class="text-center mb-8">
-                <div class="flex justify-center mb-4">
-                    <div class="bg-blue-500 rounded-full p-4">
-                        <i class="fas fa-pills text-4xl text-white"></i>
-                    </div>
-                </div>
-                <h2 class="text-3xl font-bold text-gray-900">{% trans "Pharmacy Analytic AI" %}</h2>
-                <p class="mt-2 text-sm text-gray-600">{% trans "Sign in to your account" %}</p>
-            </div>
-
-            <form method="post" action="{% url 'login' %}" class="space-y-6">
-                {% csrf_token %}
-
-                {% if form.errors %}
-                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <div class="flex">
-                        <i class="fas fa-exclamation-circle text-red-400 mt-1 mr-3"></i>
-                        <div class="text-sm text-red-700">
-                            <p class="font-medium">{% trans "Invalid credentials" %}</p>
-                            <p class="mt-1">{% trans "Please check your username and password." %}</p>
+<section class="min-vh-100 d-flex align-items-center py-5" style="background: radial-gradient(circle at top right, rgba(37,99,235,0.16), transparent 32%), linear-gradient(180deg, #f6fbff 0%, #eef4ff 100%);">
+    <div class="container">
+        <div class="row g-4 align-items-center justify-content-center">
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="p-4 p-xl-5">
+                    <span class="badge rounded-pill text-bg-primary mb-3">{% trans "Pharmacy Analytic AI" %}</span>
+                    <h1 class="display-6 fw-bold mb-3">{% trans "Sign in to your account" %}</h1>
+                    <p class="lead text-secondary mb-4">{% trans "Access analytics, forecasting, and pharmacy operations from one secure workspace." %}</p>
+                    <div class="surface-card p-4">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="brand-mark">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">{% trans "Multi-tenant dashboards" %}</div>
+                                <div class="text-muted small">{% trans "Switch teams, monitor stock, and track sales performance." %}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="brand-mark">
+                                <i class="fas fa-language"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">{% trans "Localized experience" %}</div>
+                                <div class="text-muted small">{% trans "Uzbek, Russian, and English stay available across every request." %}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                {% endif %}
+            </div>
 
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                        {% trans "Username or Email" %}
-                    </label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        required
-                        autofocus
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        placeholder="{% trans 'Enter your username or email' %}"
-                    >
-                </div>
+            <div class="col-md-8 col-lg-5 col-xl-4">
+                <div class="surface-card p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <a href="{% url 'landing' %}" class="text-decoration-none fw-bold fs-4 text-dark">{% trans "PharmacyAI" %}</a>
+                        {% include "includes/language_switcher.html" with form_class="d-inline-flex align-items-center" select_class="form-select form-select-sm rounded-pill border-0 bg-light shadow-none" element_id="login-language-switcher" %}
+                    </div>
 
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                        {% trans "Password" %}
-                    </label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        required
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                        placeholder="{% trans 'Enter your password' %}"
-                    >
-                </div>
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                        <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %} mb-2">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
 
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input
-                            id="remember-me"
-                            name="remember-me"
-                            type="checkbox"
-                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        >
-                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">
-                            {% trans "Remember me" %}
-                        </label>
+                    <div class="mb-4">
+                        <h2 class="h3 fw-bold mb-2">{% trans "Welcome back" %}</h2>
+                        <p class="text-muted mb-0">{% trans "Sign in to continue managing your pharmacy workspace." %}</p>
+                    </div>
+
+                    <form method="post" action="{% url 'login' %}" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">{% trans "Username or Email" %}</label>
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                required
+                                autofocus
+                                class="form-control form-control-lg"
+                                placeholder="{% trans 'Enter your username or email' %}"
+                            >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">{% trans "Password" %}</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                required
+                                class="form-control form-control-lg"
+                                placeholder="{% trans 'Enter your password' %}"
+                            >
+                        </div>
+
+                        <div class="d-grid gap-2 pt-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill">
+                                <i class="fas fa-right-to-bracket me-2"></i>{% trans "Sign in" %}
+                            </button>
+                            <a href="{% url 'start-trial' %}" class="btn btn-outline-secondary rounded-pill">
+                                {% trans "Start your free 14-day trial" %}
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="surface-card mt-4 p-3 bg-light border-0">
+                        <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Demo Credentials:" %}</div>
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-muted">{% trans "Username:" %}</span>
+                            <code>superadmin</code>
+                        </div>
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-muted">{% trans "Password:" %}</span>
+                            <code>DemoPass123!</code>
+                        </div>
+                        <div class="text-muted small mt-2">{% trans "Use the seeded demo accounts to showcase multi-tenant flows." %}</div>
+                    </div>
+
+                    <div class="text-center text-muted small mt-4">
+                        &copy; 2026 {% trans "Pharmacy Analytic AI. University Diploma Project." %}
                     </div>
                 </div>
-
-                <button
-                    type="submit"
-                    class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
-                >
-                    <i class="fas fa-sign-in-alt mr-2"></i>
-                    {% trans "Sign in" %}
-                </button>
-            </form>
-
-            <div class="mt-4 text-center">
-                <a href="{% url 'start-trial' %}" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                    {% trans "Start your free 14-day trial" %}
-                </a>
-            </div>
-
-            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                <p class="text-xs text-gray-600 mb-2 font-medium">{% trans "Demo Credentials:" %}</p>
-                <p class="text-xs text-gray-500">{% trans "Username:" %} <span class="font-mono">admin</span></p>
-                <p class="text-xs text-gray-500">{% trans "Password:" %} <span class="font-mono">12345</span></p>
             </div>
         </div>
-
-        <p class="text-center text-white text-sm">
-            &copy; 2026 {% trans "Pharmacy Analytic AI. University Diploma Project." %}
-        </p>
     </div>
-</div>
+</section>
 {% endblock %}
-

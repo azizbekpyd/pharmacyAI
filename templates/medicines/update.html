@@ -45,7 +45,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label" for="{{ form.sku.id_for_label }}">SKU</label>
+                            <label class="form-label" for="{{ form.sku.id_for_label }}">{% trans "SKU" %}</label>
                             {{ form.sku }}
                             {% if form.sku.errors %}
                             <div class="text-danger small mt-1">{{ form.sku.errors|join:", " }}</div>

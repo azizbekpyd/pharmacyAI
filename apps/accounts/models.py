@@ -6,6 +6,7 @@ Roles: Admin, Manager, Pharmacist
 """
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
@@ -23,22 +24,22 @@ class User(AbstractUser):
     LEGACY_ROLE_PHARMACY_MANAGER = "PHARMACY_MANAGER"
 
     ROLE_CHOICES = [
-        (ROLE_ADMIN, "Admin"),
-        (ROLE_MANAGER, "Manager"),
-        (ROLE_PHARMACIST, "Pharmacist"),
+        (ROLE_ADMIN, _("Admin")),
+        (ROLE_MANAGER, _("Manager")),
+        (ROLE_PHARMACIST, _("Pharmacist")),
     ]
     
     role = models.CharField(
         max_length=20,
         choices=ROLE_CHOICES,
         default=ROLE_MANAGER,
-        help_text="User role determines access level"
+        help_text=_("User role determines access level"),
     )
     phone_number = models.CharField(
         max_length=20,
         blank=True,
         null=True,
-        help_text="Contact phone number"
+        help_text=_("Contact phone number"),
     )
     pharmacy = models.ForeignKey(
         "tenants.Pharmacy",
@@ -46,14 +47,14 @@ class User(AbstractUser):
         null=True,
         blank=True,
         related_name="users",
-        help_text="Pharmacy this user belongs to",
+        help_text=_("Pharmacy this user belongs to"),
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "User"
-        verbose_name_plural = "Users"
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
         ordering = ['-created_at']
     
     def __str__(self):

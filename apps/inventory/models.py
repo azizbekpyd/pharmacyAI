@@ -20,40 +20,40 @@ class Inventory(models.Model):
         Medicine,
         on_delete=models.CASCADE,
         related_name='inventory',
-        help_text="Medicine this inventory record belongs to"
+        help_text=_("Medicine this inventory record belongs to"),
     )
     pharmacy = models.ForeignKey(
         "tenants.Pharmacy",
         on_delete=models.CASCADE,
         related_name="inventories",
-        help_text="Pharmacy that owns this inventory record",
+        help_text=_("Pharmacy that owns this inventory record"),
     )
     current_stock = models.PositiveIntegerField(
         default=0,
         validators=[MinValueValidator(0)],
-        help_text="Current quantity in stock"
+        help_text=_("Current quantity in stock"),
     )
     min_stock_level = models.PositiveIntegerField(
         default=10,
         validators=[MinValueValidator(1)],
-        help_text="Minimum stock level before reorder is recommended"
+        help_text=_("Minimum stock level before reorder is recommended"),
     )
     max_stock_level = models.PositiveIntegerField(
         default=100,
         validators=[MinValueValidator(1)],
-        help_text="Maximum stock level (target restock amount)"
+        help_text=_("Maximum stock level (target restock amount)"),
     )
     last_restocked_date = models.DateTimeField(
         null=True,
         blank=True,
-        help_text="Date when inventory was last restocked"
+        help_text=_("Date when inventory was last restocked"),
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "Inventory"
-        verbose_name_plural = "Inventories"
+        verbose_name = _("Inventory")
+        verbose_name_plural = _("Inventories")
         ordering = ['medicine__name']
         indexes = [
             models.Index(fields=['current_stock']),
@@ -106,49 +106,49 @@ class ReorderRecommendation(models.Model):
     System-generated recommendations for medicines that need restocking.
     """
     STATUS_CHOICES = [
-        ('PENDING', 'Pending'),
-        ('APPROVED', 'Approved'),
-        ('REJECTED', 'Rejected'),
-        ('FULFILLED', 'Fulfilled'),
+        ('PENDING', _("Pending")),
+        ('APPROVED', _("Approved")),
+        ('REJECTED', _("Rejected")),
+        ('FULFILLED', _("Fulfilled")),
     ]
     
     PRIORITY_CHOICES = [
-        ('LOW', 'Low'),
-        ('MEDIUM', 'Medium'),
-        ('HIGH', 'High'),
-        ('URGENT', 'Urgent'),
+        ('LOW', _("Low")),
+        ('MEDIUM', _("Medium")),
+        ('HIGH', _("High")),
+        ('URGENT', _("Urgent")),
     ]
     
     medicine = models.ForeignKey(
         Medicine,
         on_delete=models.CASCADE,
         related_name='reorder_recommendations',
-        help_text="Medicine that needs reordering"
+        help_text=_("Medicine that needs reordering"),
     )
     pharmacy = models.ForeignKey(
         "tenants.Pharmacy",
         on_delete=models.CASCADE,
         related_name="reorder_recommendations",
-        help_text="Pharmacy that owns this recommendation",
+        help_text=_("Pharmacy that owns this recommendation"),
     )
     recommended_quantity = models.PositiveIntegerField(
         validators=[MinValueValidator(1)],
-        help_text="Recommended quantity to order"
+        help_text=_("Recommended quantity to order"),
     )
     reason = models.TextField(
-        help_text="Reason for the recommendation (e.g., Low stock, High demand)"
+        help_text=_("Reason for the recommendation (e.g., Low stock, High demand)"),
     )
     priority = models.CharField(
         max_length=10,
         choices=PRIORITY_CHOICES,
         default='MEDIUM',
-        help_text="Priority level of the recommendation"
+        help_text=_("Priority level of the recommendation"),
     )
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
         default='PENDING',
-        help_text="Status of the recommendation"
+        help_text=_("Status of the recommendation"),
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -158,13 +158,13 @@ class ReorderRecommendation(models.Model):
         null=True,
         blank=True,
         related_name='approved_reorders',
-        help_text="User who approved the recommendation"
+        help_text=_("User who approved the recommendation"),
     )
     approved_at = models.DateTimeField(null=True, blank=True)
     
     class Meta:
-        verbose_name = "Reorder Recommendation"
-        verbose_name_plural = "Reorder Recommendations"
+        verbose_name = _("Reorder Recommendation")
+        verbose_name_plural = _("Reorder Recommendations")
         ordering = ['-priority', '-created_at']
         indexes = [
             models.Index(fields=['status']),

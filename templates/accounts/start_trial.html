@@ -1,6 +1,7 @@
-﻿{% load i18n %}
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
 <!DOCTYPE html>
-<html lang="{{ request.LANGUAGE_CODE|default:'uz' }}">
+<html lang="{{ request.LANGUAGE_CODE|default:LANGUAGE_CODE|default:CURRENT_LANGUAGE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,37 +10,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(140deg, #f5f8ff 0%, #eef5ff 45%, #ffffff 100%);
             min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 25%),
+                radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.14), transparent 30%),
+                linear-gradient(180deg, #f6fbff 0%, #eef4ff 100%);
+        }
+
+        .trial-card {
+            border-radius: 1.5rem;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+        }
+
+        .trial-check {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(37, 99, 235, 0.12);
+            color: #2563eb;
         }
     </style>
 </head>
 <body>
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-xl-5">
-            <div class="text-center mb-4">
-                <div class="d-flex justify-content-end mb-3">
-                    <form action="{% url 'set_language' %}" method="post" class="d-inline-block">
-                        {% csrf_token %}
-                        {% if request.path|slice:":4" == "/uz/" or request.path|slice:":4" == "/ru/" or request.path|slice:":4" == "/en/" %}
-                        <input type="hidden" name="next" value="{{ request.path|slice:'3:' }}">
-                        {% else %}
-                        <input type="hidden" name="next" value="{{ request.path }}">
-                        {% endif %}
-                        <select name="language" onchange="this.form.submit()" class="form-select form-select-sm">
-                            <option value="uz" {% if request.LANGUAGE_CODE == 'uz' %}selected{% endif %}>Oʻzbekcha</option>
-                            <option value="ru" {% if request.LANGUAGE_CODE == 'ru' %}selected{% endif %}>Русский</option>
-                            <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-                        </select>
-                    </form>
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 align-items-center justify-content-center">
+            <div class="col-lg-5 d-none d-lg-block">
+                <div class="pe-xl-4">
+                    <a href="{% url 'landing' %}" class="text-decoration-none h3 fw-bold text-dark">{% trans "PharmacyAI" %}</a>
+                    <h1 class="display-6 fw-bold mt-3 mb-3">{% trans "Start your 14-day free trial" %}</h1>
+                    <p class="lead text-secondary mb-4">{% trans "Launch a fully isolated pharmacy workspace with analytics, forecasting, and role-based team access in minutes." %}</p>
+                    <div class="d-grid gap-3">
+                        <div class="trial-check"><i class="fas fa-building"></i></div>
+                        <div class="fw-semibold">{% trans "Create one tenant-ready workspace for your pharmacy." %}</div>
+                        <div class="trial-check"><i class="fas fa-chart-column"></i></div>
+                        <div class="fw-semibold">{% trans "Use dashboards, inventory optimization, and demo mode from day one." %}</div>
+                        <div class="trial-check"><i class="fas fa-users"></i></div>
+                        <div class="fw-semibold">{% trans "Invite admins, managers, and pharmacists under plan limits." %}</div>
+                    </div>
                 </div>
-                <a href="/" class="text-decoration-none h3 fw-bold text-primary">PharmacyAI</a>
-                <p class="text-muted mb-0">{% trans "Start your 14-day free trial" %}</p>
             </div>
 
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4 p-md-5">
+            <div class="col-md-9 col-lg-6 col-xl-5">
+                <div class="trial-card p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <div class="small text-uppercase text-primary fw-semibold mb-1">{% trans "Trial Workspace" %}</div>
+                            <h2 class="h3 fw-bold mb-0">{% trans "Create Trial Workspace" %}</h2>
+                        </div>
+                        {% include "includes/language_switcher.html" with form_class="d-inline-flex align-items-center" select_class="form-select form-select-sm rounded-pill border-0 bg-light shadow-none" element_id="trial-language-switcher" %}
+                    </div>
+
                     {% if errors %}
                     <div class="alert alert-danger">
                         <ul class="mb-0 ps-3">
@@ -52,39 +78,47 @@
 
                     <form method="post" action="{% url 'start-trial' %}">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">{% trans "Pharmacy Name" %}</label>
-                            <input type="text" class="form-control" name="pharmacy_name" value="{{ form.pharmacy_name|default:'' }}" required>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">{% trans "Pharmacy Name" %}</label>
+                                <input type="text" class="form-control form-control-lg" name="pharmacy_name" value="{{ form.pharmacy_name|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{% trans "Admin Username" %}</label>
+                                <input type="text" class="form-control form-control-lg" name="username" value="{{ form.username|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{% trans "Admin Email" %}</label>
+                                <input type="email" class="form-control form-control-lg" name="email" value="{{ form.email|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{% trans "Password" %}</label>
+                                <input type="password" class="form-control form-control-lg" name="password" required minlength="8">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{% trans "Confirm Password" %}</label>
+                                <input type="password" class="form-control form-control-lg" name="password_confirm" required minlength="8">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">{% trans "Admin Username" %}</label>
-                            <input type="text" class="form-control" name="username" value="{{ form.username|default:'' }}" required>
+
+                        <div class="bg-light rounded-4 p-3 mt-4">
+                            <div class="fw-semibold mb-1">{% trans "What is included" %}</div>
+                            <div class="small text-muted">{% trans "A BASIC plan workspace, admin account, and 14-day trial period are provisioned automatically." %}</div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">{% trans "Admin Email" %}</label>
-                            <input type="email" class="form-control" name="email" value="{{ form.email|default:'' }}" required>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill">
+                                <i class="fa-solid fa-rocket me-2"></i>{% trans "Create Trial Workspace" %}
+                            </button>
+                            <a href="{% url 'login' %}" class="btn btn-outline-secondary rounded-pill">
+                                {% trans "Already have an account? Login" %}
+                            </a>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">{% trans "Password" %}</label>
-                            <input type="password" class="form-control" name="password" required minlength="8">
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">{% trans "Confirm Password" %}</label>
-                            <input type="password" class="form-control" name="password_confirm" required minlength="8">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fa-solid fa-rocket me-2"></i>{% trans "Create Trial Workspace" %}
-                        </button>
                     </form>
                 </div>
             </div>
-
-            <div class="text-center mt-3">
-                <a href="{% url 'login' %}" class="text-decoration-none">{% trans "Already have an account? Login" %}</a>
-            </div>
         </div>
     </div>
-</div>
+</section>
 </body>
 </html>
-

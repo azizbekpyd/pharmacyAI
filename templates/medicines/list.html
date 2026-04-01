@@ -1,81 +1,87 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Medicines - Pharmacy Analytic AI" %}{% endblock %}
 {% block page_title %}{% trans "Medicines Management" %}{% endblock %}
 
-{% block extra_css %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-{% endblock %}
-
 {% block content %}
-<div class="mb-6 flex items-center justify-between">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
     <div>
-        <h2 class="text-2xl font-bold text-gray-900">{% trans "Medicines Management" %}</h2>
-        <p class="text-sm text-gray-600 mt-1">{% trans "Track catalog, pricing, stock levels, and expiry status" %}</p>
+        <h2 class="h3 fw-bold mb-1">{% trans "Medicines Management" %}</h2>
+        <p class="text-muted mb-0">{% trans "Track catalog, pricing, stock levels, and expiry status" %}</p>
     </div>
     {% if can_manage_medicines %}
-    <a href="{% url 'medicines-create' %}" class="inline-flex items-center bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm">
-        <i class="fas fa-plus mr-2"></i>{% trans "Add Medicine" %}
+    <a href="{% url 'medicines-create' %}" class="btn btn-primary rounded-pill px-4">
+        <i class="fas fa-plus me-2"></i>{% trans "Add Medicine" %}
     </a>
     {% endif %}
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <input type="text" id="search-input" placeholder="{% trans 'Search by name or SKU' %}" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-        <select id="category-filter" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="">{% trans "All Categories" %}</option>
-        </select>
-        <select id="status-filter" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="">{% trans "All Status" %}</option>
-            <option value="expiring_soon">{% trans "Expiring Soon" %}</option>
-            <option value="expired">{% trans "Expired" %}</option>
-            <option value="low_stock">{% trans "Low Stock" %}</option>
-        </select>
-        <button onclick="loadMedicines()" class="inline-flex items-center justify-center bg-gray-900 text-white px-4 py-2.5 rounded-lg hover:bg-gray-800">
-            <i class="fas fa-filter mr-2"></i>{% trans "Apply Filters" %}
-        </button>
+<div class="surface-card p-4 mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-lg-4">
+            <label for="search-input" class="form-label small text-uppercase text-muted fw-semibold">{% trans "Search by name or SKU" %}</label>
+            <input type="text" id="search-input" class="form-control" placeholder="{% trans 'Search by name or SKU' %}">
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <label for="category-filter" class="form-label small text-uppercase text-muted fw-semibold">{% trans "Category" %}</label>
+            <select id="category-filter" class="form-select">
+                <option value="">{% trans "All Categories" %}</option>
+            </select>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <label for="status-filter" class="form-label small text-uppercase text-muted fw-semibold">{% trans "Status" %}</label>
+            <select id="status-filter" class="form-select">
+                <option value="">{% trans "All Status" %}</option>
+                <option value="expiring_soon">{% trans "Expiring Soon" %}</option>
+                <option value="expired">{% trans "Expired" %}</option>
+                <option value="low_stock">{% trans "Low Stock" %}</option>
+            </select>
+        </div>
+        <div class="col-md-4 col-lg-2 d-grid">
+            <button id="apply-filters-button" onclick="loadMedicines()" class="btn btn-outline-secondary rounded-pill">
+                <i class="fas fa-filter me-2"></i>{% trans "Apply Filters" %}
+            </button>
+        </div>
     </div>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50/80">
+<div class="surface-card p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{% trans "Medicine" %}</th>
-                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{% trans "Category" %}</th>
-                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{% trans "Price" %}</th>
-                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{% trans "Stock" %}</th>
-                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{% trans "Expiry" %}</th>
-                    <th class="px-6 py-3.5 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{% trans "Actions" %}</th>
+                    <th>{% trans "Medicine" %}</th>
+                    <th>{% trans "Category" %}</th>
+                    <th>{% trans "Price" %}</th>
+                    <th>{% trans "Stock" %}</th>
+                    <th>{% trans "Expiry" %}</th>
+                    <th class="text-end">{% trans "Actions" %}</th>
                 </tr>
             </thead>
-            <tbody id="medicines-table-body" class="bg-white divide-y divide-gray-200">
+            <tbody id="medicines-table-body">
                 <tr>
-                    <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                        <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
-                        <p>{% trans "Loading medicines..." %}</p>
+                    <td colspan="6" class="py-5 text-center text-muted">
+                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status" aria-hidden="true"></div>
+                        {% trans "Loading medicines..." %}
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <div id="pagination" class="bg-gray-50 px-6 py-4 border-t border-gray-200"></div>
+    <div id="pagination" class="border-top bg-light p-3"></div>
 </div>
 
 <div class="modal fade" id="deleteMedicineModal" tabindex="-1" aria-labelledby="deleteMedicineModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteMedicineModalLabel">{% trans "Delete Medicine" %}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans 'Close' %}"></button>
             </div>
             <div class="modal-body">
-                <p class="mb-0">
-                    {% blocktrans %}Are you sure you want to delete <span id="delete-medicine-name" class="fw-semibold"></span>?{% endblocktrans %}
-                </p>
+                <p class="mb-0">{% trans "Are you sure you want to delete this medicine?" %}</p>
+                <div class="mt-3 fw-semibold" id="delete-medicine-name"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{% trans "Cancel" %}</button>
@@ -87,21 +93,22 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let currentPage = 1;
 let totalPages = 1;
 const CAN_MANAGE_MEDICINES = {{ can_manage_medicines|yesno:"true,false" }};
 const CAN_DELETE_MEDICINES = {{ can_delete_medicines|yesno:"true,false" }};
 let deleteModal = null;
-const APP_LOCALE = "{{ LANGUAGE_CODE|default:'uz'|escapejs }}".replace('_', '-');
+const APP_LOCALE = window.APP_LOCALE || "{{ request.LANGUAGE_CODE|default:LANGUAGE_CODE|escapejs }}".replace("_", "-");
+const MEDICINES_EDIT_URL_TEMPLATE = "{% url 'medicine_update' 0 %}";
+const MEDICINES_DELETE_URL_TEMPLATE = "{% url 'medicine_delete' 0 %}";
 const I18N = {
     noMedicines: "{% trans 'No medicines found' %}",
     na: "{% trans 'N/A' %}",
+    sku: "{% trans 'SKU' %}",
     uncategorized: "{% trans 'Uncategorized' %}",
     lowStock: "{% trans 'Low Stock' %}",
     inStock: "{% trans 'In Stock' %}",
@@ -117,13 +124,32 @@ const I18N = {
     results: "{% trans 'results' %}",
     previous: "{% trans 'Previous' %}",
     next: "{% trans 'Next' %}",
+    loading: "{% trans 'Loading medicines...' %}",
+    medicinesPagination: "{% trans 'Medicines pagination' %}",
 };
 
+function renderLoadingState() {
+    document.getElementById("medicines-table-body").innerHTML = `
+        <tr>
+            <td colspan="6" class="py-5 text-center text-muted">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status" aria-hidden="true"></div>
+                ${I18N.loading}
+            </td>
+        </tr>
+    `;
+}
+
 async function loadMedicines(page = 1) {
+    const applyButton = document.getElementById("apply-filters-button");
     try {
-        const search = document.getElementById('search-input').value;
-        const category = document.getElementById('category-filter').value;
-        const status = document.getElementById('status-filter').value;
+        renderLoadingState();
+        if (applyButton) {
+            applyButton.disabled = true;
+        }
+
+        const search = document.getElementById("search-input").value;
+        const category = document.getElementById("category-filter").value;
+        const status = document.getElementById("status-filter").value;
 
         let url = `/api/medicines/medicines/?page=${page}`;
         if (search) url += `&search=${encodeURIComponent(search)}`;
@@ -134,20 +160,25 @@ async function loadMedicines(page = 1) {
         const data = await response.json();
 
         renderMedicines(data.results || []);
-        renderPagination(data);
+        renderPagination(data, page);
 
         currentPage = page;
         totalPages = Math.ceil((data.count || 0) / 20);
     } catch (error) {
-        console.error('Error loading medicines:', error);
+        console.error("Error loading medicines:", error);
+        renderMedicines([]);
+    } finally {
+        if (applyButton) {
+            applyButton.disabled = false;
+        }
     }
 }
 
 function renderMedicines(medicines) {
-    const tbody = document.getElementById('medicines-table-body');
+    const tbody = document.getElementById("medicines-table-body");
 
     if (medicines.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">${I18N.noMedicines}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-5 text-center text-muted">${I18N.noMedicines}</td></tr>`;
         return;
     }
 
@@ -158,46 +189,40 @@ function renderMedicines(medicines) {
         const isLowStock = !!medicine.is_low_stock;
         const stock = medicine.current_stock || 0;
         const stockBadge = isLowStock
-            ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">${I18N.lowStock}</span>`
-            : `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">${I18N.inStock}</span>`;
-        const expiryClass = isExpired ? 'bg-red-100 text-red-700' : (isExpiring ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700');
+            ? `<span class="badge rounded-pill text-bg-danger">${I18N.lowStock}</span>`
+            : `<span class="badge rounded-pill text-bg-success">${I18N.inStock}</span>`;
+        const expiryBadgeClass = isExpired ? "text-bg-danger" : (isExpiring ? "text-bg-warning" : "text-bg-secondary");
         const expiryLabel = isExpired ? I18N.expired : (isExpiring ? I18N.expiringSoon : I18N.valid);
 
         return `
-            <tr class="hover:bg-gray-50/80 transition-colors">
-                <td class="px-6 py-4">
-                    <div class="text-sm font-semibold text-gray-900">${medicine.name}</div>
-                    <div class="text-xs text-gray-500 mt-1">SKU: ${medicine.sku}</div>
+            <tr>
+                <td>
+                    <div class="fw-semibold">${medicine.name}</div>
+                    <div class="text-muted small">${I18N.sku}: ${medicine.sku}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-700">${medicine.category_name || I18N.uncategorized}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-semibold text-gray-900">${formatUZS(medicine.unit_price || 0)}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm font-medium text-gray-900">${stock}</span>
+                <td>${medicine.category_name || I18N.uncategorized}</td>
+                <td class="fw-semibold">${formatUZS(medicine.unit_price || 0)}</td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-semibold">${stock}</span>
                         ${stockBadge}
                     </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-700">${expiryDate}</div>
-                    <span class="inline-flex mt-1 px-2.5 py-1 rounded-full text-xs font-medium ${expiryClass}">
-                        ${expiryLabel}
-                    </span>
+                <td>
+                    <div>${expiryDate}</div>
+                    <span class="badge rounded-pill mt-1 ${expiryBadgeClass}">${expiryLabel}</span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${renderMedicineActions(medicine)}</td>
+                <td class="text-end">${renderMedicineActions(medicine)}</td>
             </tr>
         `;
-    }).join('');
+    }).join("");
 }
 
 function renderMedicineActions(medicine) {
     const actions = [];
     if (CAN_MANAGE_MEDICINES) {
         actions.push(`
-            <a href="/medicines/${medicine.id}/edit/" class="inline-flex items-center text-blue-600 hover:text-blue-800" title="${I18N.editMedicine}">
+            <a href="${MEDICINES_EDIT_URL_TEMPLATE.replace("/0/", `/${medicine.id}/`)}" class="btn btn-sm btn-outline-primary rounded-pill" title="${I18N.editMedicine}" aria-label="${I18N.editMedicine}">
                 <i class="fas fa-pen"></i>
             </a>
         `);
@@ -205,88 +230,97 @@ function renderMedicineActions(medicine) {
     if (CAN_DELETE_MEDICINES) {
         const safeName = JSON.stringify(medicine.name || I18N.thisMedicine);
         actions.push(`
-            <button type="button"
-                    class="inline-flex items-center text-red-600 hover:text-red-800"
-                    title="${I18N.deleteMedicine}"
-                    onclick='openDeleteModal(${medicine.id}, ${safeName})'>
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-danger rounded-pill"
+                title="${I18N.deleteMedicine}"
+                aria-label="${I18N.deleteMedicine}"
+                onclick='openDeleteModal(${medicine.id}, ${safeName})'>
                 <i class="fas fa-trash"></i>
             </button>
         `);
     }
 
     if (!actions.length) {
-        return '<span class="text-gray-400">-</span>';
+        return '<span class="text-muted">-</span>';
     }
 
-    return `<div class="flex items-center gap-3">${actions.join('')}</div>`;
+    return `<div class="d-inline-flex gap-2">${actions.join("")}</div>`;
 }
 
 function openDeleteModal(medicineId, medicineName) {
-    const form = document.getElementById('delete-medicine-form');
-    form.action = `/medicines/${medicineId}/delete/`;
-    document.getElementById('delete-medicine-name').textContent = medicineName;
+    const form = document.getElementById("delete-medicine-form");
+    form.action = MEDICINES_DELETE_URL_TEMPLATE.replace("/0/", `/${medicineId}/`);
+    document.getElementById("delete-medicine-name").textContent = medicineName;
     if (!deleteModal) {
-        deleteModal = new bootstrap.Modal(document.getElementById('deleteMedicineModal'));
+        deleteModal = new bootstrap.Modal(document.getElementById("deleteMedicineModal"));
     }
     deleteModal.show();
 }
 
-function renderPagination(data) {
-    const pagination = document.getElementById('pagination');
+function renderPagination(data, page) {
+    const pagination = document.getElementById("pagination");
     if (!data.next && !data.previous) {
-        pagination.innerHTML = '';
+        pagination.innerHTML = "";
         return;
     }
 
-    const current = currentPage;
     const total = Math.ceil((data.count || 0) / 20);
+    const start = ((page - 1) * 20) + 1;
+    const end = Math.min(page * 20, data.count);
+    const prevDisabled = data.previous ? "" : "disabled";
+    const nextDisabled = data.next ? "" : "disabled";
 
-    let html = '<div class="flex items-center justify-between">';
-    html += `<div class="text-sm text-gray-700">${I18N.showing} ${((current - 1) * 20) + 1} ${I18N.to} ${Math.min(current * 20, data.count)} ${I18N.of} ${data.count} ${I18N.results}</div>`;
-    html += '<div class="flex space-x-2">';
-
-    if (data.previous) {
-        html += `<button onclick="loadMedicines(${current - 1})" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">${I18N.previous}</button>`;
-    }
-    if (data.next) {
-        html += `<button onclick="loadMedicines(${current + 1})" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">${I18N.next}</button>`;
-    }
-
-    html += '</div></div>';
-    pagination.innerHTML = html;
+    pagination.innerHTML = `
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="text-muted small">${I18N.showing} ${start} ${I18N.to} ${end} ${I18N.of} ${data.count} ${I18N.results}</div>
+            <nav aria-label="${I18N.medicinesPagination}">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item ${prevDisabled}">
+                        <button class="page-link" ${prevDisabled} onclick="loadMedicines(${page - 1})">${I18N.previous}</button>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">${page}/${total}</span>
+                    </li>
+                    <li class="page-item ${nextDisabled}">
+                        <button class="page-link" ${nextDisabled} onclick="loadMedicines(${page + 1})">${I18N.next}</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    `;
 }
 
 function formatUZS(amount) {
     return new Intl.NumberFormat(APP_LOCALE, {
-        style: 'decimal',
+        style: "decimal",
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
-    }).format(Number(amount || 0)) + ' UZS';
+    }).format(Number(amount || 0)) + " UZS";
 }
 
 async function loadCategories() {
     try {
-        const response = await fetch('/api/medicines/categories/');
+        const response = await fetch("/api/medicines/categories/");
         const data = await response.json();
-        const select = document.getElementById('category-filter');
+        const select = document.getElementById("category-filter");
 
-        data.results?.forEach(category => {
-            const option = document.createElement('option');
+        (data.results || []).forEach(category => {
+            const option = document.createElement("option");
             option.value = category.id;
             option.textContent = category.name;
             select.appendChild(option);
         });
     } catch (error) {
-        console.error('Error loading categories:', error);
+        console.error("Error loading categories:", error);
     }
 }
 
-document.getElementById('search-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') loadMedicines(1);
+document.getElementById("search-input").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") loadMedicines(1);
 });
 
 loadCategories();
 loadMedicines(1);
 </script>
 {% endblock %}
-

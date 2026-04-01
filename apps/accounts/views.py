@@ -3,10 +3,9 @@ API views for accounts app.
 
 Handles user authentication, registration, and user management.
 """
-from rest_framework import status, generics, permissions
+from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -14,11 +13,11 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from datetime import timedelta
-from .models import User
-from .serializers import UserSerializer, UserCreateSerializer, LoginSerializer
 from apps.tenants.models import Pharmacy
 from apps.tenants.services import SubscriptionService
 from apps.tenants.utils import require_user_pharmacy
+from .models import User
+from .serializers import LoginSerializer, UserCreateSerializer, UserSerializer
 
 
 class UserListView(generics.ListAPIView):
