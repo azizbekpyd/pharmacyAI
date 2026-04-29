@@ -1,16 +1,20 @@
 """
 API views for sales app.
 
-Handles CRUD operations for sales, plus analytics and forecasting.
+Handles CRUD operations for sales, plus analytics, forecasting, and exports.
 """
+import csv
 from datetime import datetime
 
+from django.http import HttpResponse
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils.translation import gettext_lazy as _
 
 from apps.accounts.permissions import SaleRolePermission
+from apps.inventory.models import ActivityLog
+from apps.inventory.services import InventoryService
 from apps.tenants.mixins import TenantScopedQuerysetMixin
 from apps.tenants.models import Pharmacy
 from apps.tenants.utils import require_user_pharmacy
@@ -193,3 +197,47 @@ class SaleViewSet(TenantScopedQuerysetMixin, viewsets.ModelViewSet):
         days = int(request.query_params.get("days", 90))
         slow_moving = SalesAnalyticsService.get_slow_moving_medicines(days=days, pharmacy=pharmacy)
         return Response(slow_moving, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"])
+    def export_csv(self, request):
+        queryset = self.get_queryset().prefetch_related("items__medicine").select_related("user", "pharmacy")
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="sales.csv"'
+        writer = csv.writer(response)
+        writer.writerow([
+            "sale_id",
+            "date",
+            "cashier",
+            "medicine",
+            "sku",
+            "barcode",
+            "quantity",
+            "unit_price",
+            "subtotal",
+            "total_amount",
+            "notes",
+        ])
+        for sale in queryset:
+            for item in sale.items.all():
+                writer.writerow([
+                    sale.id,
+                    sale.date.isoformat(),
+                    sale.user.username if sale.user else "",
+                    item.medicine.name,
+                    item.medicine.sku,
+                    item.medicine.barcode or "",
+                    item.quantity,
+                    item.unit_price,
+                    item.subtotal,
+                    sale.total_amount,
+                    sale.notes or "",
+                ])
+        pharmacy = self._resolve_action_pharmacy()
+        InventoryService.log_activity(
+            pharmacy=pharmacy,
+            user=request.user,
+            action=ActivityLog.ACTION_EXPORT,
+            entity_type="Sale",
+            description=_("Sales exported to CSV"),
+        )
+        return response

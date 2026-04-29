@@ -52,3 +52,8 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Binaries and executables
+*.exe
+*.dll
+cloudflared.exe

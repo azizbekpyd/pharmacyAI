@@ -57,7 +57,7 @@ class MedicineSerializer(serializers.ModelSerializer):
         model = Medicine
         fields = [
             'id', 'name', 'category', 'category_id', 'category_name',
-            'sku', 'description', 'unit_price', 'expiry_date', 'pharmacy', 'pharmacy_name',
+            'sku', 'barcode', 'description', 'unit_price', 'cost_price', 'expiry_date', 'pharmacy', 'pharmacy_name',
             'initial_stock',
             'is_expiring_soon', 'is_expired', 'current_stock',
             'created_at', 'updated_at'
@@ -133,7 +133,7 @@ class MedicineListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medicine
         fields = [
-            'id', 'name', 'category_name', 'sku', 'unit_price',
+            'id', 'name', 'category_name', 'sku', 'barcode', 'unit_price', 'cost_price',
             'expiry_date', 'is_expiring_soon', 'is_expired', 'is_low_stock', 'current_stock', 'pharmacy_name'
         ]
     

@@ -17,7 +17,7 @@
             </div>
         </div>
 
-        <form id="delete-medicine-form" method="post" action="{% url 'medicines-delete' medicine.pk %}" class="d-none">
+        <form id="delete-medicine-form" method="post" action="{% url 'medicine_delete' medicine.pk %}" class="d-none">
             {% csrf_token %}
         </form>
 
@@ -41,9 +41,19 @@
                         {% if form.category.errors %}<div class="text-danger small mt-1">{{ form.category.errors|join:", " }}</div>{% endif %}
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label" for="{{ form.barcode.id_for_label }}">{% trans "Barcode" %}</label>
+                        {{ form.barcode }}
+                        {% if form.barcode.errors %}<div class="text-danger small mt-1">{{ form.barcode.errors|join:", " }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label" for="{{ form.unit_price.id_for_label }}">{% trans "Price" %}</label>
                         {{ form.unit_price }}
                         {% if form.unit_price.errors %}<div class="text-danger small mt-1">{{ form.unit_price.errors|join:", " }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="{{ form.cost_price.id_for_label }}">{% trans "Cost Price" %}</label>
+                        {{ form.cost_price }}
+                        {% if form.cost_price.errors %}<div class="text-danger small mt-1">{{ form.cost_price.errors|join:", " }}</div>{% endif %}
                     </div>
                     <div class="col-md-6">
                         <label class="form-label" for="{{ form.stock.id_for_label }}">{% trans "Stock" %}</label>

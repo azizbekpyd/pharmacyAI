@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Purchases - Pharmacy Analytic AI" %}{% endblock %}
+{% block page_title %}{% trans "Purchases" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h2 class="h3 fw-bold mb-1">{% trans "Suppliers & Purchases" %}</h2>
+        <p class="text-muted mb-0">{% trans "Track supplier purchases and receive incoming stock into inventory." %}</p>
+    </div>
+    <a href="{% url 'inventory-stock-movements' %}" class="btn btn-outline-secondary px-4">
+        <i class="fas fa-right-left me-2"></i>{% trans "Stock Ledger" %}
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="surface-card p-4 h-100">
+            <h3 class="h5 fw-bold mb-3">{% trans "Suppliers" %}</h3>
+            <div id="suppliers-list" class="vstack gap-3">
+                <div class="text-muted"><i class="fas fa-spinner fa-spin me-2"></i>{% trans "Loading..." %}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="surface-card p-4 h-100">
+            <h3 class="h5 fw-bold mb-3">{% trans "Purchase Orders" %}</h3>
+            <div id="purchase-orders-list" class="vstack gap-3">
+                <div class="text-muted"><i class="fas fa-spinner fa-spin me-2"></i>{% trans "Loading..." %}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const PURCHASE_I18N = {
+    noSuppliers: "{% trans 'No suppliers yet.' %}",
+    noOrders: "{% trans 'No purchase orders yet.' %}",
+    received: "{% trans 'Received' %}",
+    draft: "{% trans 'Draft' %}",
+};
+
+async function loadPurchases() {
+    const [suppliersResponse, ordersResponse] = await Promise.all([
+        fetch('/api/inventory/suppliers/'),
+        fetch('/api/inventory/purchase-orders/'),
+    ]);
+    const suppliers = await suppliersResponse.json();
+    const orders = await ordersResponse.json();
+    renderSuppliers(suppliers.results || []);
+    renderPurchaseOrders(orders.results || []);
+}
+
+function renderSuppliers(rows) {
+    const wrap = document.getElementById('suppliers-list');
+    if (!rows.length) {
+        wrap.innerHTML = `<p class="empty-state mb-0">${PURCHASE_I18N.noSuppliers}</p>`;
+        return;
+    }
+    wrap.innerHTML = rows.map(item => `
+        <div class="border-bottom pb-3">
+            <div class="fw-semibold">${item.name}</div>
+            <div class="text-muted small">${item.phone || ''} ${item.email || ''}</div>
+        </div>
+    `).join('');
+}
+
+function renderPurchaseOrders(rows) {
+    const wrap = document.getElementById('purchase-orders-list');
+    if (!rows.length) {
+        wrap.innerHTML = `<p class="empty-state mb-0">${PURCHASE_I18N.noOrders}</p>`;
+        return;
+    }
+    wrap.innerHTML = rows.map(item => `
+        <div class="border-bottom pb-3">
+            <div class="d-flex justify-content-between gap-3">
+                <div>
+                    <div class="fw-semibold">${item.reference_number || '#' + item.id}</div>
+                    <div class="text-muted small">${item.supplier_name || ''} · ${(item.items || []).length} items</div>
+                </div>
+                <div class="text-end">
+                    <span class="badge ${item.status === 'RECEIVED' ? 'text-bg-success' : 'text-bg-secondary'}">${item.status === 'RECEIVED' ? PURCHASE_I18N.received : PURCHASE_I18N.draft}</span>
+                    <div class="fw-semibold mt-1">${Number(item.total_cost || 0).toLocaleString(window.APP_LOCALE)} UZS</div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+loadPurchases().catch(error => {
+    console.error(error);
+    document.getElementById('purchase-orders-list').innerHTML = `<p class="empty-state text-danger mb-0">${error}</p>`;
+});
+</script>
+{% endblock %}

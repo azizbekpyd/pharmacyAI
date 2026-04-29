@@ -1,5 +1,6 @@
 from datetime import datetime, time, timedelta
 from decimal import Decimal
+import random
 
 from django.core.management.base import BaseCommand
 from django.db import models, transaction
@@ -251,17 +252,109 @@ class Command(BaseCommand):
             )
 
     def _create_sales(self, pharmacy, admin_user, medicines, sales_blueprint):
+        rng = random.Random(f"{pharmacy.name}-realistic-demo-sales")
+        weighted_skus = []
+        for sale_cfg in sales_blueprint:
+            for sku, qty in sale_cfg["items"]:
+                weighted_skus.extend([sku] * max(1, qty))
+
+        sku_cycle = list(medicines.keys())
+        business_days = 45
+        sale_number = 1
+
+        for days_ago in range(business_days - 1, -1, -1):
+            sale_day = timezone.localdate() - timedelta(days=days_ago)
+            weekday = sale_day.weekday()
+
+            if weekday == 6:
+                daily_sales_count = rng.randint(1, 3)
+            elif weekday == 5:
+                daily_sales_count = rng.randint(2, 4)
+            else:
+                daily_sales_count = rng.randint(3, 6)
+
+            if days_ago <= 7:
+                daily_sales_count += rng.choice([0, 1, 1, 2])
+
+            for daily_idx in range(daily_sales_count):
+                item_count = rng.choices([1, 2, 3, 4], weights=[35, 38, 20, 7], k=1)[0]
+                cart = []
+                used_skus = set()
+
+                for _ in range(item_count):
+                    roll = rng.random()
+                    if roll < 0.68 and weighted_skus:
+                        sku = rng.choice(weighted_skus)
+                    elif roll < 0.88:
+                        sku = rng.choice(sku_cycle[: max(1, len(sku_cycle) // 2)])
+                    else:
+                        sku = rng.choice(sku_cycle)
+
+                    if sku in used_skus:
+                        continue
+                    used_skus.add(sku)
+
+                    medicine = medicines[sku]
+                    if medicine.unit_price >= Decimal("60000"):
+                        quantity = rng.choices([1, 2], weights=[80, 20], k=1)[0]
+                    elif "500mg" in medicine.name or "Syrup" in medicine.name or "Spray" in medicine.name:
+                        quantity = rng.choices([1, 2, 3], weights=[55, 32, 13], k=1)[0]
+                    else:
+                        quantity = rng.choices([1, 2, 3, 4], weights=[45, 32, 16, 7], k=1)[0]
+
+                    cart.append((medicine, quantity))
+
+                if not cart:
+                    continue
+
+                hour = rng.choices(
+                    [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+                    weights=[5, 8, 10, 12, 8, 7, 9, 11, 12, 10, 6, 2],
+                    k=1,
+                )[0]
+                minute = rng.randint(0, 59)
+                sale_date = timezone.make_aware(
+                    datetime.combine(sale_day, time(hour=hour, minute=minute)),
+                    timezone.get_current_timezone(),
+                )
+
+                sale = Sale.objects.create(
+                    pharmacy=pharmacy,
+                    user=admin_user,
+                    notes=f"{self.BLUEPRINTS[pharmacy.name]['label']}-{sale_day:%Y%m%d}-{sale_number:04d}",
+                    total_amount=Decimal("0.01"),
+                )
+                Sale.objects.filter(pk=sale.pk).update(date=sale_date)
+
+                total_amount = Decimal("0.00")
+                for medicine, qty in cart:
+                    if medicine.pharmacy_id != pharmacy.id:
+                        raise ValueError("Cross-tenant medicine assignment detected during demo seed.")
+
+                    item = SaleItem.objects.create(
+                        sale=sale,
+                        pharmacy=pharmacy,
+                        medicine=medicine,
+                        quantity=qty,
+                        unit_price=medicine.unit_price,
+                    )
+                    total_amount += item.subtotal
+
+                sale.total_amount = total_amount if total_amount > 0 else Decimal("0.01")
+                sale.save(update_fields=["total_amount", "updated_at"])
+                sale_number += 1
+
         for idx, sale_cfg in enumerate(sales_blueprint, start=1):
             sale = Sale.objects.create(
                 pharmacy=pharmacy,
                 user=admin_user,
-                notes=sale_cfg["note"],
+                notes=f"{self.BLUEPRINTS[pharmacy.name]['label']}-clinical-refill-{idx:02d}",
                 total_amount=Decimal("0.01"),
             )
 
             sale_date = timezone.make_aware(
                 datetime.combine(
-                    timezone.localdate() - timedelta(days=sale_cfg["days_ago"]),
+                    timezone.localdate() - timedelta(days=business_days + sale_cfg["days_ago"]),
                     time(hour=9 + (idx % 8), minute=10 + ((idx * 7) % 45)),
                 ),
                 timezone.get_current_timezone(),

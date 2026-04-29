@@ -18,6 +18,10 @@ def _is_pharmacist(user):
     return bool(getattr(user, "is_pharmacist", lambda: False)())
 
 
+def _is_cashier(user):
+    return bool(getattr(user, "is_cashier", lambda: False)())
+
+
 def can_manage_medicines(user):
     return _is_admin(user) or _is_manager(user)
 
@@ -27,7 +31,7 @@ def can_delete_medicines(user):
 
 
 def can_create_sales(user):
-    return _is_admin(user) or _is_manager(user) or _is_pharmacist(user)
+    return _is_admin(user) or _is_manager(user) or _is_pharmacist(user) or _is_cashier(user)
 
 
 def can_manage_sales(user):

@@ -3,10 +3,11 @@ Sales analytics and forecasting services.
 """
 from datetime import timedelta
 
-from django.db.models import Avg, Count, Max, Min, Q, Sum
+from django.db.models import Avg, Count, DecimalField, ExpressionWrapper, F, Max, Min, Q, Sum
 from django.utils import timezone
 
 from apps.inventory.services import InventoryOptimizationService
+from apps.inventory.models import Inventory
 from apps.medicines.models import Medicine
 from .models import Sale, SaleItem
 
@@ -77,6 +78,9 @@ class SalesAnalyticsService:
             days=30,
             limit=10,
         )
+        profit_metrics = SalesAnalyticsService.get_profit_metrics(start_date, end_date, pharmacy=pharmacy)
+        cashier_performance = SalesAnalyticsService.get_cashier_performance(start_date, end_date, pharmacy=pharmacy)
+        stock_value = SalesAnalyticsService.get_stock_value(pharmacy=pharmacy)
 
         return {
             "period": {
@@ -100,6 +104,72 @@ class SalesAnalyticsService:
             "peak_hours": peak_hours,
             "growth_metrics": growth_metrics,
             "forecast_accuracy": forecast_accuracy,
+            "profit_metrics": profit_metrics,
+            "cashier_performance": cashier_performance,
+            "stock_value": stock_value,
+        }
+
+    @staticmethod
+    def get_profit_metrics(start_date=None, end_date=None, pharmacy=None):
+        date_filter = Q()
+        if start_date:
+            date_filter &= Q(sale__date__gte=start_date)
+        if end_date:
+            date_filter &= Q(sale__date__lte=end_date)
+        if not start_date:
+            date_filter = Q(sale__date__gte=timezone.now() - timedelta(days=30))
+
+        profit_expr = ExpressionWrapper(
+            F("subtotal") - (F("quantity") * F("medicine__cost_price")),
+            output_field=DecimalField(max_digits=12, decimal_places=2),
+        )
+        cost_expr = ExpressionWrapper(
+            F("quantity") * F("medicine__cost_price"),
+            output_field=DecimalField(max_digits=12, decimal_places=2),
+        )
+        rows = SalesAnalyticsService._scope_sale_items(pharmacy).filter(date_filter)
+        totals = rows.aggregate(total_profit=Sum(profit_expr), total_cost=Sum(cost_expr), total_revenue=Sum("subtotal"))
+        revenue = float(totals["total_revenue"] or 0)
+        profit = float(totals["total_profit"] or 0)
+        return {
+            "total_revenue": revenue,
+            "total_cost": float(totals["total_cost"] or 0),
+            "gross_profit": profit,
+            "gross_margin_percent": round((profit / revenue) * 100, 2) if revenue > 0 else 0,
+        }
+
+    @staticmethod
+    def get_cashier_performance(start_date=None, end_date=None, pharmacy=None):
+        date_filter = Q()
+        if start_date:
+            date_filter &= Q(date__gte=start_date)
+        if end_date:
+            date_filter &= Q(date__lte=end_date)
+        if not start_date:
+            date_filter = Q(date__gte=timezone.now() - timedelta(days=30))
+
+        return list(
+            SalesAnalyticsService._scope_sales(pharmacy)
+            .filter(date_filter)
+            .values("user__id", "user__username", "user__first_name", "user__last_name")
+            .annotate(total_sales=Count("id"), total_revenue=Sum("total_amount"), average_sale=Avg("total_amount"))
+            .order_by("-total_revenue")[:10]
+        )
+
+    @staticmethod
+    def get_stock_value(pharmacy=None):
+        inventories = Inventory.objects.select_related("medicine")
+        if pharmacy is not None:
+            inventories = inventories.filter(pharmacy=pharmacy)
+        retail_value = 0
+        cost_value = 0
+        for inventory in inventories:
+            retail_value += float(inventory.current_stock) * float(inventory.medicine.unit_price)
+            cost_value += float(inventory.current_stock) * float(inventory.medicine.cost_price)
+        return {
+            "retail_value": retail_value,
+            "cost_value": cost_value,
+            "estimated_margin_value": retail_value - cost_value,
         }
 
     @staticmethod

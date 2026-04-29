@@ -7,6 +7,7 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.core.validators import MinValueValidator
 from django.utils.translation import gettext_lazy as _
 
@@ -77,6 +78,12 @@ class Medicine(models.Model):
         max_length=50,
         help_text=_("Stock Keeping Unit - unique identifier for the medicine"),
     )
+    barcode = models.CharField(
+        max_length=80,
+        blank=True,
+        null=True,
+        help_text=_("Barcode used for scanner-based lookup"),
+    )
     description = models.TextField(
         blank=True,
         null=True,
@@ -87,6 +94,13 @@ class Medicine(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal('0.01'))],
         help_text=_("Price per unit"),
+    )
+    cost_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[MinValueValidator(Decimal("0.00"))],
+        help_text=_("Acquisition cost per unit for profit analytics"),
     )
     expiry_date = models.DateField(
         null=True,
@@ -105,9 +119,15 @@ class Medicine(models.Model):
                 fields=["pharmacy", "sku"],
                 name="uniq_medicine_pharmacy_sku",
             ),
+            models.UniqueConstraint(
+                fields=["pharmacy", "barcode"],
+                condition=Q(barcode__isnull=False),
+                name="uniq_medicine_pharmacy_barcode",
+            ),
         ]
         indexes = [
             models.Index(fields=['sku']),
+            models.Index(fields=['barcode']),
             models.Index(fields=['category']),
             models.Index(fields=['expiry_date']),
         ]

@@ -14,19 +14,25 @@ class User(AbstractUser):
     Custom User model extending Django's AbstractUser.
     
     Roles:
+    - OWNER: Pharmacy owner with full workspace access
     - ADMIN: Full system access
     - MANAGER: Can manage medicines and operations (cannot delete medicines)
     - PHARMACIST: Can view data and create sales
+    - CASHIER: Can process sales and view operational screens
     """
+    ROLE_OWNER = "OWNER"
     ROLE_ADMIN = "ADMIN"
     ROLE_MANAGER = "MANAGER"
     ROLE_PHARMACIST = "PHARMACIST"
+    ROLE_CASHIER = "CASHIER"
     LEGACY_ROLE_PHARMACY_MANAGER = "PHARMACY_MANAGER"
 
     ROLE_CHOICES = [
+        (ROLE_OWNER, _("Owner")),
         (ROLE_ADMIN, _("Admin")),
         (ROLE_MANAGER, _("Manager")),
         (ROLE_PHARMACIST, _("Pharmacist")),
+        (ROLE_CASHIER, _("Cashier")),
     ]
     
     role = models.CharField(
@@ -62,7 +68,11 @@ class User(AbstractUser):
     
     def is_admin(self):
         """Check if user is an admin."""
-        return self.is_superuser or self.role == self.ROLE_ADMIN
+        return self.is_superuser or self.role in {self.ROLE_OWNER, self.ROLE_ADMIN}
+
+    def is_owner(self):
+        """Check if user owns pharmacy operations."""
+        return self.is_superuser or self.role == self.ROLE_OWNER
     
     def is_manager(self):
         """Check if user is a manager (including legacy manager value)."""
@@ -76,6 +86,10 @@ class User(AbstractUser):
         """Check if user is a pharmacist."""
         return self.role == self.ROLE_PHARMACIST
 
+    def is_cashier(self):
+        """Check if user is a cashier."""
+        return self.role == self.ROLE_CASHIER
+
     def can_manage_medicines(self):
         """Admin and manager can create/edit medicines."""
         return self.is_admin() or self.is_manager()
@@ -86,7 +100,7 @@ class User(AbstractUser):
 
     def can_create_sales(self):
         """All configured roles can create sales."""
-        return self.is_admin() or self.is_manager() or self.is_pharmacist()
+        return self.is_admin() or self.is_manager() or self.is_pharmacist() or self.is_cashier()
 
     def can_manage_inventory(self):
         """Admin and manager can modify inventory/reorder entities."""

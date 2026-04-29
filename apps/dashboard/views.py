@@ -149,7 +149,12 @@ def dashboard_view(request):
         expiry_date__lte=timezone.now().date() + timedelta(days=30),
         expiry_date__gte=timezone.now().date(),
     ).count()
+    expired_count = _scope_queryset(Medicine.objects, pharmacy).filter(
+        expiry_date__isnull=False,
+        expiry_date__lt=timezone.now().date(),
+    ).count()
     low_stock_count = _scope_queryset(Inventory.objects, pharmacy).filter(current_stock__lt=F('min_stock_level')).count()
+    out_of_stock_count = _scope_queryset(Inventory.objects, pharmacy).filter(current_stock=0).count()
 
     optimization_payload = (
         InventoryOptimizationService.build_dashboard_forecast_data(pharmacy=pharmacy, limit=10)
@@ -182,6 +187,30 @@ def dashboard_view(request):
             'priority': rec.priority,
         })
 
+    dashboard_payload = {
+        'totalSales': total_sales,
+        'totalRevenueUZS': total_revenue,
+        'salesGrowthPct': sales_growth_pct,
+        'revenueGrowthPct': revenue_growth_pct,
+        'medicinesCount': medicines_count,
+        'expiringSoonCount': expiring_soon_count,
+        'expiredCount': expired_count,
+        'lowStockCount': low_stock_count,
+        'outOfStockCount': out_of_stock_count,
+        'trendLabels': trend_labels,
+        'trendSales': trend_sales,
+        'trendRevenue': trend_revenue,
+        'categoryLabels': category_labels,
+        'categoryRevenue': category_revenue,
+        'fastMoving': fast_moving,
+        'slowMoving': slow_moving,
+        'recentSales': recent_sales,
+        'alerts': alerts,
+        'forecastReorder': optimization_payload.get('items', []),
+        'forecastChart': optimization_payload.get('chart', {}),
+        'serviceLevel': optimization_payload.get('service_level', {}),
+    }
+
     context = {
         # Summary
         'total_sales': total_sales,
@@ -202,6 +231,7 @@ def dashboard_view(request):
         'forecast_reorder_json': json.dumps(optimization_payload.get('items', [])),
         'forecast_chart_json': json.dumps(optimization_payload.get('chart', {})),
         'service_level_json': json.dumps(optimization_payload.get('service_level', {})),
+        'dashboard_payload_json': json.dumps(dashboard_payload),
 
         # Lists
         'fast_moving_medicines': fast_moving,
@@ -212,6 +242,8 @@ def dashboard_view(request):
         # Counts
         'medicines_count': medicines_count,
         'expiring_soon_count': expiring_soon_count,
+        'expired_count': expired_count,
         'low_stock_count': low_stock_count,
+        'out_of_stock_count': out_of_stock_count,
     }
     return render(request, 'dashboard/index.html', context)

@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.tenants.utils import require_user_pharmacy
 from .models import Sale, SaleItem
+from .services import SalesAnalyticsService
 
 
 def _scope_queryset(queryset, pharmacy):
@@ -188,6 +189,10 @@ def sales_analytics_view(request):
         if previous_revenue > 0:
             growth_percentage = ((current_revenue - previous_revenue) / previous_revenue) * 100
 
+    profit_metrics = SalesAnalyticsService.get_profit_metrics(start_date, end_date, pharmacy=pharmacy)
+    cashier_performance = SalesAnalyticsService.get_cashier_performance(start_date, end_date, pharmacy=pharmacy)
+    stock_value = SalesAnalyticsService.get_stock_value(pharmacy=pharmacy)
+
     context = {
         "total_sales": total_sales,
         "total_revenue": total_revenue,
@@ -202,6 +207,18 @@ def sales_analytics_view(request):
         "category_distribution": category_list,
         "fast_moving_medicines": [{**item, "total_revenue": float(item.get("total_revenue", 0))} for item in list(fast_moving)],
         "slow_moving_medicines": [{**item, "total_revenue": float(item.get("total_revenue", 0))} for item in slow_moving_list[:10]],
+        "gross_profit": profit_metrics["gross_profit"],
+        "gross_margin_percent": profit_metrics["gross_margin_percent"],
+        "stock_retail_value": stock_value["retail_value"],
+        "stock_cost_value": stock_value["cost_value"],
+        "cashier_performance": [
+            {
+                **item,
+                "total_revenue": float(item.get("total_revenue") or 0),
+                "average_sale": float(item.get("average_sale") or 0),
+            }
+            for item in cashier_performance
+        ],
     }
 
     return render(request, "sales/analytics.html", context)

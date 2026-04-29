@@ -10,18 +10,29 @@
         <h2 class="h3 fw-bold mb-1">{% trans "Medicines Management" %}</h2>
         <p class="text-muted mb-0">{% trans "Track catalog, pricing, stock levels, and expiry status" %}</p>
     </div>
-    {% if can_manage_medicines %}
-    <a href="{% url 'medicines-create' %}" class="btn btn-primary rounded-pill px-4">
-        <i class="fas fa-plus me-2"></i>{% trans "Add Medicine" %}
-    </a>
-    {% endif %}
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/api/medicines/medicines/export_csv/" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fas fa-file-csv me-2"></i>{% trans "Export CSV" %}
+        </a>
+        {% if can_manage_medicines %}
+        <label class="btn btn-outline-secondary rounded-pill px-4 mb-0">
+            <i class="fas fa-file-import me-2"></i>{% trans "Import CSV" %}
+            <input id="medicines-import-input" type="file" accept=".csv,text/csv" class="d-none">
+        </label>
+        {% endif %}
+        {% if can_manage_medicines %}
+        <a href="{% url 'medicines-create' %}" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-plus me-2"></i>{% trans "Add Medicine" %}
+        </a>
+        {% endif %}
+    </div>
 </div>
 
 <div class="surface-card p-4 mb-4">
     <div class="row g-3 align-items-end">
         <div class="col-lg-4">
-            <label for="search-input" class="form-label small text-uppercase text-muted fw-semibold">{% trans "Search by name or SKU" %}</label>
-            <input type="text" id="search-input" class="form-control" placeholder="{% trans 'Search by name or SKU' %}">
+            <label for="search-input" class="form-label small text-uppercase text-muted fw-semibold">{% trans "Search by name, SKU, or barcode" %}</label>
+            <input type="text" id="search-input" class="form-control" placeholder="{% trans 'Search by name, SKU, or barcode' %}">
         </div>
         <div class="col-md-4 col-lg-3">
             <label for="category-filter" class="form-label small text-uppercase text-muted fw-semibold">{% trans "Category" %}</label>
@@ -53,7 +64,7 @@
                 <tr>
                     <th>{% trans "Medicine" %}</th>
                     <th>{% trans "Category" %}</th>
-                    <th>{% trans "Price" %}</th>
+                    <th>{% trans "Price / Cost" %}</th>
                     <th>{% trans "Stock" %}</th>
                     <th>{% trans "Expiry" %}</th>
                     <th class="text-end">{% trans "Actions" %}</th>
@@ -109,6 +120,7 @@ const I18N = {
     noMedicines: "{% trans 'No medicines found' %}",
     na: "{% trans 'N/A' %}",
     sku: "{% trans 'SKU' %}",
+    barcode: "{% trans 'Barcode' %}",
     uncategorized: "{% trans 'Uncategorized' %}",
     lowStock: "{% trans 'Low Stock' %}",
     inStock: "{% trans 'In Stock' %}",
@@ -126,6 +138,8 @@ const I18N = {
     next: "{% trans 'Next' %}",
     loading: "{% trans 'Loading medicines...' %}",
     medicinesPagination: "{% trans 'Medicines pagination' %}",
+    importComplete: "{% trans 'Medicine import complete.' %}",
+    importFailed: "{% trans 'Medicine import failed.' %}",
 };
 
 function renderLoadingState() {
@@ -199,9 +213,13 @@ function renderMedicines(medicines) {
                 <td>
                     <div class="fw-semibold">${medicine.name}</div>
                     <div class="text-muted small">${I18N.sku}: ${medicine.sku}</div>
+                    ${medicine.barcode ? `<div class="text-muted small">${I18N.barcode}: ${medicine.barcode}</div>` : ''}
                 </td>
                 <td>${medicine.category_name || I18N.uncategorized}</td>
-                <td class="fw-semibold">${formatUZS(medicine.unit_price || 0)}</td>
+                <td>
+                    <div class="fw-semibold">${formatUZS(medicine.unit_price || 0)}</div>
+                    <div class="text-muted small">${formatUZS(medicine.cost_price || 0)}</div>
+                </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <span class="fw-semibold">${stock}</span>
@@ -299,6 +317,21 @@ function formatUZS(amount) {
     }).format(Number(amount || 0)) + " UZS";
 }
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 async function loadCategories() {
     try {
         const response = await fetch("/api/medicines/categories/");
@@ -322,5 +355,26 @@ document.getElementById("search-input").addEventListener("keypress", (e) => {
 
 loadCategories();
 loadMedicines(1);
+
+document.getElementById("medicines-import-input")?.addEventListener("change", async (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+        const response = await fetch("/api/medicines/medicines/import_csv/", {
+            method: "POST",
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            body: formData
+        });
+        if (!response.ok) throw new Error(I18N.importFailed);
+        alert(I18N.importComplete);
+        loadMedicines(1);
+    } catch (error) {
+        alert(error.message || I18N.importFailed);
+    } finally {
+        event.target.value = "";
+    }
+});
 </script>
 {% endblock %}

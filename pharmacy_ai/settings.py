@@ -49,7 +49,7 @@ ALLOWED_HOSTS = config(
 )
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
-    default="http://127.0.0.1:8000,http://localhost:8000,https://clip-drives-cho-pharmaceuticals.trycloudflare.com",
+    default="http://127.0.0.1:8000,http://localhost:8000,https://significance-fell-ipod-bearing.trycloudflare.com",
     cast=Csv(),
 )
 

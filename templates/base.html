@@ -10,23 +10,73 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        (function () {
+            const storedTheme = localStorage.getItem("pharmacyai-theme");
+            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            document.documentElement.setAttribute("data-bs-theme", storedTheme === "light" || storedTheme === "dark" ? storedTheme : systemTheme);
+        })();
+    </script>
     <style>
-        :root {
-            --brand-navy: #0f172a;
+        :root,
+        [data-bs-theme="light"] {
+            color-scheme: light;
+            --brand-ink: #101828;
+            --brand-muted: #667085;
             --brand-blue: #2563eb;
+            --brand-blue-strong: #1d4ed8;
+            --brand-teal: #0f766e;
             --brand-sky: #38bdf8;
-            --brand-border: rgba(148, 163, 184, 0.22);
-            --surface-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-            --surface-shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.06);
+            --app-bg: #f6f8fb;
+            --app-bg-soft: #eef4fb;
+            --surface: rgba(255, 255, 255, 0.95);
+            --surface-solid: #ffffff;
+            --surface-muted: #f8fafc;
+            --surface-hover: #f1f5f9;
+            --brand-border: rgba(148, 163, 184, 0.26);
+            --brand-border-strong: rgba(100, 116, 139, 0.34);
+            --sidebar-bg: linear-gradient(180deg, #101828 0%, #1e293b 100%);
+            --sidebar-active: rgba(59, 130, 246, 0.18);
+            --surface-shadow: 0 20px 48px rgba(15, 23, 42, 0.11);
+            --surface-shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.08);
+            --focus-ring: 0 0 0 0.25rem rgba(37, 99, 235, 0.18);
+        }
+
+        [data-bs-theme="dark"] {
+            color-scheme: dark;
+            --brand-ink: #f8fafc;
+            --brand-muted: #a7b1c2;
+            --brand-blue: #60a5fa;
+            --brand-blue-strong: #93c5fd;
+            --brand-teal: #5eead4;
+            --brand-sky: #67e8f9;
+            --app-bg: #0b1220;
+            --app-bg-soft: #111827;
+            --surface: rgba(17, 24, 39, 0.92);
+            --surface-solid: #111827;
+            --surface-muted: #162033;
+            --surface-hover: #1f2937;
+            --brand-border: rgba(148, 163, 184, 0.20);
+            --brand-border-strong: rgba(148, 163, 184, 0.32);
+            --sidebar-bg: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            --sidebar-active: rgba(96, 165, 250, 0.22);
+            --surface-shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
+            --surface-shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.26);
+            --focus-ring: 0 0 0 0.25rem rgba(96, 165, 250, 0.20);
+        }
+
+        html {
+            background: var(--app-bg);
         }
 
         body {
             min-height: 100vh;
             background:
-                radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 28%),
+                radial-gradient(circle at top right, rgba(56, 189, 248, 0.11), transparent 28%),
                 radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 24%),
-                linear-gradient(180deg, #f5f9ff 0%, #eff4fb 100%);
-            color: var(--brand-navy);
+                linear-gradient(180deg, var(--app-bg) 0%, var(--app-bg-soft) 100%);
+            color: var(--brand-ink);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         .page-loader {
@@ -36,7 +86,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(245, 249, 255, 0.92);
+            background: color-mix(in srgb, var(--app-bg) 88%, transparent);
             backdrop-filter: blur(6px);
             transition: opacity 0.2s ease, visibility 0.2s ease;
         }
@@ -53,9 +103,7 @@
 
         .app-sidebar {
             width: 288px;
-            background:
-                linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9)),
-                linear-gradient(180deg, rgba(56, 189, 248, 0.18), transparent 45%);
+            background: var(--sidebar-bg);
             color: #e2e8f0;
             border-right: 1px solid rgba(148, 163, 184, 0.14);
             padding: 1.25rem;
@@ -73,7 +121,7 @@
             align-items: center;
             gap: 0.85rem;
             padding: 0.85rem 0.95rem;
-            border-radius: 1.25rem;
+            border-radius: 0.75rem;
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(148, 163, 184, 0.14);
         }
@@ -81,17 +129,17 @@
         .brand-mark {
             width: 2.75rem;
             height: 2.75rem;
-            border-radius: 1rem;
+            border-radius: 0.75rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, var(--brand-blue), var(--brand-sky));
             color: #fff;
-            box-shadow: 0 12px 25px rgba(37, 99, 235, 0.35);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.28);
         }
 
         .app-sidebar .nav-link {
-            border-radius: 1rem;
+            border-radius: 0.65rem;
             color: #cbd5e1;
             font-weight: 500;
             padding: 0.85rem 1rem;
@@ -104,7 +152,7 @@
         .app-sidebar .nav-link:hover,
         .app-sidebar .nav-link.is-active {
             color: #fff;
-            background: rgba(59, 130, 246, 0.18);
+            background: var(--sidebar-active);
             box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.16);
         }
 
@@ -115,7 +163,7 @@
         }
 
         .app-topbar {
-            background: rgba(255, 255, 255, 0.82);
+            background: color-mix(in srgb, var(--surface-solid) 84%, transparent);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--brand-border);
         }
@@ -123,8 +171,8 @@
         .surface-card,
         .dashboard-card {
             border: 1px solid var(--brand-border);
-            border-radius: 1.25rem;
-            background: rgba(255, 255, 255, 0.92);
+            border-radius: 0.75rem;
+            background: var(--surface);
             box-shadow: var(--surface-shadow-soft);
         }
 
@@ -139,26 +187,34 @@
 
         .empty-state {
             border: 1px dashed rgba(148, 163, 184, 0.45);
-            border-radius: 1rem;
+            border-radius: 0.75rem;
             padding: 1.5rem;
             text-align: center;
-            color: #64748b;
-            background: linear-gradient(180deg, rgba(248, 250, 252, 0.9), rgba(241, 245, 249, 0.9));
+            color: var(--brand-muted);
+            background: var(--surface-muted);
+        }
+
+        .text-muted,
+        .text-secondary {
+            color: var(--brand-muted) !important;
         }
 
         .table thead th {
             border-bottom: 0;
-            color: #64748b;
+            color: var(--brand-muted);
             font-size: 0.78rem;
-            letter-spacing: 0.06em;
+            letter-spacing: 0;
+            text-transform: uppercase;
         }
 
         .table tbody td {
             vertical-align: middle;
+            color: var(--brand-ink);
+            border-color: var(--brand-border);
         }
 
         .alert {
-            border-radius: 1rem;
+            border-radius: 0.75rem;
         }
 
         .app-sidebar-backdrop {
@@ -179,6 +235,111 @@
             padding: 0.35rem 0.75rem;
             font-size: 0.8rem;
             font-weight: 600;
+        }
+
+        .theme-toggle {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-control,
+        .form-select,
+        .page-link,
+        .modal-content,
+        .list-group-item {
+            background-color: var(--surface-solid);
+            border-color: var(--brand-border);
+            color: var(--brand-ink);
+        }
+
+        .form-control:focus,
+        .form-select:focus,
+        .btn:focus-visible,
+        .page-link:focus {
+            border-color: var(--brand-blue);
+            box-shadow: var(--focus-ring);
+        }
+
+        .table-light,
+        .bg-light,
+        .list-group-item,
+        .card {
+            --bs-table-bg: var(--surface-muted);
+            --bs-table-color: var(--brand-ink);
+            background-color: var(--surface-muted) !important;
+            color: var(--brand-ink) !important;
+            border-color: var(--brand-border) !important;
+        }
+
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            --bs-table-bg-type: color-mix(in srgb, var(--surface-muted) 72%, transparent);
+        }
+
+        .table-hover > tbody > tr:hover > * {
+            --bs-table-bg-state: var(--surface-hover);
+            color: var(--brand-ink);
+        }
+
+        .btn {
+            border-radius: 0.65rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            --bs-btn-bg: #2563eb;
+            --bs-btn-border-color: #2563eb;
+            --bs-btn-hover-bg: #1d4ed8;
+            --bs-btn-hover-border-color: #1d4ed8;
+        }
+
+        .btn-outline-secondary {
+            --bs-btn-color: var(--brand-ink);
+            --bs-btn-border-color: var(--brand-border-strong);
+            --bs-btn-hover-bg: var(--surface-hover);
+            --bs-btn-hover-border-color: var(--brand-border-strong);
+            --bs-btn-hover-color: var(--brand-ink);
+        }
+
+        [data-bs-theme="dark"] .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        [data-bs-theme="dark"] .text-dark,
+        [data-bs-theme="dark"] .text-gray-800,
+        [data-bs-theme="dark"] .text-gray-900 {
+            color: var(--brand-ink) !important;
+        }
+
+        [data-bs-theme="dark"] .text-gray-500,
+        [data-bs-theme="dark"] .text-gray-600 {
+            color: var(--brand-muted) !important;
+        }
+
+        [data-bs-theme="dark"] .bg-white,
+        [data-bs-theme="dark"] .bg-gray-50,
+        [data-bs-theme="dark"] .bg-gray-100 {
+            background-color: var(--surface-solid) !important;
+        }
+
+        [data-bs-theme="dark"] .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+        [data-bs-theme="dark"] .border,
+        [data-bs-theme="dark"] .border-top,
+        [data-bs-theme="dark"] .border-bottom {
+            border-color: var(--brand-border) !important;
+        }
+
+        [data-bs-theme="dark"] .shadow-md,
+        [data-bs-theme="dark"] .shadow-sm,
+        [data-bs-theme="dark"] .shadow {
+            box-shadow: var(--surface-shadow-soft) !important;
+        }
+
+        [data-bs-theme="dark"] .hover\:bg-gray-50:hover {
+            background-color: var(--surface-hover) !important;
         }
 
         @media (max-width: 991.98px) {
@@ -251,6 +412,18 @@
                     <i class="fas fa-bell"></i>
                     <span>{% trans "Reorder Alerts" %}</span>
                 </a>
+                <a href="{% url 'inventory-purchases' %}" class="nav-link {% if 'inventory-purchases' in current_name %}is-active{% endif %}">
+                    <i class="fas fa-truck-ramp-box"></i>
+                    <span>{% trans "Purchases" %}</span>
+                </a>
+                <a href="{% url 'inventory-stock-movements' %}" class="nav-link {% if 'inventory-stock-movements' in current_name %}is-active{% endif %}">
+                    <i class="fas fa-right-left"></i>
+                    <span>{% trans "Stock Ledger" %}</span>
+                </a>
+                <a href="{% url 'inventory-activity-log' %}" class="nav-link {% if 'inventory-activity-log' in current_name %}is-active{% endif %}">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>{% trans "Audit Log" %}</span>
+                </a>
                 {% if user.is_admin %}
                 <a href="/admin/" class="nav-link">
                     <i class="fas fa-shield-halved"></i>
@@ -293,6 +466,9 @@
                                 <i class="far fa-clock"></i>
                                 <span id="current-time"></span>
                             </span>
+                            <button id="theme-toggle" class="btn btn-outline-secondary theme-toggle" type="button" aria-label="{% trans 'Toggle dark mode' %}" title="{% trans 'Toggle dark mode' %}">
+                                <i class="fas fa-moon" aria-hidden="true"></i>
+                            </button>
                             {% include "includes/language_switcher.html" with form_class="d-inline-flex align-items-center" select_class="form-select form-select-sm rounded-pill border-0 bg-light shadow-none ps-3 pe-5" element_id="header-language-switcher" %}
                         </div>
                     </div>
@@ -341,7 +517,32 @@
         const appSidebarBackdrop = document.getElementById("app-sidebar-backdrop");
         const mobileSidebarToggle = document.getElementById("mobile-sidebar-toggle");
         const currentTimeElement = document.getElementById("current-time");
+        const themeToggle = document.getElementById("theme-toggle");
         window.APP_LOCALE = "{{ request.LANGUAGE_CODE|default:LANGUAGE_CODE|default:CURRENT_LANGUAGE|escapejs }}".replace("_", "-");
+
+        function getPreferredTheme() {
+            const storedTheme = localStorage.getItem("pharmacyai-theme");
+            if (storedTheme === "light" || storedTheme === "dark") return storedTheme;
+            return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute("data-bs-theme", theme);
+            if (window.Chart) {
+                const isDark = theme === "dark";
+                Chart.defaults.color = isDark ? "#cbd5e1" : "#475569";
+                Chart.defaults.borderColor = isDark ? "rgba(148, 163, 184, 0.18)" : "rgba(148, 163, 184, 0.28)";
+                Object.values(Chart.instances || {}).forEach((chart) => chart.update());
+            }
+            if (!themeToggle) return;
+            const icon = themeToggle.querySelector("i");
+            if (icon) {
+                icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
+            }
+            themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+        }
+
+        applyTheme(getPreferredTheme());
 
         function hidePageLoader() {
             if (!pageLoader) return;
@@ -382,6 +583,15 @@
 
         if (appSidebarBackdrop) {
             appSidebarBackdrop.addEventListener("click", closeSidebar);
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener("click", () => {
+                const nextTheme = document.documentElement.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
+                localStorage.setItem("pharmacyai-theme", nextTheme);
+                applyTheme(nextTheme);
+                window.dispatchEvent(new CustomEvent("pharmacyai:themechange", { detail: { theme: nextTheme } }));
+            });
         }
 
         window.addEventListener("resize", () => {

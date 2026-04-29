@@ -14,7 +14,9 @@ class MedicineForm(forms.ModelForm):
             "name",
             "category",
             "sku",
+            "barcode",
             "unit_price",
+            "cost_price",
             "expiry_date",
             "description",
         ]
@@ -22,8 +24,12 @@ class MedicineForm(forms.ModelForm):
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "category": forms.Select(attrs={"class": "form-select"}),
             "sku": forms.TextInput(attrs={"class": "form-control"}),
+            "barcode": forms.TextInput(attrs={"class": "form-control"}),
             "unit_price": forms.NumberInput(
                 attrs={"class": "form-control", "step": "0.01", "min": "0.01"}
+            ),
+            "cost_price": forms.NumberInput(
+                attrs={"class": "form-control", "step": "0.01", "min": "0"}
             ),
             "expiry_date": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}

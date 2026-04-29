@@ -40,15 +40,21 @@ class MedicineUpdateForm(forms.ModelForm):
         fields = [
             "name",
             "category",
+            "barcode",
             "unit_price",
+            "cost_price",
             "expiry_date",
             "description",
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "category": forms.Select(attrs={"class": "form-select"}),
+            "barcode": forms.TextInput(attrs={"class": "form-control"}),
             "unit_price": forms.NumberInput(
                 attrs={"class": "form-control", "step": "0.01", "min": "0.01"}
+            ),
+            "cost_price": forms.NumberInput(
+                attrs={"class": "form-control", "step": "0.01", "min": "0"}
             ),
             "expiry_date": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}
@@ -62,12 +68,20 @@ class MedicineUpdateForm(forms.ModelForm):
         pharmacy = kwargs.pop("pharmacy", None)
         super().__init__(*args, **kwargs)
         self.fields["category"].required = False
+        self.fields["barcode"].required = False
+        self.fields["cost_price"].required = False
         if pharmacy is not None:
             self.fields["category"].queryset = self.fields["category"].queryset.filter(pharmacy=pharmacy)
         if self.instance and self.instance.pk:
             self.fields["stock"].initial = getattr(
                 getattr(self.instance, "inventory", None), "current_stock", 0
             )
+
+    def clean_cost_price(self):
+        value = self.cleaned_data.get("cost_price")
+        if value in (None, ""):
+            return getattr(self.instance, "cost_price", Decimal("0.00")) or Decimal("0.00")
+        return value
 
     def save(self, commit=True):
         medicine = super().save(commit=commit)
@@ -145,6 +159,8 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
     category_id = payload.get("category_id") or payload.get("category") or None
     initial_stock_raw = payload.get("initial_stock", payload.get("stock", 0))
     unit_price_raw = payload.get("unit_price")
+    cost_price_raw = payload.get("cost_price", 0)
+    barcode = (payload.get("barcode") or "").strip() or None
 
     errors = {}
     if not name:
@@ -176,6 +192,14 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
         errors["unit_price"] = _("Unit price is invalid.")
         unit_price = None
 
+    try:
+        cost_price = Decimal(str(cost_price_raw or 0))
+        if cost_price < 0:
+            errors["cost_price"] = _("Cost price must be zero or greater.")
+    except (InvalidOperation, TypeError, ValueError):
+        errors["cost_price"] = _("Cost price is invalid.")
+        cost_price = Decimal("0.00")
+
     if expiry_date is not None:
         parsed_expiry = parse_date(str(expiry_date))
         if parsed_expiry is None:
@@ -192,9 +216,11 @@ def medicine_create_view(request: HttpRequest) -> HttpResponse:
     medicine_data = {
         "name": name,
         "sku": sku,
+        "barcode": barcode,
         "category": category,
         "description": description,
         "unit_price": unit_price,
+        "cost_price": cost_price,
         "expiry_date": expiry_date,
     }
 

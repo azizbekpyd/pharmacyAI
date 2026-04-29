@@ -11,7 +11,8 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from .models import Sale, SaleItem
 from apps.medicines.models import Medicine
-from apps.inventory.models import Inventory
+from apps.inventory.models import ActivityLog, Inventory, StockMovement
+from apps.inventory.services import InventoryService
 from apps.tenants.services import SubscriptionService
 from apps.tenants.utils import require_user_pharmacy
 
@@ -153,8 +154,7 @@ class SaleCreateSerializer(serializers.ModelSerializer):
                 item = SaleItem.objects.create(sale=sale, **item_data)
                 total_amount += item.subtotal
 
-                # Reduce stock for future sales flow; keep simple and safe.
-                inventory, _ = Inventory.objects.get_or_create(
+                inventory, created_inventory = Inventory.objects.get_or_create(
                     medicine=item.medicine,
                     pharmacy=sale.pharmacy,
                     defaults={
@@ -163,11 +163,31 @@ class SaleCreateSerializer(serializers.ModelSerializer):
                         'max_stock_level': 120,
                     }
                 )
-                inventory.current_stock = max(0, inventory.current_stock - item.quantity)
-                inventory.save(update_fields=['current_stock', 'updated_at'])
+                InventoryService.adjust_stock(
+                    inventory=inventory,
+                    quantity_change=-item.quantity,
+                    movement_type=StockMovement.TYPE_SALE,
+                    user=sale.user,
+                    unit_cost=item.medicine.cost_price,
+                    source_type="Sale",
+                    source_id=sale.id,
+                    reason=_("Sale checkout"),
+                )
 
             sale.total_amount = total_amount
             sale.save()
+            InventoryService.log_activity(
+                pharmacy=sale.pharmacy,
+                user=sale.user,
+                action=ActivityLog.ACTION_SALE,
+                entity_type="Sale",
+                entity_id=sale.id,
+                description=_("Sale recorded successfully"),
+                metadata={
+                    "total_amount": str(sale.total_amount),
+                    "items_count": len(items_data),
+                },
+            )
 
             return sale
 

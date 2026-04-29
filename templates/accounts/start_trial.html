@@ -8,20 +8,54 @@
     <title>{% trans "Start Free Trial - PharmacyAI" %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        (function () {
+            const storedTheme = localStorage.getItem("pharmacyai-theme");
+            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            document.documentElement.setAttribute("data-bs-theme", storedTheme === "light" || storedTheme === "dark" ? storedTheme : systemTheme);
+        })();
+    </script>
     <style>
+        :root,
+        [data-bs-theme="light"] {
+            color-scheme: light;
+            --trial-ink: #101828;
+            --trial-muted: #667085;
+            --trial-bg: #f6fbff;
+            --trial-bg-soft: #eef4ff;
+            --trial-surface: rgba(255, 255, 255, 0.95);
+            --trial-muted-surface: #f8fafc;
+            --trial-border: rgba(148, 163, 184, 0.22);
+            --trial-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+        }
+
+        [data-bs-theme="dark"] {
+            color-scheme: dark;
+            --trial-ink: #f8fafc;
+            --trial-muted: #a7b1c2;
+            --trial-bg: #0b1220;
+            --trial-bg-soft: #111827;
+            --trial-surface: rgba(17, 24, 39, 0.94);
+            --trial-muted-surface: #162033;
+            --trial-border: rgba(148, 163, 184, 0.22);
+            --trial-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+        }
+
         body {
             min-height: 100vh;
+            color: var(--trial-ink);
             background:
                 radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 25%),
                 radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.14), transparent 30%),
-                linear-gradient(180deg, #f6fbff 0%, #eef4ff 100%);
+                linear-gradient(180deg, var(--trial-bg) 0%, var(--trial-bg-soft) 100%);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         .trial-card {
-            border-radius: 1.5rem;
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+            border-radius: 0.85rem;
+            border: 1px solid var(--trial-border);
+            background: var(--trial-surface);
+            box-shadow: var(--trial-shadow);
         }
 
         .trial-check {
@@ -33,6 +67,23 @@
             justify-content: center;
             background: rgba(37, 99, 235, 0.12);
             color: #2563eb;
+        }
+
+        .text-secondary,
+        .text-muted {
+            color: var(--trial-muted) !important;
+        }
+
+        .bg-light,
+        .form-control,
+        .form-select {
+            background-color: var(--trial-muted-surface) !important;
+            border-color: var(--trial-border);
+            color: var(--trial-ink);
+        }
+
+        [data-bs-theme="dark"] .text-dark {
+            color: var(--trial-ink) !important;
         }
     </style>
 </head>
@@ -63,7 +114,12 @@
                             <div class="small text-uppercase text-primary fw-semibold mb-1">{% trans "Trial Workspace" %}</div>
                             <h2 class="h3 fw-bold mb-0">{% trans "Create Trial Workspace" %}</h2>
                         </div>
-                        {% include "includes/language_switcher.html" with form_class="d-inline-flex align-items-center" select_class="form-select form-select-sm rounded-pill border-0 bg-light shadow-none" element_id="trial-language-switcher" %}
+                        <div class="d-flex align-items-center gap-2">
+                            <button id="theme-toggle" class="btn btn-outline-secondary rounded-circle" type="button" aria-label="{% trans 'Toggle dark mode' %}" title="{% trans 'Toggle dark mode' %}">
+                                <i class="fas fa-moon" aria-hidden="true"></i>
+                            </button>
+                            {% include "includes/language_switcher.html" with form_class="d-inline-flex align-items-center" select_class="form-select form-select-sm rounded-pill border-0 bg-light shadow-none" element_id="trial-language-switcher" %}
+                        </div>
                     </div>
 
                     {% if errors %}
@@ -120,5 +176,28 @@
         </div>
     </div>
 </section>
+<script>
+    const themeToggle = document.getElementById("theme-toggle");
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute("data-bs-theme", theme);
+        if (!themeToggle) return;
+        const icon = themeToggle.querySelector("i");
+        if (icon) {
+            icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
+        }
+        themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+    }
+
+    applyTheme(document.documentElement.getAttribute("data-bs-theme") || "light");
+
+    if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
+            const nextTheme = document.documentElement.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
+            localStorage.setItem("pharmacyai-theme", nextTheme);
+            applyTheme(nextTheme);
+        });
+    }
+</script>
 </body>
 </html>

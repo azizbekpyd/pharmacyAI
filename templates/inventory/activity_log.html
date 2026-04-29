@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Audit Log - Pharmacy Analytic AI" %}{% endblock %}
+{% block page_title %}{% trans "Audit Log" %}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="h3 fw-bold mb-1">{% trans "Activity History" %}</h2>
+    <p class="text-muted mb-0">{% trans "A readable trail of important workspace actions." %}</p>
+</div>
+
+<div class="surface-card p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">{% trans "Date" %}</th>
+                    <th>{% trans "Action" %}</th>
+                    <th>{% trans "Entity" %}</th>
+                    <th>{% trans "Description" %}</th>
+                    <th class="pe-4">{% trans "User" %}</th>
+                </tr>
+            </thead>
+            <tbody id="activity-log-body">
+                <tr><td colspan="5" class="py-5 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>{% trans "Loading..." %}</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const AUDIT_I18N = {
+    empty: "{% trans 'No activity has been recorded yet.' %}",
+    na: "{% trans 'N/A' %}",
+};
+
+async function loadActivityLog() {
+    const response = await fetch('/api/inventory/activity-logs/');
+    const data = await response.json();
+    const rows = data.results || [];
+    const tbody = document.getElementById('activity-log-body');
+    if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-5 text-center text-muted">${AUDIT_I18N.empty}</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = rows.map(item => `
+        <tr>
+            <td class="ps-4 text-muted small">${new Date(item.created_at).toLocaleString(window.APP_LOCALE)}</td>
+            <td><span class="badge text-bg-light border">${item.action_display || item.action}</span></td>
+            <td>${item.entity_type}${item.entity_id ? ' #' + item.entity_id : ''}</td>
+            <td>${item.description || ''}</td>
+            <td class="pe-4">${item.user_name || AUDIT_I18N.na}</td>
+        </tr>
+    `).join('');
+}
+
+loadActivityLog().catch(error => {
+    console.error(error);
+    document.getElementById('activity-log-body').innerHTML = `<tr><td colspan="5" class="py-5 text-center text-danger">${error}</td></tr>`;
+});
+</script>
+{% endblock %}

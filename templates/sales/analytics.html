@@ -5,90 +5,163 @@
 {% block page_title %}{% trans "Sales Analytics" %}{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">{% trans "Sales Analytics" %}</h2>
-    <p class="text-gray-600 mt-1">{% trans "Comprehensive sales analysis and insights" %}</p>
+<div class="mb-4">
+    <h2 class="h3 fw-bold mb-1">{% trans "Sales Analytics" %}</h2>
+    <p class="text-muted mb-0">{% trans "Comprehensive sales analysis and insights" %}</p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <p class="text-sm text-gray-600">{% trans "Total Sales" %}</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2" id="total-sales">{{ total_sales|default:0 }}</p>
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Total Sales" %}</div>
+            <div class="display-6 fw-bold" id="total-sales">{{ total_sales|default:0 }}</div>
+        </div>
     </div>
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <p class="text-sm text-gray-600">{% trans "Total Revenue" %}</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2" id="total-revenue">{{ total_revenue|floatformat:0|default:"0" }} UZS</p>
+    <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Total Revenue" %}</div>
+            <div class="display-6 fw-bold" id="total-revenue">{{ total_revenue|floatformat:0|default:"0" }} UZS</div>
+        </div>
     </div>
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <p class="text-sm text-gray-600">{% trans "Average Sale" %}</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2" id="avg-sale">{{ average_sale|floatformat:0|default:"0" }} UZS</p>
+    <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Average Sale" %}</div>
+            <div class="display-6 fw-bold" id="avg-sale">{{ average_sale|floatformat:0|default:"0" }} UZS</div>
+        </div>
     </div>
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <p class="text-sm text-gray-600">{% trans "Growth" %}</p>
-        <p class="text-3xl font-bold mt-2 {% if growth_percentage >= 0 %}text-green-600{% else %}text-red-600{% endif %}" id="growth">
+    <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Growth" %}</div>
+            <div class="display-6 fw-bold {% if growth_percentage >= 0 %}text-success{% else %}text-danger{% endif %}" id="growth">
             {% if growth_percentage != None %}{% if growth_percentage >= 0 %}+{% endif %}{{ growth_percentage|floatformat:1 }}%{% else %}{% trans "N/A" %}{% endif %}
-        </p>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold mb-4">{% trans "Sales Trend" %}</h3>
-        <p id="sales-trend-empty" class="hidden text-sm text-gray-500 text-center py-6">
-            {% trans "No sales trend data for the selected period." %}
-        </p>
-        <div id="sales-trend-wrap" class="relative h-80">
-            <canvas id="salesTrendChart"></canvas>
-        </div>
-    </div>
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold mb-4">{% trans "Category Distribution" %}</h3>
-        <p id="category-empty" class="hidden text-sm text-gray-500 text-center py-6">
-            {% trans "No category data for the selected period." %}
-        </p>
-        <div id="category-wrap" class="relative h-80">
-            <canvas id="categoryChart"></canvas>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold mb-4">{% trans "Fast Moving Medicines" %}</h3>
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Gross Profit" %}</div>
+            <div class="h2 fw-bold mb-0">{{ gross_profit|floatformat:0|default:"0" }} UZS</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Gross Margin" %}</div>
+            <div class="h2 fw-bold mb-0">{{ gross_margin_percent|floatformat:1|default:"0" }}%</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Stock Retail Value" %}</div>
+            <div class="h2 fw-bold mb-0">{{ stock_retail_value|floatformat:0|default:"0" }} UZS</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="dashboard-card p-4 h-100">
+            <div class="small text-uppercase text-muted fw-semibold mb-2">{% trans "Stock Cost Value" %}</div>
+            <div class="h2 fw-bold mb-0">{{ stock_cost_value|floatformat:0|default:"0" }} UZS</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="surface-card p-4 h-100">
+            <h3 class="h5 fw-bold mb-3">{% trans "Sales Trend" %}</h3>
+            <p id="sales-trend-empty" class="empty-state d-none mb-0">
+                {% trans "No sales trend data for the selected period." %}
+            </p>
+            <div id="sales-trend-wrap" class="position-relative" style="height: 320px;">
+                <canvas id="salesTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="surface-card p-4 h-100">
+            <h3 class="h5 fw-bold mb-3">{% trans "Category Distribution" %}</h3>
+            <p id="category-empty" class="empty-state d-none mb-0">
+                {% trans "No category data for the selected period." %}
+            </p>
+            <div id="category-wrap" class="position-relative" style="height: 320px;">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="surface-card p-4 h-100">
+        <h3 class="h5 fw-bold mb-3">{% trans "Fast Moving Medicines" %}</h3>
         <div id="fast-moving-list">
             {% if fast_moving_medicines %}
                 {% for item in fast_moving_medicines %}
-                <div class="flex justify-between p-3 mb-2 bg-orange-50 rounded">
-                    <div class="flex-1">
-                        <span class="font-medium">{{ item.medicine__name|default:"N/A" }}</span>
-                        <p class="text-sm text-gray-600">{{ item.total_quantity|default:0 }} {% trans "units" %}</p>
+                <div class="d-flex justify-content-between align-items-center gap-3 py-3 border-bottom">
+                    <div>
+                        <div class="fw-semibold">{{ item.medicine__name|default:"N/A" }}</div>
+                        <div class="text-muted small">{{ item.total_quantity|default:0 }} {% trans "units" %}</div>
                     </div>
-                    <span class="text-orange-600 font-semibold">{{ item.total_revenue|floatformat:0 }} UZS</span>
+                    <span class="fw-semibold text-primary">{{ item.total_revenue|floatformat:0 }} UZS</span>
                 </div>
                 {% endfor %}
             {% else %}
-                <p class="text-center text-gray-500 py-4">{% trans "No fast moving medicines" %}</p>
+                <p class="empty-state mb-0">{% trans "No fast moving medicines" %}</p>
             {% endif %}
         </div>
+        </div>
     </div>
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold mb-4">{% trans "Slow Moving Medicines" %}</h3>
+    <div class="col-lg-6">
+        <div class="surface-card p-4 h-100">
+        <h3 class="h5 fw-bold mb-3">{% trans "Slow Moving Medicines" %}</h3>
         <div id="slow-moving-list">
             {% if slow_moving_medicines %}
                 {% for item in slow_moving_medicines %}
-                <div class="flex justify-between p-3 mb-2 bg-blue-50 rounded">
-                    <div class="flex-1">
-                        <span class="font-medium">{{ item.medicine_name|default:"N/A" }}</span>
-                        <p class="text-sm text-gray-600">{{ item.total_quantity|default:0 }} {% trans "units" %}</p>
+                <div class="d-flex justify-content-between align-items-center gap-3 py-3 border-bottom">
+                    <div>
+                        <div class="fw-semibold">{{ item.medicine_name|default:"N/A" }}</div>
+                        <div class="text-muted small">{{ item.total_quantity|default:0 }} {% trans "units" %}</div>
                     </div>
-                    <span class="text-blue-600">{{ item.total_revenue|floatformat:0 }} UZS</span>
+                    <span class="fw-semibold text-primary">{{ item.total_revenue|floatformat:0 }} UZS</span>
                 </div>
                 {% endfor %}
             {% else %}
-                <p class="text-center text-gray-500 py-4">{% trans "No slow moving medicines" %}</p>
+                <p class="empty-state mb-0">{% trans "No slow moving medicines" %}</p>
             {% endif %}
         </div>
+        </div>
     </div>
+</div>
+
+<div class="surface-card p-4 mt-4">
+    <h3 class="h5 fw-bold mb-3">{% trans "Cashier Performance" %}</h3>
+    {% if cashier_performance %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>{% trans "Cashier" %}</th>
+                    <th>{% trans "Sales" %}</th>
+                    <th>{% trans "Revenue" %}</th>
+                    <th>{% trans "Average Sale" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cashier_performance %}
+                <tr>
+                    <td class="fw-semibold">{{ item.user__first_name }} {{ item.user__last_name }}{% if not item.user__first_name and not item.user__last_name %}{{ item.user__username|default:"N/A" }}{% endif %}</td>
+                    <td>{{ item.total_sales|default:0 }}</td>
+                    <td>{{ item.total_revenue|floatformat:0 }} UZS</td>
+                    <td>{{ item.average_sale|floatformat:0 }} UZS</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state mb-0">{% trans "No cashier data for this period." %}</p>
+    {% endif %}
 </div>
 
 {% endblock %}
@@ -121,10 +194,10 @@ function loadAnalytics() {
         const categoryWrap = document.getElementById('category-wrap');
         const categoryEmpty = document.getElementById('category-empty');
         if (categoryWrap) {
-            categoryWrap.classList.add('hidden');
+            categoryWrap.classList.add('d-none');
         }
         if (categoryEmpty) {
-            categoryEmpty.classList.remove('hidden');
+            categoryEmpty.classList.remove('d-none');
         }
     }
 }
@@ -160,19 +233,19 @@ function renderSalesTrendChart(labels, salesData, revenueData) {
 
     if (minLength === 0) {
         if (chartWrap) {
-            chartWrap.classList.add('hidden');
+            chartWrap.classList.add('d-none');
         }
         if (emptyState) {
-            emptyState.classList.remove('hidden');
+            emptyState.classList.remove('d-none');
         }
         return;
     }
 
     if (chartWrap) {
-        chartWrap.classList.remove('hidden');
+        chartWrap.classList.remove('d-none');
     }
     if (emptyState) {
-        emptyState.classList.add('hidden');
+        emptyState.classList.add('d-none');
     }
 
     const formattedLabels = parsedLabels.map(label => {
@@ -300,19 +373,19 @@ function renderCategoryChart(labels, revenueData) {
 
     if (minLength === 0) {
         if (categoryWrap) {
-            categoryWrap.classList.add('hidden');
+            categoryWrap.classList.add('d-none');
         }
         if (categoryEmpty) {
-            categoryEmpty.classList.remove('hidden');
+            categoryEmpty.classList.remove('d-none');
         }
         return;
     }
 
     if (categoryWrap) {
-        categoryWrap.classList.remove('hidden');
+        categoryWrap.classList.remove('d-none');
     }
     if (categoryEmpty) {
-        categoryEmpty.classList.add('hidden');
+        categoryEmpty.classList.add('d-none');
     }
 
     categoryChartInstance = new Chart(ctx, {

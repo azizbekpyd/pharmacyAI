@@ -14,14 +14,16 @@ Formulas:
 from __future__ import annotations
 
 from datetime import timedelta
+from decimal import Decimal
 from math import ceil, sqrt
 
+from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 
 from apps.sales.models import SaleItem
-from .models import Inventory, ReorderRecommendation
+from .models import ActivityLog, Inventory, PurchaseOrder, ReorderRecommendation, StockMovement
 
 
 class InventoryOptimizationService:
@@ -613,9 +615,168 @@ class InventoryOptimizationService:
 
 class InventoryService:
     """
-    Backward-compatible service facade.
+    Operational inventory facade.
     """
 
     @staticmethod
     def generate_reorder_recommendations(pharmacy):
         return InventoryOptimizationService.generate_reorder_recommendations(pharmacy=pharmacy)
+
+    @staticmethod
+    def log_activity(pharmacy, user, action, entity_type, description, entity_id=None, metadata=None):
+        if pharmacy is None:
+            return None
+        return ActivityLog.objects.create(
+            pharmacy=pharmacy,
+            user=user if getattr(user, "is_authenticated", False) else None,
+            action=action,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            description=description,
+            metadata=metadata or {},
+        )
+
+    @staticmethod
+    def record_stock_movement(
+        *,
+        inventory,
+        movement_type,
+        quantity_change,
+        user=None,
+        unit_cost=None,
+        source_type="",
+        source_id=None,
+        reason="",
+    ):
+        return StockMovement.objects.create(
+            pharmacy=inventory.pharmacy,
+            inventory=inventory,
+            medicine=inventory.medicine,
+            movement_type=movement_type,
+            quantity_change=int(quantity_change),
+            stock_after=inventory.current_stock,
+            unit_cost=unit_cost,
+            source_type=source_type,
+            source_id=source_id,
+            reason=reason,
+            user=user if getattr(user, "is_authenticated", False) else None,
+        )
+
+    @staticmethod
+    def adjust_stock(
+        *,
+        inventory,
+        quantity_change,
+        movement_type=StockMovement.TYPE_ADJUSTMENT,
+        user=None,
+        unit_cost=None,
+        source_type="",
+        source_id=None,
+        reason="",
+        mark_restocked=False,
+    ):
+        quantity_change = int(quantity_change)
+        with transaction.atomic():
+            inventory.current_stock = max(0, int(inventory.current_stock) + quantity_change)
+            if mark_restocked or quantity_change > 0:
+                inventory.last_restocked_date = timezone.now()
+                update_fields = ["current_stock", "last_restocked_date", "updated_at"]
+            else:
+                update_fields = ["current_stock", "updated_at"]
+            inventory.save(update_fields=update_fields)
+            movement = InventoryService.record_stock_movement(
+                inventory=inventory,
+                movement_type=movement_type,
+                quantity_change=quantity_change,
+                user=user,
+                unit_cost=unit_cost,
+                source_type=source_type,
+                source_id=source_id,
+                reason=reason,
+            )
+            InventoryService.log_activity(
+                pharmacy=inventory.pharmacy,
+                user=user,
+                action=ActivityLog.ACTION_STOCK,
+                entity_type="Inventory",
+                entity_id=inventory.id,
+                description=f"{inventory.medicine.name}: stock changed by {quantity_change:+d}",
+                metadata={
+                    "medicine_id": inventory.medicine_id,
+                    "movement_type": movement_type,
+                    "quantity_change": quantity_change,
+                    "stock_after": inventory.current_stock,
+                    "source_type": source_type,
+                    "source_id": source_id,
+                },
+            )
+            return movement
+
+    @staticmethod
+    def set_stock(*, inventory, new_quantity, user=None, reason="Manual stock count"):
+        new_quantity = max(0, int(new_quantity))
+        quantity_change = new_quantity - int(inventory.current_stock)
+        movement_type = StockMovement.TYPE_CORRECTION if quantity_change != 0 else StockMovement.TYPE_ADJUSTMENT
+        return InventoryService.adjust_stock(
+            inventory=inventory,
+            quantity_change=quantity_change,
+            movement_type=movement_type,
+            user=user,
+            reason=reason,
+        )
+
+    @staticmethod
+    def receive_purchase_order(purchase_order, user=None):
+        if purchase_order.status == PurchaseOrder.STATUS_RECEIVED:
+            return purchase_order
+
+        with transaction.atomic():
+            purchase_order.recalculate_total()
+            purchase_order.status = PurchaseOrder.STATUS_RECEIVED
+            purchase_order.received_at = timezone.now()
+            purchase_order.save(update_fields=["status", "received_at", "total_cost", "updated_at"])
+
+            for item in purchase_order.items.select_related("medicine"):
+                inventory, _ = Inventory.objects.get_or_create(
+                    medicine=item.medicine,
+                    pharmacy=purchase_order.pharmacy,
+                    defaults={
+                        "current_stock": 0,
+                        "min_stock_level": 20,
+                        "max_stock_level": 120,
+                    },
+                )
+                InventoryService.adjust_stock(
+                    inventory=inventory,
+                    quantity_change=item.quantity,
+                    movement_type=StockMovement.TYPE_PURCHASE,
+                    user=user,
+                    unit_cost=item.unit_cost,
+                    source_type="PurchaseOrder",
+                    source_id=purchase_order.id,
+                    reason=f"Received purchase order {purchase_order.reference_number or purchase_order.id}",
+                    mark_restocked=True,
+                )
+                update_fields = ["cost_price", "updated_at"]
+                item.medicine.cost_price = item.unit_cost
+                if item.expiry_date and (
+                    not item.medicine.expiry_date or item.expiry_date > item.medicine.expiry_date
+                ):
+                    item.medicine.expiry_date = item.expiry_date
+                    update_fields.append("expiry_date")
+                item.medicine.save(update_fields=update_fields)
+
+            InventoryService.log_activity(
+                pharmacy=purchase_order.pharmacy,
+                user=user,
+                action=ActivityLog.ACTION_PURCHASE,
+                entity_type="PurchaseOrder",
+                entity_id=purchase_order.id,
+                description=f"Received purchase order {purchase_order.reference_number or purchase_order.id}",
+                metadata={
+                    "supplier_id": purchase_order.supplier_id,
+                    "total_cost": str(purchase_order.total_cost or Decimal("0.00")),
+                    "items": purchase_order.items.count(),
+                },
+            )
+            return purchase_order

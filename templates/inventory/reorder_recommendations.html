@@ -5,31 +5,31 @@
 {% block page_title %}{% trans "Reorder Recommendations" %}{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex items-center justify-between">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
     <div>
-        <h2 class="text-2xl font-bold text-gray-800">{% trans "Reorder Recommendations" %}</h2>
-        <p class="text-gray-600 mt-1">{% trans "Automatic reorder suggestions based on inventory levels" %}</p>
+        <h2 class="h3 fw-bold mb-1">{% trans "Reorder Recommendations" %}</h2>
+        <p class="text-muted mb-0">{% trans "Automatic reorder suggestions based on inventory levels" %}</p>
     </div>
-    <button onclick="generateRecommendations()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-        <i class="fas fa-sync mr-2"></i>{% trans "Generate Recommendations" %}
+    <button onclick="generateRecommendations()" class="btn btn-primary px-4">
+        <i class="fas fa-sync me-2"></i>{% trans "Generate Recommendations" %}
     </button>
 </div>
 
-<div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+<div class="surface-card p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Medicine" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Current Stock" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Recommended Qty" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Priority" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Status" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Actions" %}</th>
+                    <th class="ps-4">{% trans "Medicine" %}</th>
+                    <th>{% trans "Current Stock" %}</th>
+                    <th>{% trans "Recommended Qty" %}</th>
+                    <th>{% trans "Priority" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th class="text-end pe-4">{% trans "Actions" %}</th>
                 </tr>
             </thead>
-            <tbody id="recommendations-table-body" class="bg-white divide-y divide-gray-200">
-                <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin"></i> {% trans "Loading..." %}</td></tr>
+            <tbody id="recommendations-table-body">
+                <tr><td colspan="6" class="py-5 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>{% trans "Loading..." %}</td></tr>
             </tbody>
         </table>
     </div>
@@ -64,36 +64,36 @@ async function loadRecommendations() {
 function renderRecommendations(recommendations) {
     const tbody = document.getElementById('recommendations-table-body');
     if (recommendations.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">${I18N.noPending}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-5 text-center text-muted">${I18N.noPending}</td></tr>`;
         return;
     }
 
     const priorityColors = {
-        'URGENT': 'bg-red-100 text-red-800',
-        'HIGH': 'bg-orange-100 text-orange-800',
-        'MEDIUM': 'bg-yellow-100 text-yellow-800',
-        'LOW': 'bg-blue-100 text-blue-800'
+        'URGENT': 'text-bg-danger',
+        'HIGH': 'text-bg-warning',
+        'MEDIUM': 'text-bg-info',
+        'LOW': 'text-bg-primary'
     };
 
     tbody.innerHTML = recommendations.map(rec => `
-        <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900">${rec.medicine_name || I18N.na}</div>
-                <div class="text-sm text-gray-500">${rec.medicine_sku || ''}</div>
+        <tr>
+            <td class="ps-4">
+                <div class="fw-semibold">${rec.medicine_name || I18N.na}</div>
+                <div class="text-muted small">${rec.medicine_sku || ''}</div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold">${rec.current_stock || 0}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">${rec.recommended_quantity || 0}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 py-1 text-xs rounded ${priorityColors[rec.priority] || 'bg-gray-100'}">${rec.priority_display || rec.priority}</span>
+            <td class="text-danger fw-semibold">${rec.current_stock || 0}</td>
+            <td class="fw-semibold">${rec.recommended_quantity || 0}</td>
+            <td>
+                <span class="badge rounded-pill ${priorityColors[rec.priority] || 'text-bg-secondary'}">${rec.priority_display || rec.priority}</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">${rec.status_display || rec.status}</span>
+            <td>
+                <span class="badge rounded-pill text-bg-warning">${rec.status_display || rec.status}</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <button onclick="approveRecommendation(${rec.id})" class="text-green-600 hover:text-green-900 mr-3">
+            <td class="text-end pe-4">
+                <button onclick="approveRecommendation(${rec.id})" class="btn btn-sm btn-outline-success me-2">
                     <i class="fas fa-check"></i> ${I18N.approve}
                 </button>
-                <button onclick="rejectRecommendation(${rec.id})" class="text-red-600 hover:text-red-900">
+                <button onclick="rejectRecommendation(${rec.id})" class="btn btn-sm btn-outline-danger">
                     <i class="fas fa-times"></i> ${I18N.reject}
                 </button>
             </td>

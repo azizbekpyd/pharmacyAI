@@ -5,31 +5,43 @@
 {% block page_title %}{% trans "Inventory Management" %}{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex items-center justify-between">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
     <div>
-        <h2 class="text-2xl font-bold text-gray-800">{% trans "Inventory" %}</h2>
-        <p class="text-gray-600 mt-1">{% trans "Monitor stock levels and manage inventory" %}</p>
+        <h2 class="h3 fw-bold mb-1">{% trans "Inventory" %}</h2>
+        <p class="text-muted mb-0">{% trans "Monitor stock levels and manage inventory" %}</p>
     </div>
-    <a href="{% url 'inventory-reorder-recommendations' %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
-        <i class="fas fa-exclamation-triangle mr-2"></i>{% trans "Reorder Alerts" %}
-    </a>
+    <div class="d-flex flex-wrap gap-2">
+        <a href="/api/inventory/inventory/export_csv/" class="btn btn-outline-secondary px-4">
+            <i class="fas fa-file-csv me-2"></i>{% trans "Export CSV" %}
+        </a>
+        <label class="btn btn-outline-secondary px-4 mb-0">
+            <i class="fas fa-file-import me-2"></i>{% trans "Import CSV" %}
+            <input id="inventory-import-input" type="file" accept=".csv,text/csv" class="d-none">
+        </label>
+        <a href="{% url 'inventory-stock-movements' %}" class="btn btn-outline-primary px-4">
+            <i class="fas fa-right-left me-2"></i>{% trans "Stock Ledger" %}
+        </a>
+        <a href="{% url 'inventory-reorder-recommendations' %}" class="btn btn-danger px-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>{% trans "Reorder Alerts" %}
+        </a>
+    </div>
 </div>
 
-<div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+<div class="surface-card p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Medicine" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Current Stock" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Min Level" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Max Level" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Status" %}</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Actions" %}</th>
+                    <th class="ps-4">{% trans "Medicine" %}</th>
+                    <th>{% trans "Current Stock" %}</th>
+                    <th>{% trans "Min Level" %}</th>
+                    <th>{% trans "Max Level" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th class="text-end pe-4">{% trans "Actions" %}</th>
                 </tr>
             </thead>
-            <tbody id="inventory-table-body" class="bg-white divide-y divide-gray-200">
-                <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin"></i> {% trans "Loading..." %}</td></tr>
+            <tbody id="inventory-table-body">
+                <tr><td colspan="6" class="py-5 text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>{% trans "Loading..." %}</td></tr>
             </tbody>
         </table>
     </div>
@@ -46,6 +58,8 @@ const I18N = {
     good: "{% trans 'Good' %}",
     na: "{% trans 'N/A' %}",
     enterQuantity: "{% trans 'Enter new stock quantity:' %}",
+    importComplete: "{% trans 'Inventory import complete.' %}",
+    importFailed: "{% trans 'Inventory import failed.' %}",
 };
 
 async function loadInventory() {
@@ -61,32 +75,32 @@ async function loadInventory() {
 function renderInventory(inventory) {
     const tbody = document.getElementById('inventory-table-body');
     if (inventory.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">${I18N.noInventory}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-5 text-center text-muted">${I18N.noInventory}</td></tr>`;
         return;
     }
 
     tbody.innerHTML = inventory.map(item => {
         const needsReorder = item.needs_reorder;
         const stockPercent = item.stock_percentage || 0;
-        const statusClass = needsReorder ? 'bg-red-100 text-red-800' : stockPercent < 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800';
+        const statusClass = needsReorder ? 'text-bg-danger' : stockPercent < 50 ? 'text-bg-warning' : 'text-bg-success';
         const statusText = needsReorder ? I18N.lowStock : stockPercent < 50 ? I18N.medium : I18N.good;
 
         return `
-            <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">${item.medicine_name || I18N.na}</div>
-                    <div class="text-sm text-gray-500">${item.medicine_sku || ''}</div>
+            <tr>
+                <td class="ps-4">
+                    <div class="fw-semibold">${item.medicine_name || I18N.na}</div>
+                    <div class="text-muted small">${item.medicine_sku || ''}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm ${needsReorder ? 'text-red-600 font-semibold' : 'text-gray-900'}">
+                <td class="${needsReorder ? 'text-danger fw-semibold' : 'fw-semibold'}">
                     ${item.current_stock || 0}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.min_stock_level || 0}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.max_stock_level || 0}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs rounded ${statusClass}">${statusText}</span>
+                <td class="text-muted">${item.min_stock_level || 0}</td>
+                <td class="text-muted">${item.max_stock_level || 0}</td>
+                <td>
+                    <span class="badge rounded-pill ${statusClass}">${statusText}</span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <button onclick="updateStock(${item.id})" class="text-blue-600 hover:text-blue-900">
+                <td class="text-end pe-4">
+                    <button onclick="updateStock(${item.id})" class="btn btn-sm btn-outline-primary" aria-label="Update stock">
                         <i class="fas fa-edit"></i>
                     </button>
                 </td>
@@ -127,6 +141,27 @@ function getCookie(name) {
 }
 
 loadInventory();
+
+document.getElementById('inventory-import-input')?.addEventListener('change', async (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+        const response = await fetch('/api/inventory/inventory/import_csv/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCookie('csrftoken') },
+            body: formData
+        });
+        if (!response.ok) throw new Error(I18N.importFailed);
+        alert(I18N.importComplete);
+        loadInventory();
+    } catch (error) {
+        alert(error.message || I18N.importFailed);
+    } finally {
+        event.target.value = '';
+    }
+});
 </script>
 {% endblock %}
 

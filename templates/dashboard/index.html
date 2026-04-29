@@ -47,6 +47,9 @@
                     <div class="small text-warning">
                         <i class="fas fa-clock me-1"></i><span id="expiring-count">-</span> {% trans "expiring soon" %}
                     </div>
+                    <div class="small text-danger">
+                        <i class="fas fa-ban me-1"></i><span id="expired-count">-</span> {% trans "expired" %}
+                    </div>
                 </div>
                 <span class="status-pill bg-warning-subtle text-warning-emphasis">
                     <i class="fas fa-capsules"></i>
@@ -62,6 +65,9 @@
                     <div class="display-6 fw-bold mb-2" id="low-stock-count">-</div>
                     <div class="small text-danger">
                         <i class="fas fa-triangle-exclamation me-1"></i>{% trans "Needs reorder" %}
+                    </div>
+                    <div class="small text-muted">
+                        <i class="fas fa-circle-xmark me-1"></i><span id="out-stock-count">-</span> {% trans "out of stock" %}
                     </div>
                 </div>
                 <span class="status-pill bg-danger-subtle text-danger">
@@ -242,34 +248,16 @@ const I18N = {
   revenueUZS: "{% trans 'Revenue (UZS)' %}",
 };
 
-const DASHBOARD = {
-  totalSales: {{ total_sales|default:0 }},
-  totalRevenueUZS: {{ total_revenue_uzs|default:0|floatformat:0 }},
-  salesGrowthPct: {{ sales_growth_pct|default:"null" }},
-  revenueGrowthPct: {{ revenue_growth_pct|default:"null" }},
-  medicinesCount: {{ medicines_count|default:0 }},
-  expiringSoonCount: {{ expiring_soon_count|default:0 }},
-  lowStockCount: {{ low_stock_count|default:0 }},
-  trendLabels: {{ trend_labels_json|safe }},
-  trendSales: {{ trend_sales_json|safe }},
-  trendRevenue: {{ trend_revenue_json|safe }},
-  categoryLabels: {{ category_labels_json|safe }},
-  categoryRevenue: {{ category_revenue_json|safe }},
-  fastMoving: {{ fast_moving_json|safe }},
-  slowMoving: {{ slow_moving_json|safe }},
-  recentSales: {{ recent_sales_json|safe }},
-  alerts: {{ alerts_json|safe }},
-  forecastReorder: {{ forecast_reorder_json|safe }},
-  forecastChart: {{ forecast_chart_json|safe }},
-  serviceLevel: {{ service_level_json|safe }},
-};
+const DASHBOARD = {{ dashboard_payload_json|safe }};
 
 function loadDashboardData() {
   document.getElementById("total-sales").textContent = DASHBOARD.totalSales || 0;
   document.getElementById("total-revenue").textContent = formatUZS(DASHBOARD.totalRevenueUZS || 0);
   document.getElementById("total-medicines").textContent = DASHBOARD.medicinesCount || 0;
   document.getElementById("expiring-count").textContent = DASHBOARD.expiringSoonCount || 0;
+  document.getElementById("expired-count").textContent = DASHBOARD.expiredCount || 0;
   document.getElementById("low-stock-count").textContent = DASHBOARD.lowStockCount || 0;
+  document.getElementById("out-stock-count").textContent = DASHBOARD.outOfStockCount || 0;
 
   applyGrowth("sales-growth", DASHBOARD.salesGrowthPct);
   applyGrowth("revenue-growth", DASHBOARD.revenueGrowthPct);
