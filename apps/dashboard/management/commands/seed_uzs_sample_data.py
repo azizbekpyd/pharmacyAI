@@ -15,12 +15,22 @@ from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 import random
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
 from apps.accounts.models import User
-from apps.inventory.models import Inventory, ReorderRecommendation
+from apps.inventory.models import (
+    ActivityLog,
+    Inventory,
+    PurchaseOrder,
+    PurchaseOrderItem,
+    ReorderRecommendation,
+    StockMovement,
+    Supplier,
+)
+from apps.inventory.services import InventoryService
 from apps.medicines.models import Category, Medicine
 from apps.sales.models import Sale, SaleItem
 from apps.tenants.models import Pharmacy
@@ -52,12 +62,17 @@ class Command(BaseCommand):
         medicines = self._create_medicines(categories, pharmacy)
         self._create_inventory(medicines, pharmacy)
         self._ensure_inventory_records(medicines, pharmacy)
+        suppliers = self._create_suppliers(pharmacy)
+        purchase_orders_count = self._create_purchase_orders(medicines, suppliers, users, pharmacy)
         sales_count, total_revenue = self._create_sales(medicines, users, days, pharmacy)
         self._normalize_inventory_levels(pharmacy)
+        reorder_count = self._create_reorder_alerts(pharmacy, users[1])
 
         self.stdout.write(self.style.SUCCESS("UZS sample data seeded successfully."))
         self.stdout.write(f"Medicines: {len(medicines)}")
         self.stdout.write(f"Sales: {sales_count}")
+        self.stdout.write(f"Purchase Orders: {purchase_orders_count}")
+        self.stdout.write(f"Pending Reorder Recommendations: {reorder_count}")
         self.stdout.write(f"Total Revenue: {total_revenue:,.2f} UZS")
 
     def _reset_data(self):
@@ -65,6 +80,11 @@ class Command(BaseCommand):
         SaleItem.objects.all().delete()
         Sale.objects.all().delete()
         ReorderRecommendation.objects.all().delete()
+        PurchaseOrderItem.objects.all().delete()
+        PurchaseOrder.objects.all().delete()
+        StockMovement.objects.all().delete()
+        ActivityLog.objects.all().delete()
+        Supplier.objects.all().delete()
         Inventory.objects.all().delete()
         Medicine.objects.all().delete()
         Category.objects.all().delete()
@@ -99,14 +119,15 @@ class Command(BaseCommand):
         return [admin, manager]
 
     def _ensure_pharmacy(self, owner, users):
+        pharmacy_name = getattr(settings, "DEMO_PHARMACY_NAME", "Pharmacy Alpha")
         pharmacy, _ = Pharmacy.objects.get_or_create(
-            name="Default Pharmacy",
+            name=pharmacy_name,
             defaults={
                 "owner": owner,
                 "plan_type": Pharmacy.PlanType.BASIC,
             },
         )
-        if pharmacy.owner_id != owner.id:
+        if pharmacy.owner_id is None:
             pharmacy.owner = owner
             pharmacy.save(update_fields=["owner"])
 
@@ -178,6 +199,86 @@ class Command(BaseCommand):
                 max_stock_level=max_stock,
                 last_restocked_date=timezone.now() - timedelta(days=random.randint(1, 30)),
             )
+
+    def _create_suppliers(self, pharmacy):
+        suppliers_data = [
+            {
+                "name": "Tashkent Med Supply",
+                "contact_person": "Aziz Karimov",
+                "phone": "+998 90 123 45 67",
+                "email": "sales@tashmed.uz",
+                "address": "Toshkent, Yunusobod tumani",
+                "notes": "Fast-moving pain relief and cold medicine distributor.",
+            },
+            {
+                "name": "UzPharm Wholesale",
+                "contact_person": "Dilnoza Yusupova",
+                "phone": "+998 71 245 10 20",
+                "email": "orders@uzpharm.uz",
+                "address": "Toshkent, Chilonzor tumani",
+                "notes": "Primary supplier for antibiotics and prescription stock.",
+            },
+            {
+                "name": "HealthLine Distribution",
+                "contact_person": "Oybek Rasulov",
+                "phone": "+998 93 555 80 80",
+                "email": "info@healthline.uz",
+                "address": "Samarqand, Registon ko'chasi",
+                "notes": "Vitamins, supplements, and wellness products.",
+            },
+        ]
+        return [Supplier.objects.create(pharmacy=pharmacy, **row) for row in suppliers_data]
+
+    def _create_purchase_orders(self, medicines, suppliers, users, pharmacy):
+        by_sku = {medicine.sku: medicine for medicine in medicines}
+        orders_data = [
+            {
+                "supplier": suppliers[0],
+                "reference_number": "PO-2026-001",
+                "received": True,
+                "items": [("MED001", 80, "7600"), ("MED004", 60, "11200"), ("MED005", 32, "16800")],
+            },
+            {
+                "supplier": suppliers[1],
+                "reference_number": "PO-2026-002",
+                "received": True,
+                "items": [("MED002", 45, "26000"), ("MED008", 24, "18500"), ("MED010", 18, "53000")],
+            },
+            {
+                "supplier": suppliers[2],
+                "reference_number": "PO-2026-003",
+                "received": False,
+                "items": [("MED003", 50, "14500"), ("MED007", 30, "43000"), ("MED012", 22, "67000")],
+            },
+        ]
+
+        for index, order_data in enumerate(orders_data):
+            order = PurchaseOrder.objects.create(
+                pharmacy=pharmacy,
+                supplier=order_data["supplier"],
+                reference_number=order_data["reference_number"],
+                created_by=random.choice(users),
+                notes=f"Demo purchase order #{index + 1}",
+            )
+            for sku, quantity, unit_cost in order_data["items"]:
+                medicine = by_sku.get(sku)
+                if medicine is None:
+                    continue
+                PurchaseOrderItem.objects.create(
+                    purchase_order=order,
+                    pharmacy=pharmacy,
+                    medicine=medicine,
+                    quantity=quantity,
+                    unit_cost=Decimal(unit_cost),
+                    expiry_date=date.today() + timedelta(days=random.randint(180, 540)),
+                    batch_number=f"B-{sku}-{index + 1}",
+                )
+            order.recalculate_total()
+            order.save(update_fields=["total_cost", "updated_at"])
+            if order_data["received"]:
+                InventoryService.receive_purchase_order(order, user=random.choice(users))
+
+        return len(orders_data)
 
     def _ensure_inventory_records(self, medicines, pharmacy):
         """
@@ -298,13 +399,62 @@ class Command(BaseCommand):
                     sale_total += sale_item.subtotal
 
                     inventory = medicine.inventory
-                    inventory.current_stock = max(0, inventory.current_stock - quantity)
-                    inventory.save(update_fields=["current_stock", "updated_at"])
+                    InventoryService.adjust_stock(
+                        inventory=inventory,
+                        quantity_change=-quantity,
+                        movement_type=StockMovement.TYPE_SALE,
+                        user=sale.user,
+                        source_type="Sale",
+                        source_id=sale.id,
+                        reason=f"Sample sale {sale.id}",
+                    )
 
                 Sale.objects.filter(pk=sale.pk).update(total_amount=sale_total)
+                InventoryService.log_activity(
+                    pharmacy=pharmacy,
+                    user=sale.user,
+                    action=ActivityLog.ACTION_SALE,
+                    entity_type="Sale",
+                    entity_id=sale.id,
+                    description=f"Sample sale completed: {sale_total:,.2f} UZS",
+                    metadata={"items": item_count, "total_amount": str(sale_total)},
+                )
                 sales_created += 1
                 grand_total += sale_total
 
             day += timedelta(days=1)
 
         return sales_created, grand_total
+
+    def _create_reorder_alerts(self, pharmacy, user):
+        low_stock_targets = {
+            "MED003": 6,
+            "MED005": 4,
+            "MED008": 3,
+            "MED010": 7,
+        }
+        inventories = Inventory.objects.select_related("medicine").filter(
+            pharmacy=pharmacy,
+            medicine__sku__in=low_stock_targets.keys(),
+        )
+        for inventory in inventories:
+            target_stock = low_stock_targets[inventory.medicine.sku]
+            if inventory.current_stock == target_stock:
+                continue
+            InventoryService.set_stock(
+                inventory=inventory,
+                new_quantity=target_stock,
+                user=user,
+                reason="Demo low-stock scenario",
+            )
+
+        recommendations = InventoryService.generate_reorder_recommendations(pharmacy=pharmacy)
+        InventoryService.log_activity(
+            pharmacy=pharmacy,
+            user=user,
+            action=ActivityLog.ACTION_CREATE,
+            entity_type="ReorderRecommendation",
+            description=f"Generated {len(recommendations)} demo reorder recommendations",
+            metadata={"count": len(recommendations)},
+        )
+        return ReorderRecommendation.objects.filter(pharmacy=pharmacy, status="PENDING").count()

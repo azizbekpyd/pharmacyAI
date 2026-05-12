@@ -1806,3 +1806,91 @@ msgstr "pozitsiya"
 #: .\templates\sales\list.html:62
 msgid "Page"
 msgstr "Sahifa"
+
+#: .\templates\base.html:417 .\templates\inventory\purchases.html:4
+#: .\templates\inventory\purchases.html:5
+msgid "Purchases"
+msgstr "Xaridlar"
+
+#: .\templates\base.html:421 .\templates\inventory\stock_movements.html:4
+#: .\templates\inventory\stock_movements.html:5
+#: .\templates\inventory\purchases.html:14 .\templates\inventory\list.html:22
+msgid "Stock Ledger"
+msgstr "Zaxira jurnali"
+
+#: .\templates\base.html:425 .\templates\inventory\activity_log.html:4
+#: .\templates\inventory\activity_log.html:5
+msgid "Audit Log"
+msgstr "Audit jurnali"
+
+#: .\templates\inventory\purchases.html:10
+msgid "Suppliers & Purchases"
+msgstr "Yetkazib beruvchilar va xaridlar"
+
+#: .\templates\inventory\purchases.html:11
+msgid "Track supplier purchases and receive incoming stock into inventory."
+msgstr "Yetkazib beruvchi xaridlarini kuzating va kelgan zaxirani inventarga qabul qiling."
+
+#: .\templates\inventory\purchases.html:21
+msgid "Suppliers"
+msgstr "Yetkazib beruvchilar"
+
+#: .\templates\inventory\purchases.html:29
+msgid "Purchase Orders"
+msgstr "Xarid buyurtmalari"
+
+#: .\templates\inventory\purchases.html:41
+msgid "No suppliers yet."
+msgstr "Hali yetkazib beruvchilar yo'q."
+
+#: .\templates\inventory\purchases.html:42
+msgid "No purchase orders yet."
+msgstr "Hali xarid buyurtmalari yo'q."
+
+#: .\templates\inventory\purchases.html:43
+msgid "Received"
+msgstr "Qabul qilingan"
+
+#: .\templates\inventory\purchases.html:44
+msgid "Draft"
+msgstr "Qoralama"
+
+#: .\templates\inventory\stock_movements.html:10
+msgid "Stock Movement Ledger"
+msgstr "Zaxira harakati jurnali"
+
+#: .\templates\inventory\stock_movements.html:11
+msgid "Trace every purchase, sale, adjustment, return, and expiry removal."
+msgstr "Har bir xarid, savdo, tuzatish, qaytarish va muddati o'tgan mahsulot chiqarilishini kuzating."
+
+#: .\templates\inventory\stock_movements.html:25
+msgid "Change"
+msgstr "O'zgarish"
+
+#: .\templates\inventory\stock_movements.html:26
+msgid "Stock After"
+msgstr "Keyingi zaxira"
+
+#: .\templates\inventory\stock_movements.html:27
+msgid "Source"
+msgstr "Manba"
+
+#: .\templates\inventory\stock_movements.html:40
+msgid "No stock movements yet."
+msgstr "Hali zaxira harakatlari yo'q."
+
+#: .\templates\inventory\activity_log.html:9
+msgid "Activity History"
+msgstr "Faoliyat tarixi"
+
+#: .\templates\inventory\activity_log.html:10
+msgid "A readable trail of important workspace actions."
+msgstr "Ish maydonidagi muhim amallar bo'yicha tushunarli tarix."
+
+#: .\templates\inventory\activity_log.html:23
+msgid "Entity"
+msgstr "Obyekt"
+
+#: .\templates\inventory\activity_log.html:37
+msgid "No activity has been recorded yet."
+msgstr "Hali faoliyat yozuvlari mavjud emas."
